@@ -9,9 +9,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent mb-4">
-              Expand Global
-            </h3>
+            <Link to="/" className="flex items-center gap-3 mb-4 group">
+              <img
+                src="/expand-global-logo.jpg"
+                alt="Expand Global Logo"
+                className="w-10 h-10 rounded-lg object-cover ring-2 ring-purple-600/30 group-hover:ring-purple-600/60 transition-all duration-300"
+              />
+              <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+                Expand Global
+              </h3>
+            </Link>
             <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
               We bring brands to life through creative design and strategic branding. 
               Let's create something extraordinary together.

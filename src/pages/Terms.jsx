@@ -1,4 +1,5 @@
 import { HiShieldCheck, HiDocumentText, HiLockClosed, HiScale } from 'react-icons/hi';
+import { motion } from 'framer-motion';
 
 const sections = [
   {
@@ -56,33 +57,50 @@ const sections = [
 export default function Terms() {
   return (
     <div className="pt-20">
-      {/* Hero */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-16">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-transparent to-fuchsia-600/5 dark:from-purple-900/20 dark:to-transparent" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            className="max-w-3xl mx-auto text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <h1 className="text-5xl sm:text-6xl font-bold mb-6 tracking-tight">
               Terms &{' '}
-              <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
-                Conditions
-              </span>
+              <span className="text-gradient">Conditions</span>
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
-              Please read these terms carefully before using our services. By working with 
+              Please read these terms carefully before using our services. By working with
               Expand Global, you agree to the following terms and conditions.
             </p>
             <p className="text-sm text-[var(--text-secondary)] mt-4">
               Last updated: June 2026
             </p>
-          </div>
+          </motion.div>
 
-          <div className="max-w-4xl mx-auto space-y-6">
+          <motion.div
+            className="max-w-4xl mx-auto space-y-6"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+            }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+          >
             {sections.map(({ icon: Icon, title, content }) => (
-              <div
+              <motion.div
                 key={title}
-                className="p-6 sm:p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-purple-600/30 dark:hover:border-purple-400/30 transition-all duration-300"
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                }}
+                className="group p-6 sm:p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-purple-600/30 dark:hover:border-purple-400/30 transition-all duration-500 relative overflow-hidden"
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-fuchsia-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="flex items-start gap-4 relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="text-xl text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
@@ -90,22 +108,30 @@ export default function Terms() {
                     <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{content}</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          <div className="max-w-3xl mx-auto mt-12 p-8 rounded-2xl bg-gradient-to-br from-purple-600/10 to-purple-400/5 dark:from-purple-900/20 dark:to-purple-900/10 border border-purple-600/20 dark:border-purple-400/20 text-center">
+          <motion.div
+            className="max-w-3xl mx-auto mt-12 p-8 rounded-2xl bg-gradient-to-br from-purple-600/10 to-fuchsia-500/5 dark:from-purple-900/20 dark:to-fuchsia-900/10 border border-purple-600/20 dark:border-purple-400/20 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             <h3 className="text-xl font-semibold mb-4">Have Questions?</h3>
             <p className="text-[var(--text-secondary)] mb-6">
-              If you have any questions about these terms, please don't hesitate to contact us.
+              If you have any questions about these terms, please don&apos;t hesitate to contact us.
             </p>
-            <a
+            <motion.a
               href="mailto:hello@expandglobal.com"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-full transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
             >
               Contact Us
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
         </div>
       </section>
     </div>

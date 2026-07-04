@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HiPaperAirplane, HiPhotograph, HiColorSwatch, HiTemplate, HiOfficeBuilding } from 'react-icons/hi';
-import { FaPalette, FaBullhorn, FaLaptopCode } from 'react-icons/fa';
+import { FaPalette, FaBullhorn } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const designServices = [
   { icon: FaPalette, label: 'Logo Design' },
   { icon: FaBullhorn, label: 'Brand Identity' },
-  { icon: FaLaptopCode, label: 'UI/UX Design' },
+  { icon: null, label: 'Others' },
   { icon: HiTemplate, label: 'Polo Branding' },
   { icon: HiOfficeBuilding, label: 'Signage Design' },
   { icon: HiPhotograph, label: 'Photo Framing' },
@@ -14,16 +16,34 @@ const designServices = [
 ];
 
 export default function RequestDesign() {
+  const { currentUser, saveDesignRequest, getUserProfile } = useAuth();
+  const [submitted, setSubmitted] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  const displayName = profile
+    ? [profile.surname, profile.firstName, profile.lastName].filter(Boolean).join(' ')
+    : currentUser?.displayName || '';
+
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    name: displayName,
+    email: currentUser?.email || '',
     phone: '',
     service: '',
     description: '',
-    budget: '',
     timeline: '',
   });
-  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      getUserProfile(currentUser.uid).then((p) => {
+        setProfile(p);
+        const name = p
+          ? [p.surname, p.firstName, p.lastName].filter(Boolean).join(' ')
+          : currentUser?.displayName || '';
+        setFormData((prev) => ({ ...prev, name, email: currentUser?.email || '' }));
+      });
+    }
+  }, [currentUser, getUserProfile]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,29 +51,56 @@ export default function RequestDesign() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    saveDesignRequest(formData);
     setSubmitted(true);
-    setFormData({ name: '', email: '', phone: '', service: '', description: '', budget: '', timeline: '' });
+    setFormData({ name: displayName, email: currentUser?.email || '', phone: '', service: '', description: '', timeline: '' });
   };
+
+  function ServiceIcon({ icon, selected }) {
+    if (!icon) {
+      return (
+        <svg className={`text-2xl mx-auto mb-2 transition-colors duration-300 ${selected ? 'text-purple-600' : 'text-purple-400 group-hover:text-purple-600'}`} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="16" />
+          <line x1="8" y1="12" x2="16" y2="12" />
+        </svg>
+      );
+    }
+    const Icon = icon;
+    return <Icon className={`text-2xl mx-auto mb-2 transition-colors duration-300 ${selected ? 'text-purple-600' : 'text-purple-400 group-hover:text-purple-600'}`} />;
+  }
 
   if (submitted) {
     return (
       <div className="pt-20 min-h-screen flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-700/20 via-purple-500/10 to-purple-600/10 dark:from-purple-900/20 dark:via-transparent dark:to-purple-900/10" />
-        <div className="relative z-10 text-center max-w-lg mx-auto px-4">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-purple-400 flex items-center justify-center mx-auto mb-6 animate-bounce shadow-xl shadow-purple-600/30">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-700/20 via-purple-500/10 to-fuchsia-600/10 dark:from-purple-900/20 dark:via-transparent dark:to-fuchsia-900/10" />
+        <motion.div
+          className="relative z-10 text-center max-w-lg mx-auto px-4"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
+            className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-purple-600/30"
+          >
             <HiPaperAirplane className="text-4xl text-white rotate-45" />
-          </div>
+          </motion.div>
           <h2 className="text-3xl font-bold mb-4">Request Submitted!</h2>
           <p className="text-[var(--text-secondary)] mb-8">
-            Thank you for your design request. We'll review the details and get back to you within 24-48 hours with a custom proposal.
+            Thank you for your design request. We&apos;ll review the details and get back to you within 24-48 hours with a custom proposal.
           </p>
-          <button
+          <motion.button
             onClick={() => setSubmitted(false)}
-            className="px-8 py-3 bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-800 hover:to-purple-600 text-white font-medium rounded-full transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40 cursor-pointer"
+            className="px-8 py-3 bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-800 hover:to-purple-600 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40 cursor-pointer"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
           >
             Submit Another Request
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
@@ -61,43 +108,70 @@ export default function RequestDesign() {
   return (
     <div className="pt-20">
       <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-700/20 via-purple-500/10 to-purple-600/10 dark:from-purple-900/20 dark:via-transparent dark:to-purple-900/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-700/20 via-purple-500/10 to-fuchsia-600/10 dark:from-purple-900/20 dark:via-transparent dark:to-fuchsia-900/10" />
+        <div className="absolute top-10 left-10 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-blob" />
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-fuchsia-500/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '3s' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
+          <motion.div
+            className="max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <h1 className="text-5xl sm:text-6xl font-bold mb-6 tracking-tight">
               Request a{' '}
-              <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
-                Design
-              </span>
+              <span className="text-gradient">Design</span>
             </h1>
             <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
-              Tell us about your project and we'll create a custom solution tailored to your brand.
+              Tell us about your project and we&apos;ll create a custom solution tailored to your brand.
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-8 mb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
-            {designServices.map(({ icon: Icon, label }) => (
-              <div
+          <motion.div
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+            }}
+            initial="hidden"
+            animate="visible"
+          >
+            {designServices.map(({ icon, label }) => (
+              <motion.div
                 key={label}
-                className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-purple-600/30 transition-all duration-300 text-center group cursor-pointer"
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+                }}
+                className={`p-5 rounded-xl border transition-all duration-300 text-center group cursor-pointer ${
+                  formData.service === label
+                    ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20 shadow-md'
+                    : 'border-[var(--border-color)] bg-[var(--bg-secondary)] hover:border-purple-600/30 hover:shadow-sm'
+                }`}
                 onClick={() => setFormData({ ...formData, service: label })}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.97 }}
               >
-                <Icon className={`text-2xl mx-auto mb-2 transition-colors duration-300 ${
-                  formData.service === label ? 'text-purple-600' : 'text-purple-400 group-hover:text-purple-600'
-                }`} />
+                <ServiceIcon icon={icon} selected={formData.service === label} />
                 <span className={`text-xs font-medium ${
                   formData.service === label ? 'text-purple-600 dark:text-purple-400' : 'text-[var(--text-secondary)]'
                 }`}>{label}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="max-w-3xl mx-auto">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <motion.form
+              onSubmit={handleSubmit}
+              className="space-y-6 glass-strong rounded-2xl p-8 shadow-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">Your Name *</label>
@@ -105,10 +179,9 @@ export default function RequestDesign() {
                     type="text"
                     name="name"
                     value={formData.name}
-                    onChange={handleChange}
+                    readOnly
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:outline-none focus:ring-2 focus:ring-purple-600/50 focus:border-purple-600 transition-all duration-200"
-                    placeholder="John Doe"
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] opacity-60 border border-[var(--border-color)] cursor-not-allowed transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -117,10 +190,9 @@ export default function RequestDesign() {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    readOnly
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:outline-none focus:ring-2 focus:ring-purple-600/50 focus:border-purple-600 transition-all duration-200"
-                    placeholder="john@example.com"
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] opacity-60 border border-[var(--border-color)] cursor-not-allowed transition-all duration-200"
                   />
                 </div>
               </div>
@@ -136,22 +208,6 @@ export default function RequestDesign() {
                     className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:outline-none focus:ring-2 focus:ring-purple-600/50 focus:border-purple-600 transition-all duration-200"
                     placeholder="+1 (555) 000-0000"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Budget Range</label>
-                  <select
-                    name="budget"
-                    value={formData.budget}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus:outline-none focus:ring-2 focus:ring-purple-600/50 focus:border-purple-600 transition-all duration-200"
-                  >
-                    <option value="">Select budget range</option>
-                    <option value="Under $500">Under $500</option>
-                    <option value="$500 - $1,000">$500 - $1,000</option>
-                    <option value="$1,000 - $3,000">$1,000 - $3,000</option>
-                    <option value="$3,000 - $5,000">$3,000 - $5,000</option>
-                    <option value="$5,000+">$5,000+</option>
-                  </select>
                 </div>
               </div>
 
@@ -201,14 +257,16 @@ export default function RequestDesign() {
                 />
               </div>
 
-              <button
+              <motion.button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-800 hover:to-purple-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-800 hover:to-purple-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40 cursor-pointer"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
               >
                 Submit Design Request
                 <HiPaperAirplane className="rotate-45" />
-              </button>
-            </form>
+              </motion.button>
+            </motion.form>
           </div>
         </div>
       </section>

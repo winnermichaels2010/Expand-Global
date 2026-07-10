@@ -20,9 +20,10 @@ const userLinks = [
 ];
 
 const adminLinks = [
-  { name: 'Dashboard', path: '/dashboard' },
-  { name: 'Users', path: '/admin?view=users' },
-  { name: 'Settings', path: '/settings' },
+  { name: 'Dashboard', path: '/admin' },
+  { name: 'Users', path: '/admin/users' },
+  { name: 'Design Requests', path: '/admin/design-requests' },
+  { name: 'Settings', path: '/admin/settings' },
 ];
 
 export default function Navbar() {

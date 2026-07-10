@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { FaPalette, FaCog, FaSignOutAlt, FaCamera, FaTimes } from 'react-icons/fa';
+import { FaPalette, FaCog, FaSignOutAlt, FaCamera, FaTimes, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,10 +10,23 @@ const quickActions = [
   { icon: FaCog, label: 'Settings', path: '/settings', desc: 'Manage your preferences' },
 ];
 
+const statusIcons = {
+  Pending: FaClock,
+  Accepted: FaCheckCircle,
+  Rejected: FaTimesCircle,
+};
+
+const statusColors = {
+  Pending: 'text-amber-500',
+  Accepted: 'text-emerald-500',
+  Rejected: 'text-red-500',
+};
+
 export default function Dashboard() {
-  const { currentUser, logout, updateProfilePicture, getUserProfile } = useAuth();
+  const { currentUser, logout, updateProfilePicture, getUserProfile, getDesignRequests } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [designRequests, setDesignRequests] = useState([]);
   const [showPhotoPopup, setShowPhotoPopup] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -25,21 +38,20 @@ export default function Dashboard() {
       navigate('/admin');
     } else {
       getUserProfile(currentUser.uid).then(setProfile);
+      getDesignRequests().then((requests) => {
+        setDesignRequests(requests.filter((r) => r.email === currentUser.email));
+      });
     }
-  }, [currentUser, navigate, getUserProfile]);
+  }, [currentUser, navigate, getUserProfile, getDesignRequests]);
 
   async function handleFileUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      await updateProfilePicture(currentUser.uid, event.target.result);
-      setUploading(false);
-      setShowPhotoPopup(false);
-      getUserProfile(currentUser.uid).then(setProfile);
-    };
-    reader.readAsDataURL(file);
+    await updateProfilePicture(currentUser.uid, file);
+    setUploading(false);
+    setShowPhotoPopup(false);
+    getUserProfile(currentUser.uid).then(setProfile);
   }
 
   async function handleLogout() {
@@ -64,7 +76,7 @@ export default function Dashboard() {
     : currentUser.displayName || currentUser.email?.split('@')[0] || 'User';
 
   return (
-    <div className="pt-20 min-h-screen">
+    <div className="min-h-screen">
       <div className="relative overflow-hidden bg-gradient-to-r from-purple-700 via-purple-600 to-fuchsia-600 dark:from-purple-950 dark:via-indigo-950 dark:to-purple-900">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
@@ -142,7 +154,61 @@ export default function Dashboard() {
             </motion.div>
           </div>
 
-          <div>
+          <div className="space-y-6">
+            {designRequests.length > 0 && (
+              <motion.div
+                className="p-6 rounded-2xl glass-strong shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+              >
+                <h2 className="text-lg font-semibold mb-4">My Design Requests ({designRequests.length})</h2>
+                <div className="space-y-3">
+                  {[...designRequests].reverse().map((req) => {
+                    const StatusIcon = statusIcons[req.status] || FaClock;
+                    const statusColor = statusColors[req.status] || 'text-amber-500';
+                    return (
+                      <div key={req.id} className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <p className="text-sm font-medium">{req.service}</p>
+                            <p className="text-xs text-[var(--text-secondary)]">{new Date(req.createdAt).toLocaleDateString()}</p>
+                          </div>
+                          <span className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${
+                            req.status === 'Accepted' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+                            req.status === 'Rejected' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
+                            'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                          }`}>
+                            <StatusIcon className={`text-xs ${statusColor}`} />
+                            {req.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] mb-2">{req.description}</p>
+                        {req.status === 'Accepted' && (
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Standard: ₦{req.standardPrice?.toLocaleString()}</span>
+                            </div>
+                            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                              <span className="text-purple-600 dark:text-purple-400 font-medium">Premium: ₦{req.premiumPrice?.toLocaleString()}</span>
+                            </div>
+                          </div>
+                        )}
+                        {req.adminComment && (
+                          <p className="text-xs text-[var(--text-secondary)] mt-2 italic">&ldquo;{req.adminComment}&rdquo;</p>
+                        )}
+                        {req.status === 'Rejected' && req.rejectReason && (
+                          <p className="text-xs text-red-500 dark:text-red-400 mt-2">
+                            Reason: {req.rejectReason}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
             <motion.div
               className="p-6 rounded-2xl glass-strong shadow-lg"
               initial={{ opacity: 0, y: 20 }}

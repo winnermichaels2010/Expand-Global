@@ -1,33 +1,15 @@
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { FaSignOutAlt, FaSun, FaMoon, FaUser } from 'react-icons/fa';
+import { useTheme } from '../../context/ThemeContext';
+import { FaSun, FaMoon, FaUser } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
-export default function Settings() {
-  const { currentUser, logout } = useAuth();
+export default function AdminSettings() {
+  const { currentUser, ADMIN_EMAIL } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!currentUser) {
-      navigate('/auth');
-    }
-  }, [currentUser, navigate]);
-
-  async function handleLogout() {
-    try {
-      await logout();
-      navigate('/');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
-  }
-
-  if (!currentUser) {
+  if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
     return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-[var(--text-secondary)]">Redirecting...</p>
       </div>
     );
@@ -38,20 +20,19 @@ export default function Settings() {
       <div className="relative overflow-hidden bg-gradient-to-r from-purple-700 via-purple-600 to-fuchsia-600 dark:from-purple-950 dark:via-indigo-950 dark:to-purple-900">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+        <div className="px-4 sm:px-6 lg:px-8 py-16 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Settings</h1>
-            <p className="text-purple-200/80">Manage your account and preferences</p>
+            <p className="text-purple-200/80">Manage admin preferences</p>
           </motion.div>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 space-y-6 pb-8">
-        {/* Profile */}
         <motion.div
           className="p-6 rounded-2xl glass-strong shadow-lg"
           initial={{ opacity: 0, y: 20 }}
@@ -63,13 +44,12 @@ export default function Settings() {
               <FaUser className="text-white text-xl" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">{currentUser.displayName || 'User'}</h2>
-              <p className="text-sm text-[var(--text-secondary)]">{currentUser.email}</p>
+              <h2 className="text-lg font-semibold">{currentUser?.displayName || 'Admin'}</h2>
+              <p className="text-sm text-[var(--text-secondary)]">{currentUser?.email}</p>
             </div>
           </div>
         </motion.div>
 
-        {/* Appearance */}
         <motion.div
           className="p-6 rounded-2xl glass-strong shadow-lg"
           initial={{ opacity: 0, y: 20 }}
@@ -99,25 +79,6 @@ export default function Settings() {
               />
             </button>
           </div>
-        </motion.div>
-
-        {/* Sign Out */}
-        <motion.div
-          className="p-6 rounded-2xl glass-strong shadow-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <h2 className="text-lg font-semibold mb-4">Account</h2>
-          <motion.button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-all duration-200 cursor-pointer"
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <FaSignOutAlt />
-            Sign Out
-          </motion.button>
         </motion.div>
       </div>
     </div>

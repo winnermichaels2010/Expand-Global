@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { FaSignOutAlt, FaPalette, FaUsers, FaCheck, FaTimes, FaToggleOn, FaToggleOff } from 'react-icons/fa';
+import { FaSignOutAlt, FaPalette, FaUsers, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const ADMIN_EMAIL = 'adminemail@gmail.com';

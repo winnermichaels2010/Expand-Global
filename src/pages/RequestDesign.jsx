@@ -106,7 +106,7 @@ export default function RequestDesign() {
   }
 
   return (
-    <div className="pt-20">
+    <div>
       <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-700/20 via-purple-500/10 to-fuchsia-600/10 dark:from-purple-900/20 dark:via-transparent dark:to-fuchsia-900/10" />
         <div className="absolute top-10 left-10 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-blob" />

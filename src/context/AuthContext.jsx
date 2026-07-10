@@ -1,3 +1,5 @@
+const ADMIN_EMAIL = 'adminemail@gmail.com';
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
@@ -6,9 +8,10 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import { doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, collection } from 'firebase/firestore';
-import { auth, googleProvider, storage, db } from '../../firebase';
+import { doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, onSnapshot, writeBatch } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref as dbRef, set, get } from 'firebase/database';
+import { auth, googleProvider, db, storage, rtdb } from '../../firebase';
 
 const AuthContext = createContext();
 
@@ -20,6 +23,7 @@ export function useAuth() {
   return context;
 }
 
+// eslint-disable-next-line react/prop-types
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -87,12 +91,17 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function updateProfilePicture(userId, pictureDataUrl) {
+  async function updateProfilePicture(userId, file) {
     try {
-      const storageRef = ref(storage, `profilePictures/${userId}`);
-      await uploadString(storageRef, pictureDataUrl, 'data_url');
-      const downloadUrl = await getDownloadURL(storageRef);
-      await setDoc(doc(db, 'users', userId), { profilePicture: downloadUrl }, { merge: true });
+      const imageRef = storageRef(storage, `profile-pictures/${userId}`);
+      await uploadBytes(imageRef, file);
+      const downloadUrl = await getDownloadURL(imageRef);
+
+      await Promise.all([
+        setDoc(doc(db, 'users', userId), { profilePicture: downloadUrl }, { merge: true }),
+        set(dbRef(rtdb, `users/${userId}/profilePicture`), downloadUrl),
+      ]);
+
       return downloadUrl;
     } catch (err) {
       console.error('Failed to upload profile picture:', err);
@@ -116,8 +125,56 @@ export function AuthProvider({ children }) {
         status: 'Pending',
         createdAt: new Date().toISOString(),
       });
+      const q = query(collection(db, 'users'), where('email', '==', ADMIN_EMAIL));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const adminUser = snap.docs[0];
+        await addDoc(collection(db, 'notifications'), {
+          userId: adminUser.id,
+          message: `New design request from ${request.name || 'a user'} (${request.service})`,
+          type: 'design_request',
+          read: false,
+          createdAt: new Date().toISOString(),
+        });
+      }
     } catch (err) {
       console.error('Failed to save design request:', err);
+    }
+  }
+
+  async function updateDesignRequest(id, data) {
+    try {
+      await updateDoc(doc(db, 'designRequests', id), data);
+    } catch (err) {
+      console.error('Failed to update design request:', err);
+    }
+  }
+
+  async function rejectDesignRequest(id, reason) {
+    try {
+      await updateDoc(doc(db, 'designRequests', id), {
+        status: 'Rejected',
+        rejectReason: reason,
+        rejectedAt: new Date().toISOString(),
+      });
+      const requestDoc = await getDoc(doc(db, 'designRequests', id));
+      const requestData = requestDoc.data();
+      if (requestData?.email) {
+        const q = query(collection(db, 'users'), where('email', '==', requestData.email));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const user = snap.docs[0];
+          await addDoc(collection(db, 'notifications'), {
+            userId: user.id,
+            message: `Your design request "${requestData.service}" has been rejected. Reason: ${reason}`,
+            type: 'design_request',
+            read: false,
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to reject design request:', err);
     }
   }
 
@@ -131,6 +188,90 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.error('Failed to toggle user status:', err);
     }
+  }
+
+  // ---------- Notifications ----------
+
+  async function getNotifications(userId) {
+    try {
+      const q = query(
+        collection(db, 'notifications'),
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc')
+      );
+      const snap = await getDocs(q);
+      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch {
+      return [];
+    }
+  }
+
+  async function getUnreadNotificationCount(userId) {
+    try {
+      const q = query(
+        collection(db, 'notifications'),
+        where('userId', '==', userId),
+        where('read', '==', false)
+      );
+      const snap = await getDocs(q);
+      return snap.size;
+    } catch {
+      return 0;
+    }
+  }
+
+  async function markNotificationAsRead(notifId) {
+    try {
+      await updateDoc(doc(db, 'notifications', notifId), { read: true });
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err);
+    }
+  }
+
+  async function deleteNotification(notifId) {
+    try {
+      await deleteDoc(doc(db, 'notifications', notifId));
+    } catch (err) {
+      console.error('Failed to delete notification:', err);
+    }
+  }
+
+  async function deleteAllNotifications(userId) {
+    try {
+      const q = query(collection(db, 'notifications'), where('userId', '==', userId));
+      const snap = await getDocs(q);
+      const batch = writeBatch(db);
+      snap.docs.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    } catch (err) {
+      console.error('Failed to delete all notifications:', err);
+    }
+  }
+
+  async function addNotification(userId, message, type = 'info') {
+    try {
+      await addDoc(collection(db, 'notifications'), {
+        userId,
+        message,
+        type,
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error('Failed to add notification:', err);
+    }
+  }
+
+  function subscribeToNotifications(userId, callback) {
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+    return onSnapshot(q, (snapshot) => {
+      const notifs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(notifs);
+    });
   }
 
   useEffect(() => {
@@ -155,7 +296,17 @@ export function AuthProvider({ children }) {
     updateProfilePicture,
     getDesignRequests,
     saveDesignRequest,
+    updateDesignRequest,
+    rejectDesignRequest,
     toggleUserStatus,
+    ADMIN_EMAIL,
+    getNotifications,
+    getUnreadNotificationCount,
+    markNotificationAsRead,
+    deleteNotification,
+    deleteAllNotifications,
+    addNotification,
+    subscribeToNotifications,
   };
 
   return (

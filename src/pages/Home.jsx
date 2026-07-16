@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { HiArrowRight } from 'react-icons/hi';
-import { FaPalette, FaBullhorn, FaLaptopCode, FaQuoteLeft, FaStar } from 'react-icons/fa';
+import { FaPalette, FaBullhorn, FaLaptopCode, FaQuoteLeft, FaStar, FaPlay, FaTimes, FaExpand } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 
@@ -73,31 +73,87 @@ const cardVariants = {
   },
 };
 
-const coverPhotos = [
+const galleryImages = [
+  { src: '/images/images/IMG-20260703-WA0002.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0003.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0004.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0005.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0006.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0007.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0008.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0009.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0010.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0011.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0012.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0013.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0014.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0034.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0035.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0036.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0037.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0038.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0039.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0040.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0041.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0043.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0044.jpg', alt: 'Project showcase' },
+  { src: '/images/images/IMG-20260703-WA0046.jpg', alt: 'Project showcase' },
+];
+
+const galleryVideos = [
+  '/videos/VID-1.mp4',
+  '/videos/VID-2.mp4',
+  '/videos/VID-3.mp4',
+  '/videos/VID-4.mp4',
+  '/videos/VID-5.mp4',
+  '/videos/VID-6.mp4',
+  '/videos/VID-7.mp4',
+  '/videos/VID-8.mp4',
+  '/videos/VID-9.mp4',
+  '/videos/VID-10.mp4',
+  '/videos/VID-11.mp4',
+  '/videos/VID-12.mp4',
+  '/videos/VID-13.mp4',
+  '/videos/VID-14.mp4',
+  '/videos/VID-15.mp4',
+  '/videos/VID-16.mp4',
+  '/videos/VID-17.mp4',
+  '/videos/VID-18.mp4',
+  '/videos/VID-19.mp4',
+  '/videos/VID-20.mp4',
+  '/videos/VID-21.mp4',
+];
+
+const coverVideos = [
   {
-    url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1600&q=80',
+    url: '/cover-videos/lv_0_20260716171701.mp4',
     title: 'Brand Identity',
     subtitle: 'Crafting visual stories that resonate',
   },
   {
-    url: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=1600&q=80',
+    url: '/cover-videos/lv_0_20260716171930.mp4',
     title: 'Graphic Design',
     subtitle: 'Where creativity meets precision',
   },
   {
-    url: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1600&q=80',
+    url: '/cover-videos/lv_0_20260716172137.mp4',
     title: 'Digital Art',
     subtitle: 'Pixel-perfect experiences',
   },
   {
-    url: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=1600&q=80',
+    url: '/cover-videos/lv_0_20260716172258.mp4',
     title: 'Brand Strategy',
     subtitle: 'Building brands that matter',
   },
   {
-    url: 'https://images.unsplash.com/photo-1613909207039-6b173b755cc1?w=1600&q=80',
+    url: '/cover-videos/lv_0_20260716172450.mp4',
     title: 'Creative Excellence',
     subtitle: 'Design that speaks volumes',
+  },
+  {
+    url: '/cover-videos/lv_0_20260716172611.mp4',
+    title: 'Expand Global',
+    subtitle: 'Elevating brands worldwide',
   },
 ];
 
@@ -105,10 +161,13 @@ export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
   const pointerStart = useRef(null);
   const [transitioning, setTransitioning] = useState(false);
+  const [videoModal, setVideoModal] = useState({ open: false, src: '' });
+  const videoRef = useRef(null);
+  const coverVideoRef = useRef(null);
 
   const goTo = (index) => {
     if (transitioning) return;
-    const target = (index + coverPhotos.length) % coverPhotos.length;
+    const target = (index + coverVideos.length) % coverVideos.length;
     if (target === activeIndex) return;
     setTransitioning(true);
     setActiveIndex(target);
@@ -128,16 +187,31 @@ export default function Home() {
     pointerStart.current = null;
   };
 
+  const handleCoverVideoEnd = () => {
+    goTo(activeIndex + 1);
+  };
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      goTo(activeIndex + 1);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [activeIndex, transitioning]);
+    if (coverVideoRef.current) {
+      coverVideoRef.current.play().catch(() => {});
+    }
+  }, [activeIndex]);
+
+  const openVideoModal = (src) => {
+    setVideoModal({ open: true, src });
+  };
+
+  const closeVideoModal = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+    setVideoModal({ open: false, src: '' });
+  };
 
   return (
     <div>
-      {/* Cover Photo Carousel */}
+      {/* Cover Video Carousel */}
       <section
         className="relative h-[300px] sm:h-[450px] lg:h-[600px] overflow-hidden select-none"
         onPointerDown={handlePointerDown}
@@ -146,26 +220,29 @@ export default function Home() {
         <AnimatePresence>
           <motion.div
             key={activeIndex}
-            initial={{ opacity: 0, scale: 1.3 }}
+            initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.3 }}
+            exit={{ opacity: 0, scale: 1.1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0"
           >
-            <img
-              src={coverPhotos[activeIndex].url}
-              alt={coverPhotos[activeIndex].title}
+            <video
+              ref={coverVideoRef}
+              src={coverVideos[activeIndex].url}
               className="w-full h-full object-cover"
-              draggable="false"
+              muted
+              playsInline
+              onEnded={handleCoverVideoEnd}
+              key={activeIndex}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/30" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white px-4 max-w-3xl">
                 <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold mb-3 tracking-tight drop-shadow-lg">
-                  {coverPhotos[activeIndex].title}
+                  {coverVideos[activeIndex].title}
                 </h1>
                 <p className="text-base sm:text-xl lg:text-2xl text-white/90 font-light drop-shadow">
-                  {coverPhotos[activeIndex].subtitle}
+                  {coverVideos[activeIndex].subtitle}
                 </p>
               </div>
             </div>
@@ -174,7 +251,7 @@ export default function Home() {
 
         {/* Navigation dots */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {coverPhotos.map((_, index) => (
+          {coverVideos.map((_, index) => (
             <button
               key={index}
               onClick={() => goTo(index)}
@@ -258,6 +335,160 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Gallery Section */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-50/30 to-transparent dark:via-purple-900/8" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
+              Our{' '}
+              <span className="text-gradient">Work</span>
+            </h2>
+            <p className="max-w-xl mx-auto text-[var(--text-secondary)] text-lg">
+              A glimpse into the projects we&apos;ve brought to life.
+            </p>
+          </motion.div>
+
+          {/* Images Grid */}
+          <motion.div
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-20"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+          >
+            {galleryImages.map((img, i) => (
+              <motion.div
+                key={i}
+                custom={i % 6}
+                variants={itemVariants}
+                className={`group relative rounded-2xl overflow-hidden cursor-pointer ${
+                  i % 5 === 0 ? 'sm:row-span-2 sm:col-span-1' : ''
+                }`}
+              >
+                <div className="relative overflow-hidden rounded-2xl border border-[var(--border-color)] group-hover:border-purple-500/50 dark:group-hover:border-purple-400/40 transition-all duration-500 shadow-md group-hover:shadow-xl group-hover:shadow-purple-600/10">
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className={`w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out ${
+                      i % 5 === 0 ? 'h-64 sm:h-80' : 'h-40 sm:h-48'
+                    }`}
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                    <div className="flex items-center gap-2">
+                      <FaExpand className="text-white/80 text-xs" />
+                      <span className="text-white text-sm font-medium">View</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Videos Section */}
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <h3 className="text-3xl sm:text-4xl font-bold mb-3 text-center tracking-tight">
+              Video <span className="text-gradient">Highlights</span>
+            </h3>
+            <p className="max-w-xl mx-auto text-[var(--text-secondary)] text-center text-lg mb-12">
+              Watch our creative process in action.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {galleryVideos.map((src, i) => (
+                <motion.div
+                  key={i}
+                  custom={i % 6}
+                  variants={itemVariants}
+                  className="group relative rounded-2xl overflow-hidden cursor-pointer"
+                  onClick={() => openVideoModal(src)}
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="relative rounded-2xl overflow-hidden border border-[var(--border-color)] group-hover:border-purple-500/50 dark:group-hover:border-purple-400/40 transition-all duration-500 shadow-md group-hover:shadow-xl group-hover:shadow-purple-600/15">
+                    <video
+                      src={src}
+                      className="w-full aspect-[9/14] object-cover"
+                      muted
+                      preload="metadata"
+                      onMouseEnter={(e) => e.target.play()}
+                      onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10 group-hover:from-black/50 transition-all duration-500" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                      <div className="w-14 h-14 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:bg-purple-600/80 group-hover:border-purple-500/60 group-hover:scale-110 transition-all duration-500 shadow-lg">
+                        <FaPlay className="text-white text-lg ml-0.5" />
+                      </div>
+                      <span className="text-white/70 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        Click to play
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Video Modal */}
+      <AnimatePresence>
+        {videoModal.open && (
+          <motion.div
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={closeVideoModal}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+            <motion.div
+              className="relative w-full max-w-2xl z-10"
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <button
+                onClick={closeVideoModal}
+                className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 cursor-pointer z-20"
+              >
+                <FaTimes className="text-lg" />
+              </button>
+              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50">
+                <video
+                  ref={videoRef}
+                  src={videoModal.src}
+                  className="w-full aspect-[9/14] sm:aspect-video object-cover bg-black"
+                  controls
+                  autoPlay
+                  playsInline
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Testimonials Section */}
       <section className="py-24 relative overflow-hidden">

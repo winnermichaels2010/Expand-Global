@@ -46,16 +46,19 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile toggle button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] shadow-md"
+        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg pressable"
+        style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-default)',
+          color: 'var(--text-primary)',
+        }}
         aria-label="Toggle sidebar"
       >
         {isOpen ? <HiX size={24} /> : <HiMenu size={24} />}
       </button>
 
-      {/* Overlay backdrop on mobile */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -64,56 +67,87 @@ export default function AdminSidebar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black/50 z-30 md:hidden"
+            className="fixed inset-0 z-30 md:hidden"
+            style={{ background: 'rgba(0,0,0,0.5)' }}
           />
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] z-40 flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0`}
+        className="fixed left-0 top-0 h-full w-64 z-40 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0"
+        style={{
+          background: 'var(--bg-secondary)',
+          borderRight: '1px solid var(--border-default)',
+          transform: isOpen ? 'translateX(0)' : undefined,
+        }}
       >
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-[var(--border-color)]">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+        <div
+          className="flex items-center gap-3 px-6 py-5"
+          style={{ borderBottom: '1px solid var(--border-default)' }}
+        >
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+            style={{ background: 'var(--color-accent)' }}
+          >
             EG
           </div>
-          <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+          <span
+            className="text-lg font-bold"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+          >
             Admin Panel
           </span>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navLinks.map(({ name, path, icon: Icon }) => (
-            <Link
-              key={path}
-              to={path}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive(path)
-                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-sm'
-                  : 'text-[var(--text-secondary)] hover:bg-purple-50 dark:hover:bg-purple-900/10 hover:text-purple-600 dark:hover:text-purple-400'
-              }`}
-            >
-              <Icon className="text-base" />
-              {name}
-            </Link>
-          ))}
+          {navLinks.map(({ name, path, icon: Icon }) => {
+            const active = isActive(path);
+            return (
+              <Link
+                key={path}
+                to={path}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                style={{
+                  color: active ? 'var(--color-accent)' : 'var(--text-secondary)',
+                  background: active ? 'var(--color-accent-light)' : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.background = 'var(--bg-secondary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+              >
+                <Icon className="text-base" />
+                {name}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="px-3 py-3 border-t border-[var(--border-color)] space-y-2">
+        <div
+          className="px-3 py-3 space-y-2"
+          style={{ borderTop: '1px solid var(--border-default)' }}
+        >
           <div className="flex items-center justify-center">
             {adminUid && <NotificationPanel userId={adminUid} />}
           </div>
-          <motion.button
+          <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-white text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
+            style={{ background: '#dc2626' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#b91c1c'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#dc2626'; }}
           >
             <FaSignOutAlt />
             Sign Out
-          </motion.button>
+          </button>
         </div>
       </aside>
     </>

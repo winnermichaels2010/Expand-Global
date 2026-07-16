@@ -17,9 +17,9 @@ const statusIcons = {
 };
 
 const statusColors = {
-  Pending: 'text-amber-500',
-  Accepted: 'text-emerald-500',
-  Rejected: 'text-red-500',
+  Pending: '#f59e0b',
+  Accepted: '#10b981',
+  Rejected: '#ef4444',
 };
 
 export default function Dashboard() {
@@ -66,7 +66,7 @@ export default function Dashboard() {
   if (!currentUser) {
     return (
       <div className="pt-20 min-h-screen flex items-center justify-center">
-        <p className="text-[var(--text-secondary)]">Redirecting...</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Redirecting...</p>
       </div>
     );
   }
@@ -76,10 +76,8 @@ export default function Dashboard() {
     : currentUser.displayName || currentUser.email?.split('@')[0] || 'User';
 
   return (
-    <div className="min-h-screen">
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-700 via-purple-600 to-fuchsia-600 dark:from-purple-950 dark:via-indigo-950 dark:to-purple-900">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+      <div className="relative overflow-hidden" style={{ background: 'var(--color-accent)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
           <motion.div
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
@@ -93,27 +91,33 @@ export default function Dashboard() {
                   <img
                     src={profile.profilePicture}
                     alt="Profile"
-                    className="w-16 h-16 rounded-full object-cover ring-4 ring-white/20 hover:ring-purple-300 transition-all duration-200"
+                    className="w-16 h-16 rounded-full object-cover ring-4 ring-white/30 hover:ring-white/60 transition-all duration-200"
                   />
                 </button>
               ) : (
                 <button
                   onClick={() => setShowPhotoPopup(true)}
-                  className="w-16 h-16 rounded-full bg-white/10 ring-4 ring-white/20 flex items-center justify-center hover:ring-purple-300 transition-all duration-200 cursor-pointer"
+                  className="w-16 h-16 rounded-full bg-white/15 ring-4 ring-white/30 flex items-center justify-center hover:ring-white/60 transition-all duration-200 cursor-pointer"
                 >
                   <FaCamera className="text-white text-xl" />
                 </button>
               )}
               <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Dashboard</h1>
-                <p className="text-purple-200/80">
+                <h1
+                  className="text-3xl sm:text-4xl font-bold text-white mb-2"
+                  style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                  Dashboard
+                </h1>
+                <p className="text-white/70">
                   Welcome back, {fullName}
                 </p>
               </div>
             </div>
             <motion.button
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-all duration-200 cursor-pointer"
+              className="pressable inline-flex items-center gap-2 px-5 py-2.5 text-white font-medium rounded-xl transition-all duration-200 cursor-pointer"
+              style={{ background: '#dc2626' }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >
@@ -133,20 +137,32 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+              <h2
+                className="text-lg font-semibold mb-4"
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+              >
+                Quick Actions
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {quickActions.map(({ icon: Icon, label, path, desc }) => (
                   <Link
                     key={path}
                     to={path}
-                    className="group flex items-center gap-3 p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-purple-600/30 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-all duration-200"
+                    className="hover-lift group flex items-center gap-3 p-4 rounded-xl transition-all duration-200"
+                    style={{
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border-subtle)',
+                    }}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-200">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-200"
+                      style={{ background: 'var(--color-accent)' }}
+                    >
                       <Icon className="text-white text-lg" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{label}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">{desc}</p>
+                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{label}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
                     </div>
                   </Link>
                 ))}
@@ -162,43 +178,76 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.15 }}
               >
-                <h2 className="text-lg font-semibold mb-4">My Design Requests ({designRequests.length})</h2>
+                <h2
+                  className="text-lg font-semibold mb-4"
+                  style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+                >
+                  My Design Requests ({designRequests.length})
+                </h2>
                 <div className="space-y-3">
                   {[...designRequests].reverse().map((req) => {
                     const StatusIcon = statusIcons[req.status] || FaClock;
-                    const statusColor = statusColors[req.status] || 'text-amber-500';
+                    const badgeColor = statusColors[req.status] || '#f59e0b';
+                    const badgeBg =
+                      req.status === 'Accepted' ? 'rgba(16,185,129,0.12)' :
+                      req.status === 'Rejected' ? 'rgba(239,68,68,0.12)' :
+                      'rgba(245,158,11,0.12)';
                     return (
-                      <div key={req.id} className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
+                      <div
+                        key={req.id}
+                        className="p-4 rounded-xl"
+                        style={{
+                          background: 'var(--bg-primary)',
+                          border: '1px solid var(--border-subtle)',
+                        }}
+                      >
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <p className="text-sm font-medium">{req.service}</p>
-                            <p className="text-xs text-[var(--text-secondary)]">{new Date(req.createdAt).toLocaleDateString()}</p>
+                            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{req.service}</p>
+                            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{new Date(req.createdAt).toLocaleDateString()}</p>
                           </div>
-                          <span className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${
-                            req.status === 'Accepted' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
-                            req.status === 'Rejected' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
-                            'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                          }`}>
-                            <StatusIcon className={`text-xs ${statusColor}`} />
+                          <span
+                            className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium"
+                            style={{ background: badgeBg, color: badgeColor }}
+                          >
+                            <StatusIcon className="text-xs" style={{ color: badgeColor }} />
                             {req.status}
                           </span>
                         </div>
-                        <p className="text-xs text-[var(--text-secondary)] mb-2">{req.description}</p>
+                        <p className="text-xs mb-2" style={{ color: 'var(--text-secondary)' }}>{req.description}</p>
                         {req.status === 'Accepted' && (
                           <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
-                              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Standard: ₦{req.standardPrice?.toLocaleString()}</span>
+                            <div
+                              className="p-2 rounded-lg"
+                              style={{
+                                background: 'rgba(16,185,129,0.08)',
+                                border: '1px solid rgba(16,185,129,0.2)',
+                              }}
+                            >
+                              <span style={{ color: '#10b981' }} className="font-medium">
+                                Standard: ₦{req.standardPrice?.toLocaleString()}
+                              </span>
                             </div>
-                            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                              <span className="text-purple-600 dark:text-purple-400 font-medium">Premium: ₦{req.premiumPrice?.toLocaleString()}</span>
+                            <div
+                              className="p-2 rounded-lg"
+                              style={{
+                                background: 'rgba(139,92,246,0.08)',
+                                border: '1px solid rgba(139,92,246,0.2)',
+                              }}
+                            >
+                              <span style={{ color: 'var(--color-accent)' }} className="font-medium">
+                                Premium: ₦{req.premiumPrice?.toLocaleString()}
+                              </span>
                             </div>
                           </div>
                         )}
                         {req.adminComment && (
-                          <p className="text-xs text-[var(--text-secondary)] mt-2 italic">&ldquo;{req.adminComment}&rdquo;</p>
+                          <p className="text-xs italic mt-2" style={{ color: 'var(--text-secondary)' }}>
+                            &ldquo;{req.adminComment}&rdquo;
+                          </p>
                         )}
                         {req.status === 'Rejected' && req.rejectReason && (
-                          <p className="text-xs text-red-500 dark:text-red-400 mt-2">
+                          <p className="text-xs mt-2" style={{ color: '#ef4444' }}>
                             Reason: {req.rejectReason}
                           </p>
                         )}
@@ -215,15 +264,32 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <h2 className="text-lg font-semibold mb-4">Account</h2>
+              <h2
+                className="text-lg font-semibold mb-4"
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+              >
+                Account
+              </h2>
               <div className="space-y-3">
-                <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
-                  <p className="text-xs text-[var(--text-secondary)] mb-1">Email</p>
-                  <p className="text-sm font-medium truncate">{currentUser.email}</p>
+                <div
+                  className="p-4 rounded-xl"
+                  style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                  }}
+                >
+                  <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>Email</p>
+                  <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{currentUser.email}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
-                  <p className="text-xs text-[var(--text-secondary)] mb-1">Full Name</p>
-                  <p className="text-sm font-medium">{fullName}</p>
+                <div
+                  className="p-4 rounded-xl"
+                  style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                  }}
+                >
+                  <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>Full Name</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{fullName}</p>
                 </div>
               </div>
             </motion.div>
@@ -239,9 +305,16 @@ export default function Dashboard() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPhotoPopup(false)} />
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowPhotoPopup(false)}
+            />
             <motion.div
-              className="relative bg-[var(--bg-primary)] rounded-2xl shadow-2xl border border-[var(--border-color)] p-8 max-w-sm w-full text-center"
+              className="relative rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-default)',
+              }}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -249,20 +322,36 @@ export default function Dashboard() {
             >
               <button
                 onClick={() => setShowPhotoPopup(false)}
-                className="absolute top-3 right-3 p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition-colors duration-200 cursor-pointer text-[var(--text-secondary)]"
+                className="absolute top-3 right-3 p-2 rounded-lg transition-colors duration-200 cursor-pointer"
+                style={{ color: 'var(--text-secondary)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-secondary)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 <FaTimes />
               </button>
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center mx-auto mb-4 shadow-xl">
+              <div
+                className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl"
+                style={{ background: 'var(--color-accent)' }}
+              >
                 {profile?.profilePicture ? (
                   <img src={profile.profilePicture} alt="Profile" className="w-24 h-24 rounded-full object-cover" />
                 ) : (
                   <FaCamera className="text-4xl text-white" />
                 )}
               </div>
-              <h3 className="text-xl font-bold mb-2">Profile Picture</h3>
-              <p className="text-sm text-[var(--text-secondary)] mb-6">Upload a new photo or change your current one.</p>
-              <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-medium rounded-xl transition-all duration-200 cursor-pointer shadow-lg">
+              <h3
+                className="text-xl font-bold mb-2"
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+              >
+                Profile Picture
+              </h3>
+              <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+                Upload a new photo or change your current one.
+              </p>
+              <label
+                className="pressable inline-flex items-center gap-2 px-6 py-3 text-white font-medium rounded-xl transition-all duration-200 cursor-pointer shadow-lg"
+                style={{ background: 'var(--color-accent)' }}
+              >
                 <FaCamera />
                 {uploading ? 'Uploading...' : 'Choose Photo'}
                 <input
@@ -276,7 +365,10 @@ export default function Dashboard() {
               </label>
               <button
                 onClick={() => setShowPhotoPopup(false)}
-                className="block w-full mt-3 px-6 py-2.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 cursor-pointer"
+                className="block w-full mt-3 px-6 py-2.5 text-sm transition-colors duration-200 cursor-pointer"
+                style={{ color: 'var(--text-secondary)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Skip
               </button>

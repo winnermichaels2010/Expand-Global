@@ -21,26 +21,22 @@ export default function AdminUsers() {
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-[var(--text-secondary)]">Redirecting...</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Redirecting...</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen">
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-700 via-purple-600 to-fuchsia-600 dark:from-purple-950 dark:via-indigo-950 dark:to-purple-900">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="px-4 sm:px-6 lg:px-8 py-16 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Users</h1>
-            <p className="text-purple-200/80">Manage registered users</p>
-          </motion.div>
-        </div>
+      <div style={{ background: 'var(--color-accent)' }} className="px-4 sm:px-6 lg:px-8 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-heading)' }}>Users</h1>
+          <p className="text-white/70">Manage registered users</p>
+        </motion.div>
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
@@ -49,42 +45,52 @@ export default function AdminUsers() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h2 className="text-lg font-semibold mb-6">User Management ({registeredUsers.length} total)</h2>
-          <div className="space-y-4">
+          <h2 className="text-lg font-semibold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>User Management ({registeredUsers.length} total)</h2>
+          <div className="space-y-3">
             {registeredUsers.length === 0 ? (
-              <p className="text-sm text-[var(--text-secondary)] text-center py-8">No registered users yet.</p>
+              <p className="text-sm text-center py-8" style={{ color: 'var(--text-secondary)' }}>No registered users yet.</p>
             ) : (
               [...registeredUsers].reverse().map((user) => (
-                <div key={user.userId} className="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-purple-600/30 transition-all duration-300">
+                <div
+                  key={user.userId}
+                  className="flex items-center justify-between p-4 rounded-xl transition-all duration-200 hover-lift"
+                  style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-default)' }}
+                >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-white font-bold text-sm">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                      style={{ background: 'var(--color-accent)' }}
+                    >
                       {user.firstName?.[0] || user.email?.[0]?.toUpperCase() || '?'}
                     </div>
                     <div>
                       <p className="text-sm font-medium">
                         {[user.surname, user.firstName, user.lastName].filter(Boolean).join(' ') || user.email}
                       </p>
-                      <p className="text-xs text-[var(--text-secondary)]">{user.email}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                      user.active === false
-                        ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                        : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                    }`}>
+                    <span
+                      className="text-xs px-2.5 py-1 rounded-full font-medium"
+                      style={{
+                        background: user.active === false ? 'hsl(0 80% 92%)' : 'hsl(152 60% 90%)',
+                        color: user.active === false ? 'hsl(0 70% 45%)' : 'hsl(152 65% 35%)',
+                      }}
+                    >
                       {user.active === false ? 'Inactive' : 'Active'}
                     </span>
                     <motion.button
                       onClick={() => handleToggleUser(user.userId)}
-                      className="p-2 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors duration-200 cursor-pointer"
+                      className="p-2 rounded-lg transition-colors duration-200 cursor-pointer"
+                      style={{ color: user.active === false ? '#ef4444' : '#10b981' }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
                       title={user.active === false ? 'Activate' : 'Deactivate'}
                     >
                       {user.active === false
-                        ? <FaToggleOff className="text-red-500 text-lg" />
-                        : <FaToggleOn className="text-emerald-500 text-lg" />
+                        ? <FaToggleOff className="text-lg" />
+                        : <FaToggleOn className="text-lg" />
                       }
                     </motion.button>
                   </div>

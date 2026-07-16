@@ -22,20 +22,19 @@ const userLinks = [
 const adminLinks = [
   { name: 'Dashboard', path: '/admin' },
   { name: 'Users', path: '/admin/users' },
-  { name: 'Design Requests', path: '/admin/design-requests' },
+  { name: 'Requests', path: '/admin/design-requests' },
   { name: 'Settings', path: '/admin/settings' },
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const { darkMode, toggleDarkMode } = useTheme();
   const { currentUser } = useAuth();
   const location = useLocation();
   const navbarRef = useRef(null);
 
-  const isActive = (path) => location.pathname === path || location.pathname + location.search === path;
+  const isActive = (path) => location.pathname === path;
   const isAdmin = currentUser?.email === 'adminemail@gmail.com';
 
   const links = !currentUser
@@ -45,17 +44,10 @@ export default function Navbar() {
       : publicLinks.filter((l) => l.name !== 'Home').concat(userLinks);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setScrolled(currentScrollY > 20);
-      if (mobileOpen && currentScrollY < lastScrollY) {
-        setMobileOpen(false);
-      }
-      setLastScrollY(currentScrollY);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [mobileOpen, lastScrollY]);
+  }, []);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -68,51 +60,49 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [mobileOpen]);
 
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   return (
     <motion.nav
       ref={navbarRef}
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4"
+      className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 sm:px-6 lg:px-8"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <motion.div
-        className="w-full max-w-7xl rounded-2xl glass shadow-lg shadow-purple-600/5"
-        animate={{
-          paddingTop: scrolled ? '0.5rem' : '0.75rem',
-          paddingBottom: scrolled ? '0.5rem' : '0.75rem',
-          paddingLeft: scrolled ? '1.5rem' : '2rem',
-          paddingRight: scrolled ? '1.5rem' : '2rem',
-          borderRadius: scrolled ? '1rem' : '1rem',
-        }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+      <div
+        className={`w-full max-w-6xl transition-all duration-500 ease-out ${
+          scrolled
+            ? 'mt-3 glass rounded-2xl shadow-lg shadow-black/[0.04] dark:shadow-black/20 px-5 py-3'
+            : 'mt-5 px-6 py-4'
+        }`}
       >
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <motion.img
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <img
               src="/expand-global-logo.jpg"
-              alt="Expand Global Logo"
-              className="w-9 h-9 rounded-lg object-cover ring-2 ring-purple-600/30 group-hover:ring-purple-600/60 transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
+              alt="Expand Global"
+              className="w-8 h-8 rounded-lg object-cover ring-1 ring-black/[0.06] dark:ring-white/[0.08] group-hover:ring-[var(--color-accent)]/40 transition-all duration-300"
             />
-            <motion.span
-              className="text-xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent"
-              animate={{ fontSize: scrolled ? '1.125rem' : '1.25rem' }}
-              transition={{ duration: 0.3 }}
+            <span
+              className="text-lg tracking-tight transition-all duration-300"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
             >
               Expand Global
-            </motion.span>
+            </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-0.5">
             {links.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`relative px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+                className={`relative px-3.5 py-2 text-[0.8125rem] font-medium rounded-lg transition-all duration-200 ${
                   isActive(link.path)
-                    ? 'text-purple-600 dark:text-purple-400 bg-purple-100/60 dark:bg-purple-900/20'
-                    : 'text-[var(--text-secondary)] hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/10'
+                    ? 'text-[var(--color-accent)] bg-[var(--color-accent-light)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]'
                 }`}
               >
                 {link.name}
@@ -120,60 +110,52 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-2">
-            <motion.button
+          <div className="hidden md:flex items-center gap-2.5">
+            <button
               onClick={toggleDarkMode}
-              className="p-2.5 rounded-xl bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200 cursor-pointer border border-[var(--border-color)]"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all duration-200 cursor-pointer"
               aria-label="Toggle theme"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
-              {darkMode ? <BsSun size={16} /> : <BsMoonStars size={16} />}
-            </motion.button>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                to={currentUser ? (isAdmin ? '/admin' : '/dashboard') : '/auth'}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white text-sm font-medium rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/20 hover:shadow-purple-600/40"
-              >
-                <span className="hidden lg:inline">{currentUser ? (isAdmin ? 'Admin' : 'Account') : 'Sign In'}</span>
-                <span className="lg:hidden">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                </span>
-              </Link>
-            </motion.div>
+              {darkMode ? <BsSun size={15} /> : <BsMoonStars size={15} />}
+            </button>
+            <Link
+              to={currentUser ? (isAdmin ? '/admin' : '/dashboard') : '/auth'}
+              className="inline-flex items-center px-5 py-2 text-[0.8125rem] font-semibold rounded-lg bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-all duration-200 shadow-sm hover:shadow-md pressable"
+            >
+              {currentUser ? (isAdmin ? 'Admin Panel' : 'My Account') : 'Get Started'}
+            </Link>
           </div>
 
           <div className="md:hidden flex items-center gap-1.5">
-            <motion.button
+            <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200 cursor-pointer"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors duration-200 cursor-pointer"
               aria-label="Toggle theme"
-              whileTap={{ scale: 0.95 }}
             >
-              {darkMode ? <BsSun size={16} /> : <BsMoonStars size={16} />}
-            </motion.button>
-            <motion.button
+              {darkMode ? <BsSun size={15} /> : <BsMoonStars size={15} />}
+            </button>
+            <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-xl text-[var(--text-primary)] hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200 cursor-pointer"
+              className="p-2 rounded-lg text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors duration-200 cursor-pointer"
               aria-label="Toggle menu"
-              whileTap={{ scale: 0.95 }}
             >
               {mobileOpen ? <HiX size={20} /> : <HiMenu size={20} />}
-            </motion.button>
+            </button>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scaleY: 0.95 }}
-            animate={{ opacity: 1, y: 0, scaleY: 1 }}
-            exit={{ opacity: 0, y: -10, scaleY: 0.95 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute top-full left-4 right-4 mt-2 rounded-2xl glass shadow-xl border border-[var(--glass-border)] overflow-hidden md:hidden"
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute top-[72px] left-4 right-4 sm:left-6 sm:right-6 rounded-2xl glass shadow-xl overflow-hidden md:hidden"
+            style={{ border: '1px solid var(--border-default)' }}
           >
-            <div className="px-4 py-3 space-y-1">
+            <div className="p-3 space-y-0.5">
               {links.map((link) => (
                 <Link
                   key={link.path}
@@ -181,20 +163,22 @@ export default function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive(link.path)
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
-                      : 'text-[var(--text-secondary)] hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400'
+                      ? 'text-[var(--color-accent)] bg-[var(--color-accent-light)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]'
                   }`}
                 >
                   {link.name}
                 </Link>
               ))}
-              <Link
-                to={currentUser ? (isAdmin ? '/admin' : '/dashboard') : '/auth'}
-                onClick={() => setMobileOpen(false)}
-                className="block px-4 py-2.5 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-center mt-2"
-              >
-                {currentUser ? (isAdmin ? 'Admin' : 'Account') : 'Sign In'}
-              </Link>
+              <div className="pt-1.5 mt-1.5" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                <Link
+                  to={currentUser ? (isAdmin ? '/admin' : '/dashboard') : '/auth'}
+                  onClick={() => setMobileOpen(false)}
+                  className="block px-4 py-2.5 rounded-xl text-sm font-semibold text-white text-center bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] transition-all duration-200"
+                >
+                  {currentUser ? (isAdmin ? 'Admin Panel' : 'My Account') : 'Get Started'}
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

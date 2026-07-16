@@ -54,7 +54,7 @@ export default function AdminDesignRequestReply() {
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-[var(--text-secondary)]">Redirecting...</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Redirecting...</p>
       </div>
     );
   }
@@ -62,7 +62,7 @@ export default function AdminDesignRequestReply() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-[var(--text-secondary)]">Loading...</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function AdminDesignRequestReply() {
   if (!request) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-[var(--text-secondary)]">Design request not found.</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Design request not found.</p>
       </div>
     );
   }
@@ -81,10 +81,8 @@ export default function AdminDesignRequestReply() {
 
   return (
     <div className="min-h-screen">
-      <div className="relative overflow-hidden bg-gradient-to-r from-purple-700 via-purple-600 to-fuchsia-600 dark:from-purple-950 dark:via-indigo-950 dark:to-purple-900">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+      <div style={{ background: 'var(--color-accent)' }}>
+        <div className="px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -92,50 +90,90 @@ export default function AdminDesignRequestReply() {
           >
             <button
               onClick={() => navigate('/admin/design-requests')}
-              className="flex items-center gap-2 text-purple-200 hover:text-white transition-colors duration-200 mb-4 cursor-pointer"
+              className="flex items-center gap-2 mb-4 cursor-pointer transition-colors duration-200"
+              style={{ color: 'var(--color-accent-light)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-accent-light)'; }}
             >
               <FaArrowLeft /> Back to Design Requests
             </button>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Reply to Request</h1>
-            <p className="text-purple-200/80">Review project details and set pricing</p>
+            <h1
+              className="text-3xl sm:text-4xl font-bold text-white mb-2"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              Reply to Request
+            </h1>
+            <p style={{ color: 'var(--color-accent-light)' }}>
+              Review project details and set pricing
+            </p>
           </motion.div>
         </div>
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8 max-w-3xl mx-auto">
         <motion.div
-          className="p-6 rounded-2xl glass-strong shadow-lg"
+          className="p-6 rounded-2xl glass-strong"
+          style={{
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border-default)',
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h2 className="text-lg font-semibold mb-4">Project Details</h2>
-          <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] mb-6 space-y-3">
+          <h2
+            className="text-lg font-semibold mb-4"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Project Details
+          </h2>
+          <div
+            className="p-4 rounded-xl mb-6 space-y-3"
+            style={{
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border-default)',
+            }}
+          >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center text-white font-bold text-sm">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                style={{ background: 'var(--color-accent)' }}
+              >
                 {request.name?.split(' ').map(n => n[0]).join('') || '?'}
               </div>
               <div>
                 <p className="text-sm font-medium">{request.name || 'Unknown'}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{request.email}</p>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  {request.email}
+                </p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 text-xs text-[var(--text-secondary)]">
+            <div className="grid grid-cols-2 gap-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
               <span><strong>Service:</strong> {request.service}</span>
               <span><strong>Phone:</strong> {request.phone || 'Not specified'}</span>
               <span><strong>Timeline:</strong> {request.timeline || 'Not specified'}</span>
               <span><strong>Budget:</strong> {request.budget || 'Not specified'}</span>
             </div>
             <div>
-              <p className="text-xs text-[var(--text-secondary)]"><strong>Description:</strong></p>
+              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                <strong>Description:</strong>
+              </p>
               <p className="text-sm mt-1">{request.description}</p>
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold mb-4">Set Project Pricing</h2>
+          <h2
+            className="text-lg font-semibold mb-4"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Set Project Pricing
+          </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+              <label
+                className="block text-sm font-medium mb-1.5"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 Standard Price (₦)
               </label>
               <input
@@ -143,12 +181,20 @@ export default function AdminDesignRequestReply() {
                 value={standardPrice}
                 onChange={(e) => setStandardPrice(e.target.value)}
                 placeholder="e.g. 50000"
-                className="w-full px-4 py-2.5 text-sm rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2.5 text-sm rounded-xl input-base"
+                style={{
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border-default)',
+                  color: 'var(--text-primary)',
+                }}
                 min="0"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+              <label
+                className="block text-sm font-medium mb-1.5"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 Premium Price (₦)
               </label>
               <input
@@ -156,29 +202,45 @@ export default function AdminDesignRequestReply() {
                 value={premiumPrice}
                 onChange={(e) => setPremiumPrice(e.target.value)}
                 placeholder="e.g. 100000"
-                className="w-full px-4 py-2.5 text-sm rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2.5 text-sm rounded-xl input-base"
+                style={{
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border-default)',
+                  color: 'var(--text-primary)',
+                }}
                 min="0"
               />
             </div>
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-              Comment <span className="text-[var(--text-tertiary)]">(optional)</span>
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Comment <span style={{ color: 'var(--text-tertiary)' }}>(optional)</span>
             </label>
             <textarea
               value={adminComment}
               onChange={(e) => setAdminComment(e.target.value)}
               placeholder="Add a comment or clarification about the project..."
-              className="w-full px-4 py-2.5 text-sm rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+              className="w-full px-4 py-2.5 text-sm rounded-xl resize-none input-base"
+              style={{
+                background: 'var(--bg-primary)',
+                border: '1px solid var(--border-default)',
+                color: 'var(--text-primary)',
+              }}
               rows={4}
             />
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[var(--border-color)]">
-            <div className="text-sm text-[var(--text-secondary)]">
+          <div
+            className="flex items-center justify-between pt-4"
+            style={{ borderTop: '1px solid var(--border-default)' }}
+          >
+            <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               {isValid && (
-                <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                <span className="font-medium" style={{ color: '#059669' }}>
                   Prices set: ₦{standard.toLocaleString()} / ₦{premium.toLocaleString()}
                 </span>
               )}
@@ -186,14 +248,25 @@ export default function AdminDesignRequestReply() {
             <div className="flex gap-3">
               <button
                 onClick={() => navigate('/admin/design-requests')}
-                className="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-700 text-[var(--text-secondary)] hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 cursor-pointer"
+                className="px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  color: 'var(--text-secondary)',
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleAccept}
                 disabled={!isValid || submitting}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer pressable"
+                style={{ background: '#059669' }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) e.currentTarget.style.background = '#047857';
+                }}
+                onMouseLeave={(e) => {
+                  if (!e.currentTarget.disabled) e.currentTarget.style.background = '#059669';
+                }}
               >
                 <FaCheckCircle />
                 {submitting ? 'Submitting...' : 'Accept & Submit'}

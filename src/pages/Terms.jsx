@@ -54,37 +54,55 @@ const sections = [
   },
 ];
 
+const staggerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 },
+  },
+};
+
 export default function Terms() {
   return (
     <div className="pt-20">
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-transparent to-fuchsia-600/5 dark:from-purple-900/20 dark:to-transparent" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="max-w-3xl mx-auto text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="text-5xl sm:text-6xl font-bold mb-6 tracking-tight">
-              Terms &{' '}
-              <span className="text-gradient">Conditions</span>
+            <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>
+              Legal
+            </span>
+            <h1
+              className="text-5xl sm:text-6xl mb-6"
+              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
+            >
+              Terms & Conditions
             </h1>
-            <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
+            <p className="text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               Please read these terms carefully before using our services. By working with
               Expand Global, you agree to the following terms and conditions.
             </p>
-            <p className="text-sm text-[var(--text-secondary)] mt-4">
+            <p className="text-sm mt-4" style={{ color: 'var(--text-tertiary)' }}>
               Last updated: June 2026
             </p>
           </motion.div>
 
           <motion.div
             className="max-w-4xl mx-auto space-y-6"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-            }}
+            variants={staggerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
@@ -92,20 +110,33 @@ export default function Terms() {
             {sections.map(({ icon: Icon, title, content }) => (
               <motion.div
                 key={title}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                variants={itemVariants}
+                className="group p-6 sm:p-8 rounded-2xl hover-lift"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-default)',
                 }}
-                className="group p-6 sm:p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-purple-600/30 dark:hover:border-purple-400/30 transition-all duration-500 relative overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-fuchsia-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="flex items-start gap-4 relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                    <Icon className="text-xl text-purple-600 dark:text-purple-400" />
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300"
+                    style={{ background: 'var(--color-accent-light)' }}
+                  >
+                    <Icon className="text-xl" style={{ color: 'var(--color-accent)' }} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-3">{title}</h3>
-                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{content}</p>
+                    <h3
+                      className="text-lg font-semibold mb-3"
+                      style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+                    >
+                      {title}
+                    </h3>
+                    <p
+                      className="text-sm leading-relaxed"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      {content}
+                    </p>
                   </div>
                 </div>
               </motion.div>
@@ -113,19 +144,29 @@ export default function Terms() {
           </motion.div>
 
           <motion.div
-            className="max-w-3xl mx-auto mt-12 p-8 rounded-2xl bg-gradient-to-br from-purple-600/10 to-fuchsia-500/5 dark:from-purple-900/20 dark:to-fuchsia-900/10 border border-purple-600/20 dark:border-purple-400/20 text-center"
+            className="max-w-3xl mx-auto mt-12 p-8 rounded-2xl text-center"
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-default)',
+            }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <h3 className="text-xl font-semibold mb-4">Have Questions?</h3>
-            <p className="text-[var(--text-secondary)] mb-6">
+            <h3
+              className="text-xl font-semibold mb-4"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+            >
+              Have Questions?
+            </h3>
+            <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
               If you have any questions about these terms, please don&apos;t hesitate to contact us.
             </p>
             <motion.a
-              href="mailto:hello@expandglobal.com"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40"
+              href="mailto:esenichijindu53@gmail.com"
+              className="inline-flex items-center gap-2 px-8 py-3 font-semibold rounded-xl transition-all duration-200 pressable"
+              style={{ background: 'var(--color-accent)', color: 'white' }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >

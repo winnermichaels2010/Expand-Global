@@ -27,7 +27,7 @@ export default function UserLayout({ children }) {
   return (
     <div className="min-h-screen flex">
       <UserSidebar />
-      <div className="flex-1 md:ml-64">
+      <div className="flex-1 md:ml-64 pt-14 md:pt-0">
         {children}
       </div>
     </div>

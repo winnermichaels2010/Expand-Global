@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { useAuth } from '../../context/AuthContext';
 
@@ -47,6 +47,20 @@ export default function AdminDesignRequestReply() {
       adminComment: adminComment.trim(),
       repliedAt: new Date().toISOString(),
     });
+    if (request?.email) {
+      const q = query(collection(db, 'users'), where('email', '==', request.email));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const user = snap.docs[0];
+        await addDoc(collection(db, 'notifications'), {
+          userId: user.id,
+          message: `Your design request "${request.service}" has been accepted! Standard: ₦${standard.toLocaleString()}, Premium: ₦${premium.toLocaleString()}`,
+          type: 'design_request',
+          read: false,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
     setSubmitting(false);
     navigate('/admin/design-requests');
   }

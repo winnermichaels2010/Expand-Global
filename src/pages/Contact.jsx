@@ -2,6 +2,8 @@ import { HiMail, HiPhone, HiLocationMarker, HiClock } from 'react-icons/hi';
 import { FaInstagram, FaBehance, FaDribbble, FaLinkedin } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const staggerVariants = {
   hidden: { opacity: 0 },
@@ -28,6 +30,7 @@ const socialLinks = [
 ];
 
 export default function Contact() {
+  const { currentUser } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
@@ -133,6 +136,25 @@ export default function Contact() {
                   ))}
                 </div>
               </div>
+
+              <div className="flex flex-col gap-3">
+                <a
+                  href="tel:+2348160740145"
+                  className="flex items-center gap-3 px-5 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 pressable"
+                  style={{ background: 'var(--color-accent)', color: 'white' }}
+                >
+                  <HiPhone size={18} />
+                  Call Us Now
+                </a>
+                <a
+                  href="mailto:esenichijindu53@gmail.com"
+                  className="flex items-center gap-3 px-5 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 pressable"
+                  style={{ border: '1px solid var(--border-default)', color: 'var(--text-primary)' }}
+                >
+                  <HiMail size={18} />
+                  Send an Email
+                </a>
+              </div>
             </motion.div>
 
             {/* Right — Form */}
@@ -144,78 +166,108 @@ export default function Contact() {
               transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="p-8 sm:p-10 rounded-2xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}>
-                <h3 className="text-xl mb-2" style={{ fontFamily: 'var(--font-heading)' }}>Send us a message</h3>
-                <p className="text-sm mb-8" style={{ color: 'var(--text-tertiary)' }}>Fill out the form and we&apos;ll be in touch shortly.</p>
+                {currentUser ? (
+                  <>
+                    <h3 className="text-xl mb-2" style={{ fontFamily: 'var(--font-heading)' }}>Send us a message</h3>
+                    <p className="text-sm mb-8" style={{ color: 'var(--text-tertiary)' }}>Fill out the form and we&apos;ll be in touch shortly.</p>
 
-                {submitted && (
-                  <div className="mb-6 p-4 rounded-xl text-sm font-medium" style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', border: '1px solid var(--color-accent)' }}>
-                    Message sent! We&apos;ll get back to you soon.
+                    {submitted && (
+                      <div className="mb-6 p-4 rounded-xl text-sm font-medium" style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', border: '1px solid var(--color-accent)' }}>
+                        Message sent! We&apos;ll get back to you soon.
+                      </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                          <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Name</label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            required
+                            placeholder="Your name"
+                            className="input-base"
+                            style={inputStyle}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Email</label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            required
+                            placeholder="you@example.com"
+                            className="input-base"
+                            style={inputStyle}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Subject</label>
+                        <input
+                          type="text"
+                          name="subject"
+                          value={form.subject}
+                          onChange={handleChange}
+                          required
+                          placeholder="What's this about?"
+                          className="input-base"
+                          style={inputStyle}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Message</label>
+                        <textarea
+                          name="message"
+                          value={form.message}
+                          onChange={handleChange}
+                          required
+                          rows={5}
+                          placeholder="Tell us about your project..."
+                          className="input-base resize-none"
+                          style={inputStyle}
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3.5 px-6 font-semibold rounded-xl transition-all duration-200 pressable cursor-pointer"
+                        style={{ background: 'var(--color-accent)', color: 'white' }}
+                      >
+                        Send Message
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'var(--color-accent-light)' }}>
+                      <HiMail className="text-2xl" style={{ color: 'var(--color-accent)' }} />
+                    </div>
+                    <h3 className="text-xl mb-2" style={{ fontFamily: 'var(--font-heading)' }}>Log in to send a message</h3>
+                    <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+                      You need an account to contact us through this form. It only takes a minute.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                      <Link
+                        to="/auth"
+                        className="inline-flex items-center gap-2 px-7 py-3 font-semibold rounded-xl transition-all duration-200 pressable"
+                        style={{ background: 'var(--color-accent)', color: 'white' }}
+                      >
+                        Log In
+                      </Link>
+                      <a
+                        href="mailto:esenichijindu53@gmail.com"
+                        className="inline-flex items-center gap-2 px-7 py-3 font-semibold rounded-xl transition-all duration-200 pressable"
+                        style={{ border: '1px solid var(--border-default)', color: 'var(--text-secondary)' }}
+                      >
+                        Or Email Us Directly
+                      </a>
+                    </div>
                   </div>
                 )}
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Name</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="Your name"
-                        className="input-base"
-                        style={inputStyle}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                        placeholder="you@example.com"
-                        className="input-base"
-                        style={inputStyle}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Subject</label>
-                    <input
-                      type="text"
-                      name="subject"
-                      value={form.subject}
-                      onChange={handleChange}
-                      required
-                      placeholder="What's this about?"
-                      className="input-base"
-                      style={inputStyle}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-tertiary)' }}>Message</label>
-                    <textarea
-                      name="message"
-                      value={form.message}
-                      onChange={handleChange}
-                      required
-                      rows={5}
-                      placeholder="Tell us about your project..."
-                      className="input-base resize-none"
-                      style={inputStyle}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 px-6 font-semibold rounded-xl transition-all duration-200 pressable cursor-pointer"
-                    style={{ background: 'var(--color-accent)', color: 'white' }}
-                  >
-                    Send Message
-                  </button>
-                </form>
               </div>
             </motion.div>
 

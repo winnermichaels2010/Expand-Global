@@ -69,7 +69,8 @@ export function AuthProvider({ children }) {
     try {
       const snap = await getDocs(collection(db, 'users'));
       return snap.docs.map((d) => ({ userId: d.id, ...d.data() }));
-    } catch {
+    } catch (err) {
+      console.error('Failed to fetch registered users:', err);
       return [];
     }
   }
@@ -113,18 +114,19 @@ export function AuthProvider({ children }) {
     try {
       const snap = await getDocs(collection(db, 'designRequests'));
       return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    } catch {
+    } catch (err) {
+      console.error('Failed to fetch design requests:', err);
       return [];
     }
   }
 
   async function saveDesignRequest(request) {
+    await addDoc(collection(db, 'designRequests'), {
+      ...request,
+      status: 'Pending',
+      createdAt: new Date().toISOString(),
+    });
     try {
-      await addDoc(collection(db, 'designRequests'), {
-        ...request,
-        status: 'Pending',
-        createdAt: new Date().toISOString(),
-      });
       const q = query(collection(db, 'users'), where('email', '==', ADMIN_EMAIL));
       const snap = await getDocs(q);
       if (!snap.empty) {
@@ -138,7 +140,7 @@ export function AuthProvider({ children }) {
         });
       }
     } catch (err) {
-      console.error('Failed to save design request:', err);
+      console.error('Failed to notify admin:', err);
     }
   }
 

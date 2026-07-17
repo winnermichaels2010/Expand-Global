@@ -18,6 +18,8 @@ const designServices = [
 export default function RequestDesign() {
   const { currentUser, saveDesignRequest, getUserProfile } = useAuth();
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const [profile, setProfile] = useState(null);
 
   const displayName = profile
@@ -49,11 +51,20 @@ export default function RequestDesign() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    saveDesignRequest(formData);
-    setSubmitted(true);
-    setFormData({ name: displayName, email: currentUser?.email || '', phone: '', service: '', description: '', timeline: '' });
+    setSubmitting(true);
+    setError('');
+    try {
+      await saveDesignRequest(formData);
+      setSubmitted(true);
+      setFormData({ name: displayName, email: currentUser?.email || '', phone: '', service: '', description: '', timeline: '' });
+    } catch (err) {
+      console.error('Failed to submit design request:', err);
+      setError('Failed to submit request. Please check your connection and try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   function ServiceIcon({ icon, selected }) {
@@ -253,15 +264,29 @@ export default function RequestDesign() {
                 />
               </div>
 
+              {error && (
+                <div
+                  className="p-3 rounded-xl text-sm"
+                  style={{
+                    background: 'rgba(220, 38, 38, 0.08)',
+                    border: '1px solid rgba(220, 38, 38, 0.2)',
+                    color: '#dc2626',
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
               <motion.button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold rounded-xl transition-all duration-200 pressable"
+                disabled={submitting}
+                className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold rounded-xl transition-all duration-200 pressable disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ background: 'var(--color-accent)', color: 'white', boxShadow: '0 4px 12px hsl(270 60% 50% / 0.2)' }}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: submitting ? 1 : 1.01 }}
+                whileTap={{ scale: submitting ? 1 : 0.98 }}
               >
-                Submit Design Request
-                <HiPaperAirplane className="rotate-45" />
+                {submitting ? 'Submitting...' : 'Submit Design Request'}
+                {!submitting && <HiPaperAirplane className="rotate-45" />}
               </motion.button>
             </motion.form>
           </div>

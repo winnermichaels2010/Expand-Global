@@ -216,40 +216,56 @@ export default function Dashboard() {
                         </div>
                         <p className="text-xs mb-2" style={{ color: 'var(--text-secondary)' }}>{req.description}</p>
                         {req.status === 'Accepted' && (
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div
-                              className="p-2 rounded-lg"
-                              style={{
-                                background: 'rgba(16,185,129,0.08)',
-                                border: '1px solid rgba(16,185,129,0.2)',
-                              }}
-                            >
-                              <span style={{ color: '#10b981' }} className="font-medium">
-                                Standard: ₦{req.standardPrice?.toLocaleString()}
-                              </span>
+                          <div className="mt-2 space-y-2">
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div
+                                className="p-2 rounded-lg"
+                                style={{
+                                  background: 'rgba(16,185,129,0.08)',
+                                  border: '1px solid rgba(16,185,129,0.2)',
+                                }}
+                              >
+                                <span style={{ color: '#10b981' }} className="font-medium">
+                                  Standard: ₦{req.standardPrice?.toLocaleString()}
+                                </span>
+                              </div>
+                              <div
+                                className="p-2 rounded-lg"
+                                style={{
+                                  background: 'rgba(139,92,246,0.08)',
+                                  border: '1px solid rgba(139,92,246,0.2)',
+                                }}
+                              >
+                                <span style={{ color: 'var(--color-accent)' }} className="font-medium">
+                                  Premium: ₦{req.premiumPrice?.toLocaleString()}
+                                </span>
+                              </div>
                             </div>
-                            <div
-                              className="p-2 rounded-lg"
-                              style={{
-                                background: 'rgba(139,92,246,0.08)',
-                                border: '1px solid rgba(139,92,246,0.2)',
-                              }}
-                            >
-                              <span style={{ color: 'var(--color-accent)' }} className="font-medium">
-                                Premium: ₦{req.premiumPrice?.toLocaleString()}
-                              </span>
-                            </div>
+                            {req.adminComment && (
+                              <div
+                                className="p-2 rounded-lg text-xs"
+                                style={{
+                                  background: 'rgba(16,185,129,0.06)',
+                                  border: '1px solid rgba(16,185,129,0.15)',
+                                }}
+                              >
+                                <p className="font-medium mb-1" style={{ color: '#10b981' }}>Admin Reply:</p>
+                                <p style={{ color: 'var(--text-secondary)' }}>{req.adminComment}</p>
+                              </div>
+                            )}
                           </div>
                         )}
-                        {req.adminComment && (
-                          <p className="text-xs italic mt-2" style={{ color: 'var(--text-secondary)' }}>
-                            &ldquo;{req.adminComment}&rdquo;
-                          </p>
-                        )}
                         {req.status === 'Rejected' && req.rejectReason && (
-                          <p className="text-xs mt-2" style={{ color: '#ef4444' }}>
-                            Reason: {req.rejectReason}
-                          </p>
+                          <div
+                            className="p-2 rounded-lg text-xs mt-2"
+                            style={{
+                              background: 'rgba(239,68,68,0.06)',
+                              border: '1px solid rgba(239,68,68,0.15)',
+                            }}
+                          >
+                            <p className="font-medium mb-1" style={{ color: '#ef4444' }}>Rejection Reason:</p>
+                            <p style={{ color: 'var(--text-secondary)' }}>{req.rejectReason}</p>
+                          </div>
                         )}
                       </div>
                     );

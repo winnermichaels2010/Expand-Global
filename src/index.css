@@ -186,8 +186,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .video-marquee-item {
-  width: 320px;
-  height: 180px;
+  width: 200px;
+  height: 200px;
   border-radius: 12px;
   flex-shrink: 0;
 }

@@ -15,10 +15,19 @@ const navLinks = [
 
 export default function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const { currentUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const adminUid = currentUser?.uid;
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const handler = (e) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    setIsDesktop(mq.matches);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useEffect(() => {
     setIsOpen(false);
@@ -78,7 +87,7 @@ export default function AdminSidebar() {
         style={{
           background: 'var(--bg-secondary)',
           borderRight: '1px solid var(--border-default)',
-          transform: isOpen ? 'translateX(0)' : undefined,
+          transform: isDesktop ? 'translateX(0)' : (isOpen ? 'translateX(0)' : 'translateX(-100%)'),
         }}
       >
         <div

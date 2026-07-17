@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -19,6 +20,22 @@ import AdminDesignRequests from './pages/admin/AdminDesignRequests';
 import AdminDesignRequestReply from './pages/admin/AdminDesignRequestReply';
 import AdminSettings from './pages/admin/AdminSettings';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+function HomeRedirect() {
+  const { currentUser, loading } = useAuth();
+  if (loading) return null;
+  if (currentUser) {
+    const isAdmin = currentUser.email === 'adminemail@gmail.com';
+    return <Navigate to={isAdmin ? '/admin' : '/dashboard'} replace />;
+  }
+  return <Home />;
+}
+
 function AppLayout() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
@@ -27,10 +44,11 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       {showPublicLayout && <Navbar />}
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomeRedirect />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/terms" element={<Terms />} />

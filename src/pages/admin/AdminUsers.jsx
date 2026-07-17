@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
@@ -6,16 +6,24 @@ import { useAuth } from '../../context/AuthContext';
 export default function AdminUsers() {
   const { currentUser, getRegisteredUsers, toggleUserStatus, ADMIN_EMAIL } = useAuth();
   const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    const users = await getRegisteredUsers();
+    setRegisteredUsers(users);
+    setLoading(false);
+  }, [getRegisteredUsers]);
 
   useEffect(() => {
     if (currentUser?.email === ADMIN_EMAIL) {
-      getRegisteredUsers().then(setRegisteredUsers);
+      fetchUsers();
     }
-  }, [currentUser, getRegisteredUsers, ADMIN_EMAIL]);
+  }, [currentUser, ADMIN_EMAIL, fetchUsers]);
 
   async function handleToggleUser(userId) {
     await toggleUserStatus(userId);
-    getRegisteredUsers().then(setRegisteredUsers);
+    fetchUsers();
   }
 
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
@@ -47,7 +55,9 @@ export default function AdminUsers() {
         >
           <h2 className="text-lg font-semibold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>User Management ({registeredUsers.length} total)</h2>
           <div className="space-y-3">
-            {registeredUsers.length === 0 ? (
+            {loading ? (
+              <p className="text-sm text-center py-8" style={{ color: 'var(--text-secondary)' }}>Loading users...</p>
+            ) : registeredUsers.length === 0 ? (
               <p className="text-sm text-center py-8" style={{ color: 'var(--text-secondary)' }}>No registered users yet.</p>
             ) : (
               [...registeredUsers].reverse().map((user) => (
@@ -57,12 +67,16 @@ export default function AdminUsers() {
                   style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-default)' }}
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      {user.firstName?.[0] || user.email?.[0]?.toUpperCase() || '?'}
-                    </div>
+                    {user.profilePicture ? (
+                      <img src={user.profilePicture} alt="" className="w-10 h-10 rounded-full object-cover" style={{ border: '2px solid var(--border-default)' }} />
+                    ) : (
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                        style={{ background: 'var(--color-accent)' }}
+                      >
+                        {user.firstName?.[0] || user.email?.[0]?.toUpperCase() || '?'}
+                      </div>
+                    )}
                     <div>
                       <p className="text-sm font-medium">
                         {[user.surname, user.firstName, user.lastName].filter(Boolean).join(' ') || user.email}

@@ -4,6 +4,7 @@ import { FaTachometerAlt, FaPalette, FaCog, FaSignOutAlt } from 'react-icons/fa'
 import { HiMenu, HiX } from 'react-icons/hi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import NotificationPanel from './NotificationPanel';
 
 const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: FaTachometerAlt },
@@ -13,9 +14,18 @@ const navLinks = [
 
 export default function UserSidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { logout } = useAuth();
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const { currentUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const handler = (e) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    setIsDesktop(mq.matches);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useEffect(() => {
     setIsOpen(false);
@@ -75,7 +85,7 @@ export default function UserSidebar() {
         style={{
           background: 'var(--bg-secondary)',
           borderRight: '1px solid var(--border-default)',
-          transform: isOpen ? 'translateX(0)' : undefined,
+          transform: isDesktop ? 'translateX(0)' : (isOpen ? 'translateX(0)' : 'translateX(-100%)'),
         }}
       >
         <Link
@@ -130,9 +140,12 @@ export default function UserSidebar() {
         </nav>
 
         <div
-          className="px-3 py-3"
+          className="px-3 py-3 space-y-2"
           style={{ borderTop: '1px solid var(--border-default)' }}
         >
+          <div className="flex items-center justify-center">
+            {currentUser && <NotificationPanel userId={currentUser.uid} />}
+          </div>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-white text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"

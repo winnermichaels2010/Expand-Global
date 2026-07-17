@@ -235,7 +235,7 @@ export default function Home() {
 
             <motion.h1
               className="text-5xl sm:text-6xl lg:text-8xl"
-              style={{ fontFamily: 'var(--font-heading)', color: 'white', letterSpacing: '-0.04em', lineHeight: 1.05 }}
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', letterSpacing: '-0.04em', lineHeight: 1.05 }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -246,7 +246,7 @@ export default function Home() {
 
             <motion.p
               className="text-lg sm:text-xl lg:text-2xl font-light max-w-2xl mx-auto mt-6 mb-10"
-              style={{ color: 'hsl(0 0% 100% / 0.55)', lineHeight: 1.6 }}
+              style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -271,7 +271,7 @@ export default function Home() {
               <Link
                 to="/about"
                 className="inline-flex items-center gap-2 px-8 py-3.5 font-semibold rounded-xl transition-all duration-300 pressable"
-                style={{ border: '2px solid hsl(0 0% 100% / 0.2)', color: 'hsl(0 0% 100% / 0.8)' }}
+                style={{ border: '2px solid var(--border-default)', color: 'var(--text-primary)' }}
               >
                 Learn More
               </Link>
@@ -588,7 +588,7 @@ export default function Home() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="relative group">
-              <div className="absolute -inset-4 rounded-full transition-all duration-500 group-hover:-inset-6" style={{ background: 'hsl(247 12% 50% / 0.06)' }} />
+              <div className="absolute -inset-4 rounded-full transition-all duration-500 group-hover:-inset-6" style={{ background: 'hsl(270 60% 50% / 0.06)' }} />
               <img
                 src="/expand-global-logo.jpg"
                 alt="Expand Global Logo"

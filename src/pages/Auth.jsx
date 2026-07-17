@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
@@ -16,7 +16,7 @@ function PasswordStrength({ password }) { // eslint-disable-line react/prop-type
   const strength = passwordRequirements.filter((r) => r.test(password)).length;
   const bars = [
     { active: strength >= 1, color: '#ef4444' },
-    { active: strength >= 2, color: 'hsl(247 12% 50%)' },
+    { active: strength >= 2, color: 'hsl(270 60% 50%)' },
     { active: strength >= 3, color: '#10b981' },
   ];
 
@@ -75,6 +75,7 @@ export default function Auth() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const { signup, login, loginWithGoogle, currentUser, saveUserProfile } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
@@ -99,6 +100,9 @@ export default function Auth() {
     }
     if (password.length < 6) {
       return setError('Password must be at least 6 characters');
+    }
+    if (!isLogin && !agreedToTerms) {
+      return setError('You must agree to the Terms & Conditions');
     }
 
     setLoading(true);
@@ -136,6 +140,9 @@ export default function Auth() {
 
   async function handleGoogleLogin() {
     setError('');
+    if (!isLogin && !agreedToTerms) {
+      return setError('You must agree to the Terms & Conditions');
+    }
     setLoading(true);
     try {
       const result = await loginWithGoogle();
@@ -144,6 +151,7 @@ export default function Auth() {
         surname: result.user.displayName?.split(' ').slice(1).join(' ') || '',
         firstName: result.user.displayName?.split(' ')[0] || '',
         lastName: '',
+        profilePicture: result.user.photoURL || '',
         createdAt: new Date().toISOString(),
       });
       redirectUser(result.user.email);
@@ -400,9 +408,27 @@ export default function Auth() {
               </div>
             )}
 
+            {!isLogin && (
+              <div className="flex items-start gap-2.5 pt-1">
+                <input
+                  type="checkbox"
+                  id="agreeTerms"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded cursor-pointer accent-[var(--color-accent)]"
+                />
+                <label htmlFor="agreeTerms" className="text-xs leading-relaxed cursor-pointer" style={{ color: 'var(--text-secondary)' }}>
+                  I agree to the{' '}
+                  <Link to="/terms" className="font-semibold hover:underline" style={{ color: 'var(--color-accent)' }}>
+                    Terms &amp; Conditions
+                  </Link>
+                </label>
+              </div>
+            )}
+
             <motion.button
               type="submit"
-              disabled={loading}
+              disabled={loading || (!isLogin && !agreedToTerms)}
               className="pressable w-full py-3 rounded-xl text-white font-semibold transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               style={{ background: 'var(--color-accent)' }}
               whileHover={{ scale: loading ? 1 : 1.01 }}
@@ -432,7 +458,7 @@ export default function Auth() {
 
           <motion.button
             onClick={handleGoogleLogin}
-            disabled={loading}
+            disabled={loading || (!isLogin && !agreedToTerms)}
             className="pressable w-full py-3 rounded-xl font-medium flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer disabled:opacity-60"
             style={{
               background: 'var(--bg-elevated)',

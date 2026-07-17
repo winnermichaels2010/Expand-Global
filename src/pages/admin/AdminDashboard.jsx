@@ -37,7 +37,7 @@ export default function AdminDashboard() {
       label: 'Pending Requests',
       value: pendingRequests.length,
       icon: FaCheck,
-      iconBg: '#d97706',
+      iconBg: 'var(--color-accent)',
     },
     {
       label: 'Active Users',
@@ -161,12 +161,12 @@ export default function AdminDashboard() {
                               request.status === 'Completed' ? 'hsl(160 84% 39% / 0.12)' :
                               request.status === 'In Progress' ? 'hsl(217 91% 60% / 0.12)' :
                               request.status === 'Rejected' ? 'hsl(0 84% 60% / 0.12)' :
-                              'hsl(38 92% 50% / 0.12)',
+                              'hsl(247 12% 50% / 0.12)',
                             color:
                               request.status === 'Completed' ? '#059669' :
                               request.status === 'In Progress' ? '#2563eb' :
                               request.status === 'Rejected' ? '#dc2626' :
-                              '#d97706',
+                              'var(--color-accent)',
                           }}
                         >
                           {request.status}

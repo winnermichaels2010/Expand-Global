@@ -84,7 +84,7 @@ export default function RequestDesign() {
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
             className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-            style={{ background: 'var(--color-accent)', boxShadow: '0 8px 24px hsl(32 85% 50% / 0.25)' }}
+            style={{ background: 'var(--color-accent)', boxShadow: '0 8px 24px hsl(270 60% 50% / 0.25)' }}
           >
             <HiPaperAirplane className="text-4xl text-white rotate-45" />
           </motion.div>
@@ -95,7 +95,7 @@ export default function RequestDesign() {
           <motion.button
             onClick={() => setSubmitted(false)}
             className="px-8 py-3 font-medium rounded-xl transition-all duration-200 pressable"
-            style={{ background: 'var(--color-accent)', color: 'white', boxShadow: '0 4px 12px hsl(32 85% 50% / 0.2)' }}
+            style={{ background: 'var(--color-accent)', color: 'white', boxShadow: '0 4px 12px hsl(270 60% 50% / 0.2)' }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
@@ -256,7 +256,7 @@ export default function RequestDesign() {
               <motion.button
                 type="submit"
                 className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold rounded-xl transition-all duration-200 pressable"
-                style={{ background: 'var(--color-accent)', color: 'white', boxShadow: '0 4px 12px hsl(32 85% 50% / 0.2)' }}
+                style={{ background: 'var(--color-accent)', color: 'white', boxShadow: '0 4px 12px hsl(270 60% 50% / 0.2)' }}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
               >

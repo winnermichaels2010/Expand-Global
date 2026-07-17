@@ -16,7 +16,7 @@ function PasswordStrength({ password }) { // eslint-disable-line react/prop-type
   const strength = passwordRequirements.filter((r) => r.test(password)).length;
   const bars = [
     { active: strength >= 1, color: '#ef4444' },
-    { active: strength >= 2, color: '#f59e0b' },
+    { active: strength >= 2, color: 'hsl(247 12% 50%)' },
     { active: strength >= 3, color: '#10b981' },
   ];
 

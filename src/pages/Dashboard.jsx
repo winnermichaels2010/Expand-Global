@@ -17,7 +17,7 @@ const statusIcons = {
 };
 
 const statusColors = {
-  Pending: '#f59e0b',
+  Pending: 'hsl(247 12% 50%)',
   Accepted: '#10b981',
   Rejected: '#ef4444',
 };
@@ -187,11 +187,11 @@ export default function Dashboard() {
                 <div className="space-y-3">
                   {[...designRequests].reverse().map((req) => {
                     const StatusIcon = statusIcons[req.status] || FaClock;
-                    const badgeColor = statusColors[req.status] || '#f59e0b';
+                    const badgeColor = statusColors[req.status] || 'hsl(247 12% 50%)';
                     const badgeBg =
                       req.status === 'Accepted' ? 'rgba(16,185,129,0.12)' :
                       req.status === 'Rejected' ? 'rgba(239,68,68,0.12)' :
-                      'rgba(245,158,11,0.12)';
+                      'hsl(247 12% 50% / 0.12)';
                     return (
                       <div
                         key={req.id}

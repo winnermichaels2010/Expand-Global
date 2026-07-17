@@ -43,7 +43,7 @@ export default function AdminDesignRequests() {
 
   const getStatusBadge = (status) => {
     const styles = {
-      Pending: { background: 'hsl(38 92% 50% / 0.12)', color: '#d97706' },
+      Pending: { background: 'hsl(247 12% 50% / 0.12)', color: 'var(--color-accent)' },
       'In Progress': { background: 'hsl(217 91% 60% / 0.12)', color: '#2563eb' },
       Completed: { background: 'hsl(160 84% 39% / 0.12)', color: '#059669' },
       Rejected: { background: 'hsl(0 84% 60% / 0.12)', color: '#dc2626' },

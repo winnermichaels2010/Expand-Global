@@ -512,7 +512,7 @@ export default function Home() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="relative group">
-              <div className="absolute -inset-4 rounded-full transition-all duration-500 group-hover:-inset-6" style={{ background: 'hsl(32 85% 50% / 0.06)' }} />
+              <div className="absolute -inset-4 rounded-full transition-all duration-500 group-hover:-inset-6" style={{ background: 'hsl(247 12% 50% / 0.06)' }} />
               <img
                 src="/expand-global-logo.jpg"
                 alt="Expand Global Logo"

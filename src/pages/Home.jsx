@@ -1,8 +1,8 @@
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HiArrowRight } from 'react-icons/hi';
 import { FaPalette, FaBullhorn, FaLaptopCode, FaQuoteLeft, FaPlay, FaTimes, FaExpand } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
 
 const services = [
   {
@@ -23,10 +23,10 @@ const services = [
 ];
 
 const stats = [
-  { value: '50+', label: 'Projects Completed' },
-  { value: '30+', label: 'Happy Clients' },
-  { value: '5+', label: 'Years Experience' },
-  { value: '15+', label: 'Awards Won' },
+  { value: 50, suffix: '+', label: 'Projects Delivered' },
+  { value: 30, suffix: '+', label: 'Happy Clients' },
+  { value: 5, suffix: '+', label: 'Years in the Game' },
+  { value: 15, suffix: '+', label: 'Awards Won' },
 ];
 
 const testimonials = [
@@ -51,6 +51,38 @@ const itemVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
+
+function CountUp({ target, suffix = '', duration = 1.8 }) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setStarted(true); },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    let start = null;
+    const step = (timestamp) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / (duration * 1000), 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [started, target, duration]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+}
 
 const galleryImages = [
   { src: '/images/images/IMG-20260703-WA0002.jpg', alt: 'Project showcase' },
@@ -103,43 +135,33 @@ const galleryVideos = [
   '/videos/VID-21.mp4',
 ];
 
-const coverVideos = [
-  { url: '/cover-videos/lv_0_20260716171701.mp4', title: 'Brand Identity', subtitle: 'Crafting visual stories that resonate' },
-  { url: '/cover-videos/lv_0_20260716171930.mp4', title: 'Graphic Design', subtitle: 'Where creativity meets precision' },
-  { url: '/cover-videos/lv_0_20260716172137.mp4', title: 'Digital Art', subtitle: 'Pixel-perfect experiences' },
-  { url: '/cover-videos/lv_0_20260716172258.mp4', title: 'Brand Strategy', subtitle: 'Building brands that matter' },
-  { url: '/cover-videos/lv_0_20260716172450.mp4', title: 'Creative Excellence', subtitle: 'Design that speaks volumes' },
-  { url: '/cover-videos/lv_0_20260716172611.mp4', title: 'Expand Global', subtitle: 'Elevating brands worldwide' },
-];
-
 export default function Home() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const pointerStart = useRef(null);
-  const [transitioning, setTransitioning] = useState(false);
   const [videoModal, setVideoModal] = useState({ open: false, src: '' });
   const videoRef = useRef(null);
-  const coverVideoRef = useRef(null);
+  const marqueeRef = useRef(null);
+  const dragState = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
 
-  const goTo = (index) => {
-    if (transitioning) return;
-    const target = (index + coverVideos.length) % coverVideos.length;
-    if (target === activeIndex) return;
-    setTransitioning(true);
-    setActiveIndex(target);
-    setTimeout(() => setTransitioning(false), 800);
+  const handleDragStart = (e) => {
+    const el = marqueeRef.current;
+    if (!el) return;
+    dragState.current = { isDragging: true, startX: e.pageX || e.touches?.[0]?.pageX || 0, scrollLeft: el.scrollLeft };
+    el.classList.add('paused');
   };
 
-  const handlePointerDown = (e) => { pointerStart.current = e.pageX; };
-  const handlePointerUp = (e) => {
-    if (pointerStart.current === null) return;
-    const diff = pointerStart.current - e.pageX;
-    if (Math.abs(diff) > 50) goTo(diff > 0 ? activeIndex + 1 : activeIndex - 1);
-    pointerStart.current = null;
+  const handleDragMove = (e) => {
+    if (!dragState.current.isDragging) return;
+    e.preventDefault();
+    const el = marqueeRef.current;
+    if (!el) return;
+    const x = e.pageX || e.touches?.[0]?.pageX || 0;
+    const walk = (dragState.current.startX - x) * 1.5;
+    el.scrollLeft = dragState.current.scrollLeft + walk;
   };
 
-  useEffect(() => {
-    if (coverVideoRef.current) coverVideoRef.current.play().catch(() => {});
-  }, [activeIndex]);
+  const handleDragEnd = () => {
+    dragState.current.isDragging = false;
+    if (marqueeRef.current) marqueeRef.current.classList.remove('paused');
+  };
 
   const openVideoModal = (src) => setVideoModal({ open: true, src });
   const closeVideoModal = () => {
@@ -149,70 +171,116 @@ export default function Home() {
 
   return (
     <div>
-      {/* ===== HERO VIDEO CAROUSEL ===== */}
-      <section
-        className="relative h-[320px] sm:h-[480px] lg:h-[640px] overflow-hidden select-none"
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-      >
-        <AnimatePresence>
-          <motion.div
-            key={activeIndex}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0"
-          >
-            <video
-              ref={coverVideoRef}
-              src={coverVideos[activeIndex].url}
-              className="w-full h-full object-cover"
-              muted
-              playsInline
-              onEnded={() => goTo(activeIndex + 1)}
-              key={activeIndex}
-            />
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, hsl(230 15% 8% / 0.75), hsl(230 15% 8% / 0.2) 50%, hsl(230 15% 8% / 0.35))' }} />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-4 max-w-3xl">
-                <motion.h1
-                  className="text-4xl sm:text-5xl lg:text-7xl mb-4"
-                  style={{ fontFamily: 'var(--font-heading)', color: 'white', letterSpacing: '-0.03em', lineHeight: 1.05 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  {coverVideos[activeIndex].title}
-                </motion.h1>
-                <motion.p
-                  className="text-base sm:text-lg lg:text-xl font-light"
-                  style={{ color: 'hsl(0 0% 100% / 0.7)' }}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.35 }}
-                >
-                  {coverVideos[activeIndex].subtitle}
-                </motion.p>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+      {/* ===== HERO ANIMATED SECTION ===== */}
+      <section className="relative min-h-screen lg:h-[85vh] overflow-hidden select-none flex flex-col" style={{ paddingTop: '100px' }}>
+        <div className="absolute inset-0" style={{ background: 'var(--bg-primary)' }} />
 
-        {/* Navigation dots */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {coverVideos.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goTo(index)}
-              className="h-1.5 rounded-full transition-all duration-400 cursor-pointer"
-              style={{
-                width: index === activeIndex ? '28px' : '6px',
-                background: index === activeIndex ? 'white' : 'hsl(0 0% 100% / 0.35)',
-              }}
-            />
-          ))}
+        {/* Floating orbs */}
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: '600px', height: '600px',
+            background: 'radial-gradient(circle, hsl(270 60% 50% / 0.22), transparent 70%)',
+            top: '-15%', right: '-12%',
+            filter: 'blur(80px)',
+          }}
+          animate={{ x: [0, 40, -25, 0], y: [0, -25, 20, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: '500px', height: '500px',
+            background: 'radial-gradient(circle, hsl(270 60% 50% / 0.14), transparent 70%)',
+            bottom: '-10%', left: '-8%',
+            filter: 'blur(60px)',
+          }}
+          animate={{ x: [0, -30, 20, 0], y: [0, 25, -15, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute rounded-full"
+          style={{
+            width: '350px', height: '350px',
+            background: 'radial-gradient(circle, hsl(280 70% 60% / 0.1), transparent 70%)',
+            top: '35%', left: '45%',
+            filter: 'blur(50px)',
+          }}
+          animate={{ x: [0, 50, -35, 0], y: [0, -35, 25, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        {/* Subtle grid */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'linear-gradient(hsl(270 60% 50% / 0.04) 1px, transparent 1px), linear-gradient(90deg, hsl(270 60% 50% / 0.04) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
+        }} />
+
+        {/* Grain */}
+        <div className="grain-overlay absolute inset-0" />
+
+        {/* Content */}
+        <div className="relative z-10 flex-1 flex items-center justify-center px-4 pb-20">
+          <div className="text-center max-w-4xl">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8" style={{ background: 'hsl(270 60% 50% / 0.12)', border: '1px solid hsl(270 60% 50% / 0.2)' }}>
+                <div className="w-2 h-2 rounded-full" style={{ background: 'hsl(270 60% 60%)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+                <span className="text-sm font-medium" style={{ color: 'hsl(270 60% 80%)' }}>Design studio for bold brands</span>
+              </div>
+            </motion.div>
+
+            <motion.h1
+              className="text-5xl sm:text-6xl lg:text-8xl"
+              style={{ fontFamily: 'var(--font-heading)', color: 'white', letterSpacing: '-0.04em', lineHeight: 1.05 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              Expand
+              <span className="block" style={{ color: 'hsl(270 60% 65%)' }}>Global</span>
+            </motion.h1>
+
+            <motion.p
+              className="text-lg sm:text-xl lg:text-2xl font-light max-w-2xl mx-auto mt-6 mb-10"
+              style={{ color: 'hsl(0 0% 100% / 0.55)', lineHeight: 1.6 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              We build identities, design experiences, and craft visuals that make brands impossible to ignore.
+            </motion.p>
+
+            <motion.div
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Link
+                to="/auth"
+                className="inline-flex items-center gap-2 px-8 py-3.5 font-semibold rounded-xl transition-all duration-300 pressable"
+                style={{ background: 'hsl(270 60% 50%)', color: 'white', boxShadow: '0 8px 32px hsl(270 60% 50% / 0.35)' }}
+              >
+                Get Started
+                <HiArrowRight />
+              </Link>
+              <Link
+                to="/about"
+                className="inline-flex items-center gap-2 px-8 py-3.5 font-semibold rounded-xl transition-all duration-300 pressable"
+                style={{ border: '2px solid hsl(0 0% 100% / 0.2)', color: 'hsl(0 0% 100% / 0.8)' }}
+              >
+                Learn More
+              </Link>
+            </motion.div>
+          </div>
         </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 z-10" style={{ background: 'linear-gradient(to top, var(--bg-primary), transparent)' }} />
       </section>
 
       {/* ===== STATS ===== */}
@@ -228,7 +296,7 @@ export default function Home() {
             {stats.map((stat) => (
               <motion.div key={stat.label} className="text-center" variants={itemVariants}>
                 <div className="text-3xl sm:text-4xl md:text-5xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-accent)', letterSpacing: '-0.03em' }}>
-                  {stat.value}
+                  <CountUp target={stat.value} suffix={stat.suffix} />
                 </div>
                 <div className="text-xs mt-2 label-caps" style={{ color: 'var(--text-tertiary)' }}>
                   {stat.label}
@@ -358,26 +426,34 @@ export default function Home() {
             <p className="text-lg mb-12" style={{ color: 'var(--text-secondary)' }}>
               Watch our creative process in action.
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-              {galleryVideos.map((src, i) => (
-                <motion.div
-                  key={i}
-                  custom={i % 6}
-                  variants={itemVariants}
-                  className="group relative rounded-xl overflow-hidden cursor-pointer hover-lift"
-                  onClick={() => openVideoModal(src)}
-                >
-                  <div className="relative rounded-xl overflow-hidden" style={{ border: '1px solid var(--border-default)' }}>
+            <div
+              ref={marqueeRef}
+              className="video-marquee-wrap"
+              onMouseDown={handleDragStart}
+              onMouseMove={handleDragMove}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={handleDragEnd}
+              onTouchStart={handleDragStart}
+              onTouchMove={handleDragMove}
+              onTouchEnd={handleDragEnd}
+            >
+              <div className="video-marquee-track">
+                {[...galleryVideos, ...galleryVideos].map((src, i) => (
+                  <div
+                    key={i}
+                    className="video-marquee-item group relative rounded-xl overflow-hidden cursor-pointer flex-shrink-0"
+                    onClick={() => openVideoModal(src)}
+                  >
                     <video
                       src={src}
-                      className="w-full aspect-[9/14] object-cover"
+                      className="w-full h-full object-cover"
                       muted
                       preload="metadata"
                       onMouseEnter={(e) => e.target.play()}
                       onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/5 group-hover:from-black/40 transition-all duration-400" />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/5 group-hover:from-black/30 transition-all duration-400" />
+                    <div className="absolute inset-0 flex items-center justify-center">
                       <div
                         className="w-12 h-12 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-400"
                         style={{ background: 'hsl(0 0% 100% / 0.12)', backdropFilter: 'blur(8px)', border: '1px solid hsl(0 0% 100% / 0.15)' }}
@@ -386,8 +462,8 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              ))}
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
@@ -405,7 +481,7 @@ export default function Home() {
           >
             <motion.div
               className="absolute inset-0"
-              style={{ background: 'hsl(230 15% 8% / 0.85)', backdropFilter: 'blur(8px)' }}
+              style={{ background: 'hsl(0 0% 5% / 0.85)', backdropFilter: 'blur(8px)' }}
               onClick={closeVideoModal}
             />
             <motion.div
@@ -426,7 +502,7 @@ export default function Home() {
                 <video
                   ref={videoRef}
                   src={videoModal.src}
-                  className="w-full aspect-[9/14] sm:aspect-video object-cover"
+                  className="w-full aspect-video object-cover"
                   style={{ background: 'black' }}
                   controls
                   autoPlay

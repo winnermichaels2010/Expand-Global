@@ -146,6 +146,66 @@ h1, h2, h3, h4, h5, h6 {
   90% { transform: translate(-10%, 10%); }
 }
 
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.video-marquee-wrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+.video-marquee-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.video-marquee-wrap:active {
+  cursor: grabbing;
+}
+
+.video-marquee-track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: marquee-scroll 80s linear infinite;
+}
+
+.video-marquee-wrap.paused .video-marquee-track {
+  animation-play-state: paused;
+}
+
+.video-marquee-item {
+  width: 320px;
+  height: 180px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .video-marquee-item {
+    width: 380px;
+    height: 214px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .video-marquee-item {
+    width: 440px;
+    height: 248px;
+  }
+}
+
 /* ============================================================
    ANIMATION UTILITIES
    ============================================================ */

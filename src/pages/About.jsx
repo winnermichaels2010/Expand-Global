@@ -5,165 +5,107 @@ import { BsGraphUpArrow } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-const values = [
-  {
-    icon: HiSparkles,
-    title: 'Creativity First',
-    description: 'We push boundaries to deliver unique, memorable designs that stand out.',
-  },
-  {
-    icon: HiBadgeCheck,
-    title: 'Quality Driven',
-    description: 'Every pixel matters. We obsess over details to ensure exceptional results.',
-  },
-  {
-    icon: FaHeart,
-    title: 'Client Centric',
-    description: 'Your vision is our priority. We collaborate closely to bring your ideas to life.',
-  },
-];
-
-const team = [
-  {
-    name: 'Michael Winner',
-    role: 'Creative Director & Lead Designer',
-    bio: 'With over 5 years of experience in graphic design and branding, Michael founded Expand Global to help businesses build powerful visual identities.',
-  },
-  {
-    name: 'Sarah Johnson',
-    role: 'Brand Strategist',
-    bio: 'Sarah brings strategic thinking to every project, ensuring brands connect meaningfully with their target audiences.',
-  },
-  {
-    name: 'David Okafor',
-    role: 'UI/UX Designer',
-    bio: 'David specializes in creating intuitive digital experiences that blend aesthetics with functionality.',
-  },
-];
-
 const staggerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-  },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
+
+const team = [
+  { name: 'Michael Winner', role: 'Creative Director & Lead Designer', bio: 'With over 5 years of experience in graphic design and branding, Michael founded Expand Global to help businesses build powerful visual identities.' },
+  { name: 'Sarah Johnson', role: 'Brand Strategist', bio: 'Sarah brings strategic thinking to every project, ensuring brands connect meaningfully with their target audiences.' },
+  { name: 'David Okafor', role: 'UI/UX Designer', bio: 'David specializes in creating intuitive digital experiences that blend aesthetics with functionality.' },
+];
 
 export default function About() {
   return (
     <div className="pt-20">
+
       {/* Hero */}
-      <section className="py-24 md:py-32">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative py-28 md:py-36 overflow-hidden">
+        <div className="absolute inset-0" style={{ background: 'var(--color-accent)' }} />
+        <div className="grain-overlay absolute inset-0" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full" style={{ background: 'hsl(0 0% 100% / 0.06)', filter: 'blur(80px)' }} />
+        <div className="absolute bottom-0 left-1/4 w-64 h-64 rounded-full" style={{ background: 'hsl(0 0% 100% / 0.04)', filter: 'blur(60px)' }} />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <motion.div
-            className="max-w-3xl mx-auto text-center"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>Who We Are</span>
-            <h1
-              className="text-5xl sm:text-6xl mb-6"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              About Expand Global
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6" style={{ background: 'hsl(0 0% 100% / 0.15)', border: '1px solid hsl(0 0% 100% / 0.2)', color: 'white' }}>
+              <HiSparkles size={14} />
+              Our Story
+            </span>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl mb-6 text-white" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+              We craft brands<br />that leave a mark
             </h1>
-            <p className="text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              We are a passionate team of designers and brand strategists dedicated to helping
-              businesses create meaningful visual identities. Our mission is to empower brands
-              to expand their reach through exceptional design.
+            <p className="text-lg sm:text-xl max-w-2xl mx-auto" style={{ color: 'hsl(0 0% 100% / 0.7)', lineHeight: 1.7 }}>
+              A design studio built on the belief that every business deserves a visual identity as bold as its ambition.
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-24 md:py-32" style={{ background: 'var(--bg-secondary)' }}>
+      <section className="py-24 md:py-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-            variants={staggerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-          >
-            <motion.div
-              variants={itemVariants}
-              className="hover-lift p-10 rounded-2xl"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
-            >
-              <FaEye className="text-4xl mb-6" style={{ color: 'var(--color-accent)' }} />
-              <h2
-                className="text-2xl font-bold mb-4"
-                style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { icon: FaEye, label: 'Vision', text: 'To position businesses for visibility, excellence, and confidence through premium solutions.' },
+              { icon: FaFlag, label: 'Mission', text: 'To deliver durable, high-quality branding materials that elevate organizational identity and public perception.' },
+            ].map(({ icon: Icon, label, text }) => (
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="group p-8 md:p-10 rounded-2xl hover-lift"
+                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
               >
-                Our Vision
-              </h2>
-              <p style={{ color: 'var(--text-secondary)' }} className="leading-relaxed">
-                To position businesses for visibility, excellence, and confidence through premium solutions.
-              </p>
-            </motion.div>
-            <motion.div
-              variants={itemVariants}
-              className="hover-lift p-10 rounded-2xl"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
-            >
-              <FaFlag className="text-4xl mb-6" style={{ color: 'var(--color-accent)' }} />
-              <h2
-                className="text-2xl font-bold mb-4"
-                style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}
-              >
-                Our Mission
-              </h2>
-              <p style={{ color: 'var(--text-secondary)' }} className="leading-relaxed">
-                To deliver durable, high-quality branding materials that elevate organization identity and public perception.
-              </p>
-            </motion.div>
-          </motion.div>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300" style={{ background: 'var(--color-accent-light)' }}>
+                  <Icon className="text-2xl" style={{ color: 'var(--color-accent)' }} />
+                </div>
+                <h3 className="text-xl mb-3" style={{ fontFamily: 'var(--font-heading)' }}>{label}</h3>
+                <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{text}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* The Problem */}
-      <section className="py-24 md:py-32">
+      <section className="py-24 md:py-32" style={{ background: 'var(--bg-secondary)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
+            className="max-w-xl mb-16"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>Challenges</span>
-            <h2
-              className="text-4xl sm:text-5xl mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              The Problem
+            <h2 className="text-4xl sm:text-5xl mb-5" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>
+              The problem we solve
             </h2>
-            <p className="max-w-xl mx-auto text-lg" style={{ color: 'var(--text-secondary)' }}>
-              We understand the challenges businesses face today.
+            <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+              Businesses struggle with inconsistent branding, poor visibility, and materials that don&apos;t last.
             </p>
           </motion.div>
 
+          {/* Who */}
           <div className="mb-16">
-            <h3
-              className="text-xl font-semibold mb-6 flex items-center gap-2"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
+            <h3 className="text-lg font-semibold mb-5 flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
               <FaUserTie style={{ color: 'var(--color-accent)' }} />
-              Who Has The Problem?
+              Who faces this?
             </h3>
             <motion.div
-              className="grid grid-cols-2 md:grid-cols-5 gap-4"
+              className="flex flex-wrap gap-3"
               variants={staggerVariants}
               initial="hidden"
               whileInView="visible"
@@ -179,29 +121,24 @@ export default function About() {
                 <motion.div
                   key={name}
                   variants={itemVariants}
-                  className="hover-lift p-5 rounded-xl text-center"
-                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-default)' }}
+                  className="flex items-center gap-3 px-5 py-3 rounded-xl"
+                  style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
                 >
-                  <Icon
-                    className="text-2xl mx-auto mb-2"
-                    style={{ color: 'var(--color-accent)' }}
-                  />
+                  <Icon style={{ color: 'var(--color-accent)' }} />
                   <span className="text-sm font-medium">{name}</span>
                 </motion.div>
               ))}
             </motion.div>
           </div>
 
+          {/* What */}
           <div>
-            <h3
-              className="text-xl font-semibold mb-6 flex items-center gap-2"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
+            <h3 className="text-lg font-semibold mb-5 flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
               <FaEye style={{ color: 'var(--color-accent)' }} />
-              What Is The Problem?
+              What they deal with
             </h3>
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
               variants={staggerVariants}
               initial="hidden"
               whileInView="visible"
@@ -209,20 +146,24 @@ export default function About() {
             >
               {[
                 { icon: FaGem, title: 'Lack of uniqueness', desc: 'in brand presentation' },
-                { icon: FaHandshake, title: 'Poor visual harmony', desc: 'among staff' },
-                { icon: FaEye, title: 'Weak business', desc: 'visibility' },
-                { icon: FaStar, title: 'Short lifespan', desc: 'of flex banners' },
-                { icon: FaHeart, title: 'Low customer traffic', desc: 'due to poor branding' },
+                { icon: FaHandshake, title: 'Poor visual harmony', desc: 'across team and space' },
+                { icon: FaEye, title: 'Weak visibility', desc: 'in a crowded market' },
+                { icon: FaStar, title: 'Short-lived materials', desc: 'banners that fade fast' },
+                { icon: FaHeart, title: 'Low foot traffic', desc: 'caused by poor branding' },
               ].map(({ icon: Icon, title, desc }) => (
                 <motion.div
                   key={title}
                   variants={itemVariants}
-                  className="hover-lift p-5 rounded-xl group"
-                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-default)' }}
+                  className="flex items-start gap-4 p-5 rounded-xl"
+                  style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
                 >
-                  <Icon className="text-2xl mb-3" style={{ color: 'var(--color-accent)' }} />
-                  <h4 className="font-semibold text-sm">{title}</h4>
-                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'var(--color-accent-light)' }}>
+                    <Icon style={{ color: 'var(--color-accent)' }} />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm">{title}</h4>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>{desc}</p>
+                  </div>
                 </motion.div>
               ))}
             </motion.div>
@@ -231,65 +172,51 @@ export default function About() {
       </section>
 
       {/* Our Solution */}
-      <section className="py-24 md:py-32" style={{ background: 'var(--bg-secondary)' }}>
+      <section className="py-24 md:py-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
+            className="max-w-xl mb-16"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>What We Offer</span>
-            <h2
-              className="text-4xl sm:text-5xl mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              Our Solution
+            <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>Solutions</span>
+            <h2 className="text-4xl sm:text-5xl mb-5" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>
+              What we offer
             </h2>
-            <p className="max-w-xl mx-auto text-lg" style={{ color: 'var(--text-secondary)' }}>
-              What we offer to transform your brand.
-            </p>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10"
             variants={staggerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
           >
             {[
-              { icon: HiTemplate, title: 'Polo Branding', desc: 'for staff identity' },
-              { icon: HiOfficeBuilding, title: 'Premium Signage', desc: 'installation' },
+              { icon: HiTemplate, title: 'Polo Branding', desc: 'Staff identity solutions' },
+              { icon: HiOfficeBuilding, title: 'Premium Signage', desc: 'Installation & design' },
               { icon: HiPhotograph, title: 'Picture Framing', desc: '& artwork production' },
-              { icon: HiColorSwatch, title: 'Birthday/Custom', desc: 'photo production' },
+              { icon: HiColorSwatch, title: 'Custom Photo', desc: 'Birthday & event shoots' },
             ].map(({ icon: Icon, title, desc }) => (
               <motion.div
                 key={title}
                 variants={itemVariants}
-                className="hover-lift p-6 rounded-2xl text-center"
+                className="p-6 rounded-2xl text-center hover-lift"
                 style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
               >
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 mx-auto"
-                  style={{ background: 'var(--color-accent-light)' }}
-                >
-                  <Icon className="text-2xl" style={{ color: 'var(--color-accent)' }} />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 mx-auto" style={{ background: 'var(--color-accent-light)' }}>
+                  <Icon className="text-xl" style={{ color: 'var(--color-accent)' }} />
                 </div>
-                <h3
-                  className="text-lg font-semibold mb-2"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  {title}
-                </h3>
+                <h4 className="font-semibold mb-1" style={{ fontFamily: 'var(--font-heading)' }}>{title}</h4>
                 <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
               </motion.div>
             ))}
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             variants={staggerVariants}
             initial="hidden"
             whileInView="visible"
@@ -297,19 +224,23 @@ export default function About() {
           >
             {[
               { icon: HiBadgeCheck, title: 'Easier identification', desc: 'of staff and business location' },
-              { icon: FaStar, title: 'Long-lasting', desc: 'signage solutions' },
-              { icon: FaGem, title: 'Premium brand', desc: 'positioning' },
-              { icon: FaLightbulb, title: 'Turning imagination', desc: 'into visible excellence' },
+              { icon: FaStar, title: 'Long-lasting signage', desc: 'that withstands the elements' },
+              { icon: FaGem, title: 'Premium positioning', desc: 'that elevates brand perception' },
+              { icon: FaLightbulb, title: 'Imagination made visible', desc: 'turning ideas into excellence' },
             ].map(({ icon: Icon, title, desc }) => (
               <motion.div
                 key={title}
                 variants={itemVariants}
-                className="hover-lift p-6 rounded-2xl"
+                className="flex items-start gap-4 p-6 rounded-2xl"
                 style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
               >
-                <Icon className="text-3xl mb-3" style={{ color: 'var(--color-accent)' }} />
-                <h4 className="font-semibold">{title}</h4>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'var(--color-accent-light)' }}>
+                  <Icon style={{ color: 'var(--color-accent)' }} />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">{title}</h4>
+                  <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -317,29 +248,23 @@ export default function About() {
       </section>
 
       {/* What Makes Us Different */}
-      <section className="py-24 md:py-32">
+      <section className="py-24 md:py-32" style={{ background: 'var(--bg-secondary)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
+            className="max-w-xl mb-16"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>Our Edge</span>
-            <h2
-              className="text-4xl sm:text-5xl mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              What Makes Us Different
+            <h2 className="text-4xl sm:text-5xl mb-5" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>
+              Why choose us
             </h2>
-            <p className="max-w-xl mx-auto text-lg" style={{ color: 'var(--text-secondary)' }}>
-              We don&apos;t just print, <strong>we elevate brands</strong>
-            </p>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
             variants={staggerVariants}
             initial="hidden"
             whileInView="visible"
@@ -347,24 +272,19 @@ export default function About() {
           >
             {[
               { icon: FaStar, title: 'Durable Signage', desc: 'Longer lasting than flex banners' },
-              { icon: BsGraphUpArrow, title: 'Volume Pricing', desc: 'Volume-based pricing advantage' },
-              { icon: FaGem, title: 'Premium Focus', desc: 'Focus on excellence and brand perception' },
-              { icon: FaLightbulb, title: 'Creative Blend', desc: 'Blend of creativity and technical installation' },
-              { icon: MdTrendingUp, title: 'Fast Growing', desc: 'Fast-growing presence in the region' },
+              { icon: BsGraphUpArrow, title: 'Volume Pricing', desc: 'Better rates at scale' },
+              { icon: FaGem, title: 'Premium Focus', desc: 'Excellence in every detail' },
+              { icon: FaLightbulb, title: 'Creative + Technical', desc: 'Design meets expert installation' },
+              { icon: MdTrendingUp, title: 'Fast Growing', desc: 'Rising presence in the region' },
             ].map(({ icon: Icon, title, desc }) => (
               <motion.div
                 key={title}
                 variants={itemVariants}
-                className="hover-lift p-6 rounded-2xl"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-default)' }}
+                className="p-6 rounded-2xl hover-lift"
+                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
               >
-                <Icon className="text-3xl mb-4" style={{ color: 'var(--color-accent)' }} />
-                <h3
-                  className="text-lg font-semibold mb-2"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  {title}
-                </h3>
+                <Icon className="text-2xl mb-4" style={{ color: 'var(--color-accent)' }} />
+                <h4 className="font-semibold mb-1" style={{ fontFamily: 'var(--font-heading)' }}>{title}</h4>
                 <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
               </motion.div>
             ))}
@@ -372,189 +292,69 @@ export default function About() {
         </div>
       </section>
 
-      {/* Market Opportunity */}
-      <section className="py-24 md:py-32" style={{ background: 'var(--bg-secondary)' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>Growth</span>
-            <h2
-              className="text-4xl sm:text-5xl mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              Market Opportunity
-            </h2>
-          </motion.div>
-
-          <div className="mb-16">
-            <h3
-              className="text-xl font-semibold mb-6 flex items-center gap-2"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              <FaFlag style={{ color: 'var(--color-accent)' }} />
-              Target Market
-            </h3>
-            <motion.div
-              className="grid grid-cols-2 md:grid-cols-4 gap-4"
-              variants={staggerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-50px' }}
-            >
-              {[
-                { name: 'Churches', icon: FaChurch },
-                { name: 'Filling Stations', icon: FaGasPump },
-                { name: 'Hotels', icon: FaHotel },
-                { name: 'Sole Proprietors', icon: FaUserTie },
-              ].map(({ name, icon: Icon }) => (
-                <motion.div
-                  key={name}
-                  variants={itemVariants}
-                  className="hover-lift p-6 rounded-xl text-center"
-                  style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
-                >
-                  <Icon className="text-3xl mx-auto mb-3" style={{ color: 'var(--color-accent)' }} />
-                  <span className="font-medium text-sm">{name}</span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          <div>
-            <h3
-              className="text-xl font-semibold mb-6 flex items-center gap-2"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              <MdTrendingUp style={{ color: 'var(--color-accent)' }} />
-              Market Potential
-            </h3>
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              variants={staggerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-50px' }}
-            >
-              {[
-                'Branding is becoming a necessity, not luxury',
-                'Growing demand for premium signage',
-                'Artwork & photo framing create emotional value',
-                'Estimated 60-70% growing demand within our region',
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  variants={itemVariants}
-                  className="hover-lift p-5 rounded-xl flex items-center gap-3"
-                  style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
-                >
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--color-accent-light)' }}
-                  >
-                    <HiBadgeCheck style={{ color: 'var(--color-accent)' }} />
-                  </div>
-                  <span className="text-sm">{item}</span>
-                </motion.div>
-              ))}
-            </motion.div>
-            <motion.div
-              className="mt-8 p-8 rounded-2xl text-center"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <p
-                className="text-lg font-semibold italic"
-                style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-accent)' }}
-              >
-                Brand visibility is now strategic
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Values Section */}
+      {/* Values */}
       <section className="py-24 md:py-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
+            className="max-w-xl mb-16"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>Principles</span>
-            <h2
-              className="text-4xl sm:text-5xl mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              Our Values
+            <h2 className="text-4xl sm:text-5xl mb-5" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>
+              Our values
             </h2>
-            <p className="max-w-xl mx-auto text-lg" style={{ color: 'var(--text-secondary)' }}>
-              The principles that guide every project we undertake.
-            </p>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
             variants={staggerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
           >
-            {values.map(({ icon: Icon, title, description }) => (
+            {[
+              { icon: HiSparkles, title: 'Creativity First', desc: 'We push boundaries to deliver unique, memorable designs that stand out.' },
+              { icon: HiBadgeCheck, title: 'Quality Driven', desc: 'Every pixel matters. We obsess over details to ensure exceptional results.' },
+              { icon: FaHeart, title: 'Client Centric', desc: 'Your vision is our priority. We collaborate closely to bring your ideas to life.' },
+            ].map(({ icon: Icon, title, desc }) => (
               <motion.div
                 key={title}
                 variants={itemVariants}
-                className="hover-lift p-8 rounded-2xl"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-default)' }}
+                className="p-8 rounded-2xl hover-lift"
+                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
               >
-                <Icon className="text-3xl mb-4" style={{ color: 'var(--color-accent)' }} />
-                <h3
-                  className="text-lg font-semibold mb-3"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  {title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{description}</p>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style={{ background: 'var(--color-accent-light)' }}>
+                  <Icon className="text-xl" style={{ color: 'var(--color-accent)' }} />
+                </div>
+                <h4 className="text-lg font-semibold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>{title}</h4>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Team */}
       <section className="py-24 md:py-32" style={{ background: 'var(--bg-secondary)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
+            className="max-w-xl mb-16"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>People</span>
-            <h2
-              className="text-4xl sm:text-5xl mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              Meet the Team
+            <h2 className="text-4xl sm:text-5xl mb-5" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>
+              Meet the team
             </h2>
-            <p className="max-w-xl mx-auto text-lg" style={{ color: 'var(--text-secondary)' }}>
-              The creative minds behind Expand Global.
-            </p>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
             variants={staggerVariants}
             initial="hidden"
             whileInView="visible"
@@ -564,23 +364,15 @@ export default function About() {
               <motion.div
                 key={member.name}
                 variants={itemVariants}
-                className="hover-lift p-8 rounded-2xl"
+                className="p-8 rounded-2xl hover-lift"
                 style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
               >
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                  style={{ background: 'var(--color-accent)' }}
-                >
-                  <span className="text-2xl font-bold text-white">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-5" style={{ background: 'var(--color-accent)' }}>
+                  <span className="text-xl font-bold text-white">
                     {member.name.split(' ').map(n => n[0]).join('')}
                   </span>
                 </div>
-                <h3
-                  className="text-lg font-semibold mb-1"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  {member.name}
-                </h3>
+                <h4 className="font-semibold mb-1" style={{ fontFamily: 'var(--font-heading)' }}>{member.name}</h4>
                 <p className="text-sm mb-3" style={{ color: 'var(--color-accent)' }}>{member.role}</p>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{member.bio}</p>
               </motion.div>
@@ -590,28 +382,26 @@ export default function About() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 md:py-32">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: 'var(--color-accent)' }}>
+        <div className="grain-overlay absolute inset-0" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full" style={{ background: 'hsl(0 0% 100% / 0.06)', filter: 'blur(80px)' }} />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="label-caps mb-4 block" style={{ color: 'var(--color-accent)' }}>Get Started</span>
-            <h2
-              className="text-4xl sm:text-5xl mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
-            >
-              Want to work together?
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl mb-6 text-white" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+              Ready to elevate your brand?
             </h2>
-            <p className="text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
-              Let&apos;s discuss your next project and see how we can help.
+            <p className="text-lg mb-10 max-w-xl mx-auto" style={{ color: 'hsl(0 0% 100% / 0.75)' }}>
+              Let&apos;s collaborate and create something remarkable together.
             </p>
             <Link
               to="/contact"
-              className="pressable inline-flex items-center gap-2 px-9 py-3.5 font-medium rounded-xl transition-all duration-200"
-              style={{ background: 'var(--color-accent)', color: 'white' }}
+              className="inline-flex items-center gap-2 px-8 py-3.5 font-semibold rounded-xl transition-all duration-200 pressable"
+              style={{ background: 'white', color: 'var(--color-accent-hover)' }}
             >
               Get In Touch
             </Link>

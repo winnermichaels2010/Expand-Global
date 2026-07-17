@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaReply, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
 export default function AdminDesignRequests() {
@@ -166,11 +166,11 @@ export default function AdminDesignRequests() {
                           <button
                             onClick={() => navigate(`/admin/design-requests/reply/${request.id}`)}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-all duration-200 cursor-pointer pressable"
-                            style={{ background: 'var(--color-accent)' }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-accent-hover)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--color-accent)'; }}
+                            style={{ background: '#059669' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = '#047857'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = '#059669'; }}
                           >
-                            <FaReply /> Reply
+                            <FaCheck /> Accept
                           </button>
                           <button
                             onClick={() => {
@@ -242,6 +242,7 @@ export default function AdminDesignRequests() {
                       </div>
                     </div>
                   )}
+
                 </div>
               ))
             )}

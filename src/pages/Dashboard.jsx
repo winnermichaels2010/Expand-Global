@@ -1,14 +1,9 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { FaPalette, FaCog, FaSignOutAlt, FaCamera, FaTimes, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaSignOutAlt, FaCamera, FaTimes, FaCheckCircle, FaTimesCircle, FaClock, FaCommentDots } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const quickActions = [
-  { icon: FaPalette, label: 'Request Design', path: '/request-design', desc: 'Submit a new design request' },
-  { icon: FaCog, label: 'Settings', path: '/settings', desc: 'Manage your preferences' },
-];
+import MessageThread from '../components/MessageThread';
 
 const statusIcons = {
   Pending: FaClock,
@@ -22,6 +17,8 @@ const statusColors = {
   Rejected: '#ef4444',
 };
 
+const filters = ['All', 'Pending', 'Accepted', 'Rejected'];
+
 export default function Dashboard() {
   const { currentUser, logout, updateProfilePicture, getUserProfile, getDesignRequests } = useAuth();
   const navigate = useNavigate();
@@ -30,6 +27,8 @@ export default function Dashboard() {
   const [showPhotoPopup, setShowPhotoPopup] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const [openThreadId, setOpenThreadId] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('All');
 
   useEffect(() => {
     if (!currentUser) {
@@ -74,6 +73,17 @@ export default function Dashboard() {
   const fullName = profile
     ? [profile.surname, profile.firstName, profile.lastName].filter(Boolean).join(' ')
     : currentUser.displayName || currentUser.email?.split('@')[0] || 'User';
+
+  const filteredRequests = activeFilter === 'All'
+    ? [...designRequests].reverse()
+    : designRequests.filter((r) => r.status === activeFilter).reverse();
+
+  const counts = {
+    All: designRequests.length,
+    Pending: designRequests.filter((r) => r.status === 'Pending').length,
+    Accepted: designRequests.filter((r) => r.status === 'Accepted').length,
+    Rejected: designRequests.filter((r) => r.status === 'Rejected').length,
+  };
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
@@ -128,189 +138,170 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <motion.div
-              className="p-6 rounded-2xl glass-strong shadow-lg"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <h2
-                className="text-lg font-semibold mb-4"
-                style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          {filters.map((f) => {
+            const Icon = f === 'All' ? FaClock : statusIcons[f];
+            const color = f === 'All' ? 'var(--color-accent)' : statusColors[f];
+            return (
+              <motion.div
+                key={f}
+                className="p-4 rounded-2xl glass-strong shadow-lg text-center cursor-pointer hover-lift"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                onClick={() => setActiveFilter(f)}
+                style={{
+                  border: activeFilter === f ? `2px solid ${color}` : '1px solid var(--border-default)',
+                  background: activeFilter === f ? `${color}10` : 'var(--bg-elevated)',
+                }}
               >
-                Quick Actions
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {quickActions.map(({ icon: Icon, label, path, desc }) => (
-                  <Link
-                    key={path}
-                    to={path}
-                    className="hover-lift group flex items-center gap-3 p-4 rounded-xl transition-all duration-200"
+                <Icon className="text-lg mx-auto mb-1" style={{ color }} />
+                <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{counts[f]}</p>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{f}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <motion.div
+          className="p-6 rounded-2xl glass-strong shadow-lg"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <h2
+            className="text-lg font-semibold mb-6"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+          >
+            {activeFilter === 'All' ? 'All Requests' : `${activeFilter} Requests`} ({filteredRequests.length})
+          </h2>
+
+          {filteredRequests.length === 0 ? (
+            <div className="text-center py-12">
+              <FaClock className="text-4xl mx-auto mb-3" style={{ color: 'var(--text-tertiary)' }} />
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                {activeFilter === 'All' ? 'No design requests yet.' : `No ${activeFilter.toLowerCase()} requests.`}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredRequests.map((req) => {
+                const StatusIcon = statusIcons[req.status] || FaClock;
+                const badgeColor = statusColors[req.status] || 'hsl(247 12% 50%)';
+                const badgeBg =
+                  req.status === 'Accepted' ? 'rgba(16,185,129,0.12)' :
+                  req.status === 'Rejected' ? 'rgba(239,68,68,0.12)' :
+                  'hsl(247 12% 50% / 0.12)';
+                return (
+                  <div
+                    key={req.id}
+                    className="p-5 rounded-xl"
                     style={{
                       background: 'var(--bg-primary)',
                       border: '1px solid var(--border-subtle)',
                     }}
                   >
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-200"
-                      style={{ background: 'var(--color-accent)' }}
-                    >
-                      <Icon className="text-white text-lg" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{label}</p>
-                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-
-          <div className="space-y-6">
-            {designRequests.length > 0 && (
-              <motion.div
-                className="p-6 rounded-2xl glass-strong shadow-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.15 }}
-              >
-                <h2
-                  className="text-lg font-semibold mb-4"
-                  style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
-                >
-                  My Design Requests ({designRequests.length})
-                </h2>
-                <div className="space-y-3">
-                  {[...designRequests].reverse().map((req) => {
-                    const StatusIcon = statusIcons[req.status] || FaClock;
-                    const badgeColor = statusColors[req.status] || 'hsl(247 12% 50%)';
-                    const badgeBg =
-                      req.status === 'Accepted' ? 'rgba(16,185,129,0.12)' :
-                      req.status === 'Rejected' ? 'rgba(239,68,68,0.12)' :
-                      'hsl(247 12% 50% / 0.12)';
-                    return (
-                      <div
-                        key={req.id}
-                        className="p-4 rounded-xl"
-                        style={{
-                          background: 'var(--bg-primary)',
-                          border: '1px solid var(--border-subtle)',
-                        }}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{req.service}</p>
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{new Date(req.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <span
+                        className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium"
+                        style={{ background: badgeBg, color: badgeColor }}
                       >
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{req.service}</p>
-                            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{new Date(req.createdAt).toLocaleDateString()}</p>
-                          </div>
-                          <span
-                            className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium"
-                            style={{ background: badgeBg, color: badgeColor }}
-                          >
-                            <StatusIcon className="text-xs" style={{ color: badgeColor }} />
-                            {req.status}
-                          </span>
-                        </div>
-                        <p className="text-xs mb-2" style={{ color: 'var(--text-secondary)' }}>{req.description}</p>
-                        {req.status === 'Accepted' && (
-                          <div className="mt-2 space-y-2">
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              <div
-                                className="p-2 rounded-lg"
-                                style={{
-                                  background: 'rgba(16,185,129,0.08)',
-                                  border: '1px solid rgba(16,185,129,0.2)',
-                                }}
-                              >
-                                <span style={{ color: '#10b981' }} className="font-medium">
-                                  Standard: ₦{req.standardPrice?.toLocaleString()}
-                                </span>
-                              </div>
-                              <div
-                                className="p-2 rounded-lg"
-                                style={{
-                                  background: 'rgba(139,92,246,0.08)',
-                                  border: '1px solid rgba(139,92,246,0.2)',
-                                }}
-                              >
-                                <span style={{ color: 'var(--color-accent)' }} className="font-medium">
-                                  Premium: ₦{req.premiumPrice?.toLocaleString()}
-                                </span>
-                              </div>
-                            </div>
-                            {req.adminComment && (
-                              <div
-                                className="p-2 rounded-lg text-xs"
-                                style={{
-                                  background: 'rgba(16,185,129,0.06)',
-                                  border: '1px solid rgba(16,185,129,0.15)',
-                                }}
-                              >
-                                <p className="font-medium mb-1" style={{ color: '#10b981' }}>Admin Reply:</p>
-                                <p style={{ color: 'var(--text-secondary)' }}>{req.adminComment}</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        {req.status === 'Rejected' && req.rejectReason && (
+                        <StatusIcon className="text-xs" style={{ color: badgeColor }} />
+                        {req.status}
+                      </span>
+                    </div>
+
+                    <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>{req.description}</p>
+
+                    <div
+                      className="flex flex-wrap gap-3 text-[11px] mb-3"
+                      style={{ color: 'var(--text-tertiary)' }}
+                    >
+                      {req.phone && <span>Phone: {req.phone}</span>}
+                      {req.timeline && <span>Timeline: {req.timeline}</span>}
+                    </div>
+
+                    {req.status === 'Accepted' && (
+                      <div className="space-y-2 mb-3">
+                        <div className="grid grid-cols-2 gap-2 text-xs">
                           <div
-                            className="p-2 rounded-lg text-xs mt-2"
+                            className="p-2.5 rounded-lg"
                             style={{
-                              background: 'rgba(239,68,68,0.06)',
-                              border: '1px solid rgba(239,68,68,0.15)',
+                              background: 'rgba(16,185,129,0.08)',
+                              border: '1px solid rgba(16,185,129,0.2)',
                             }}
                           >
-                            <p className="font-medium mb-1" style={{ color: '#ef4444' }}>Rejection Reason:</p>
-                            <p style={{ color: 'var(--text-secondary)' }}>{req.rejectReason}</p>
+                            <span style={{ color: '#10b981' }} className="font-medium">
+                              Standard: ₦{req.standardPrice?.toLocaleString()}
+                            </span>
+                          </div>
+                          <div
+                            className="p-2.5 rounded-lg"
+                            style={{
+                              background: 'rgba(139,92,246,0.08)',
+                              border: '1px solid rgba(139,92,246,0.2)',
+                            }}
+                          >
+                            <span style={{ color: 'var(--color-accent)' }} className="font-medium">
+                              Premium: ₦{req.premiumPrice?.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                        {req.adminComment && (
+                          <div
+                            className="p-2.5 rounded-lg text-xs"
+                            style={{
+                              background: 'rgba(16,185,129,0.06)',
+                              border: '1px solid rgba(16,185,129,0.15)',
+                            }}
+                          >
+                            <p className="font-medium mb-1" style={{ color: '#10b981' }}>Admin Reply:</p>
+                            <p style={{ color: 'var(--text-secondary)' }}>{req.adminComment}</p>
                           </div>
                         )}
                       </div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+                    )}
 
-            <motion.div
-              className="p-6 rounded-2xl glass-strong shadow-lg"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <h2
-                className="text-lg font-semibold mb-4"
-                style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
-              >
-                Account
-              </h2>
-              <div className="space-y-3">
-                <div
-                  className="p-4 rounded-xl"
-                  style={{
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>Email</p>
-                  <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{currentUser.email}</p>
-                </div>
-                <div
-                  className="p-4 rounded-xl"
-                  style={{
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>Full Name</p>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{fullName}</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
+                    {req.status === 'Rejected' && req.rejectReason && (
+                      <div
+                        className="p-2.5 rounded-lg text-xs mb-3"
+                        style={{
+                          background: 'rgba(239,68,68,0.06)',
+                          border: '1px solid rgba(239,68,68,0.15)',
+                        }}
+                      >
+                        <p className="font-medium mb-1" style={{ color: '#ef4444' }}>Rejection Reason:</p>
+                        <p style={{ color: 'var(--text-secondary)' }}>{req.rejectReason}</p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 cursor-pointer pressable"
+                      style={{
+                        background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--bg-secondary)',
+                        color: openThreadId === req.id ? '#fff' : 'var(--text-secondary)',
+                        border: '1px solid var(--border-subtle)',
+                      }}
+                    >
+                      <FaCommentDots />
+                      {openThreadId === req.id ? 'Hide Messages' : 'Message Admin'}
+                    </button>
+
+                    {openThreadId === req.id && (
+                      <MessageThread designRequestId={req.id} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
       </div>
 
       <AnimatePresence>

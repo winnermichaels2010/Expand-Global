@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { HiPaperAirplane, HiPhotograph, HiColorSwatch, HiTemplate, HiOfficeBuilding } from 'react-icons/hi';
 import { FaPalette, FaBullhorn } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const designServices = [
@@ -17,6 +18,7 @@ const designServices = [
 
 export default function RequestDesign() {
   const { currentUser, saveDesignRequest, getUserProfile } = useAuth();
+  const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -46,6 +48,13 @@ export default function RequestDesign() {
       });
     }
   }, [currentUser, getUserProfile]);
+
+  useEffect(() => {
+    if (submitted) {
+      const timer = setTimeout(() => navigate('/dashboard'), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitted, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -104,14 +113,17 @@ export default function RequestDesign() {
             Thank you for your design request. We&apos;ll review the details and get back to you within 24-48 hours with a custom proposal.
           </p>
           <motion.button
-            onClick={() => setSubmitted(false)}
+            onClick={() => navigate('/dashboard')}
             className="px-8 py-3 font-medium rounded-xl transition-all duration-200 pressable"
             style={{ background: 'var(--color-accent)', color: 'white', boxShadow: '0 4px 12px hsl(270 60% 50% / 0.2)' }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
-            Submit Another Request
+            Go Back to Dashboard
           </motion.button>
+          <p className="mt-3 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+            Redirecting in 3 seconds...
+          </p>
         </motion.div>
       </div>
     );

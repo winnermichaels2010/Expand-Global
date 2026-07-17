@@ -276,6 +276,64 @@ export function AuthProvider({ children }) {
     });
   }
 
+  // ---------- Messages ----------
+
+  async function sendMessage(designRequestId, message, currentUserProfile) {
+    try {
+      const senderName = currentUserProfile
+        ? [currentUserProfile.surname, currentUserProfile.firstName, currentUserProfile.lastName].filter(Boolean).join(' ') || currentUser.email
+        : currentUser.displayName || currentUser.email;
+
+      await addDoc(collection(db, 'messages'), {
+        designRequestId,
+        senderId: currentUser.uid,
+        senderEmail: currentUser.email,
+        senderName,
+        message,
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+
+      const requestDoc = await getDoc(doc(db, 'designRequests', designRequestId));
+      const requestData = requestDoc.data();
+      if (!requestData) return;
+
+      let recipientQuery;
+      if (currentUser.email === ADMIN_EMAIL) {
+        recipientQuery = query(collection(db, 'users'), where('email', '==', requestData.email));
+      } else {
+        recipientQuery = query(collection(db, 'users'), where('email', '==', ADMIN_EMAIL));
+      }
+
+      const recipientSnap = await getDocs(recipientQuery);
+      if (!recipientSnap.empty) {
+        const recipient = recipientSnap.docs[0];
+        const isFromAdmin = currentUser.email === ADMIN_EMAIL;
+        await addDoc(collection(db, 'notifications'), {
+          userId: recipient.id,
+          message: `New message from ${isFromAdmin ? 'Admin' : senderName} regarding "${requestData.service}" request`,
+          type: 'message',
+          read: false,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
+  }
+
+  function subscribeToMessages(designRequestId, callback) {
+    const q = query(
+      collection(db, 'messages'),
+      where('designRequestId', '==', designRequestId),
+      orderBy('createdAt', 'asc')
+    );
+    return onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(msgs);
+    });
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -309,6 +367,8 @@ export function AuthProvider({ children }) {
     deleteAllNotifications,
     addNotification,
     subscribeToNotifications,
+    sendMessage,
+    subscribeToMessages,
   };
 
   return (

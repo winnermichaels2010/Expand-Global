@@ -41,28 +41,28 @@
 }
 
 .dark {
-  --bg-primary: hsl(230 15% 8%);
-  --bg-secondary: hsl(230 12% 11%);
-  --bg-tertiary: hsl(230 10% 14%);
-  --bg-elevated: hsl(230 14% 13%);
+  --bg-primary: hsl(0 0% 5%);
+  --bg-secondary: hsl(0 0% 8%);
+  --bg-tertiary: hsl(0 0% 11%);
+  --bg-elevated: hsl(0 0% 10%);
 
   --text-primary: hsl(40 15% 92%);
   --text-secondary: hsl(30 10% 62%);
   --text-tertiary: hsl(30 8% 48%);
-  --text-inverse: hsl(230 20% 12%);
+  --text-inverse: hsl(0 0% 12%);
 
-  --border-default: hsl(230 10% 20%);
-  --border-subtle: hsl(230 10% 16%);
-  --border-strong: hsl(230 10% 26%);
+  --border-default: hsl(0 0% 20%);
+  --border-subtle: hsl(0 0% 16%);
+  --border-strong: hsl(0 0% 26%);
 
-  --shadow-color: 230 50% 3%;
+  --shadow-color: 0 0% 0%;
   --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.2), 0 1px 3px hsl(var(--shadow-color) / 0.3);
   --shadow-md: 0 4px 6px hsl(var(--shadow-color) / 0.2), 0 2px 12px hsl(var(--shadow-color) / 0.3);
   --shadow-lg: 0 10px 25px hsl(var(--shadow-color) / 0.25), 0 4px 20px hsl(var(--shadow-color) / 0.35);
   --shadow-xl: 0 20px 40px hsl(var(--shadow-color) / 0.3), 0 8px 30px hsl(var(--shadow-color) / 0.4);
 
-  --glass-bg: hsl(230 15% 8% / 0.8);
-  --glass-border: hsl(230 10% 20% / 0.6);
+  --glass-bg: hsl(0 0% 5% / 0.8);
+  --glass-border: hsl(0 0% 20% / 0.6);
 }
 
 /* ============================================================

@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { FaSignOutAlt, FaCamera, FaTimes, FaCheckCircle, FaTimesCircle, FaClock, FaCommentDots } from 'react-icons/fa';
+import { FaCamera, FaTimes, FaCheckCircle, FaTimesCircle, FaClock, FaCommentDots } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import MessageThread from '../components/MessageThread';
 
@@ -20,7 +20,7 @@ const statusColors = {
 const filters = ['All', 'Pending', 'Accepted', 'Rejected'];
 
 export default function Dashboard() {
-  const { currentUser, logout, updateProfilePicture, getUserProfile, getDesignRequests } = useAuth();
+  const { currentUser, updateProfilePicture, getUserProfile, subscribeToDesignRequests } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [designRequests, setDesignRequests] = useState([]);
@@ -37,11 +37,12 @@ export default function Dashboard() {
       navigate('/admin');
     } else {
       getUserProfile(currentUser.uid).then(setProfile);
-      getDesignRequests().then((requests) => {
+      const unsub = subscribeToDesignRequests((requests) => {
         setDesignRequests(requests.filter((r) => r.email === currentUser.email));
       });
+      return unsub;
     }
-  }, [currentUser, navigate, getUserProfile, getDesignRequests]);
+  }, [currentUser, navigate, getUserProfile, subscribeToDesignRequests]);
 
   async function handleFileUpload(e) {
     const file = e.target.files?.[0];
@@ -51,15 +52,6 @@ export default function Dashboard() {
     setUploading(false);
     setShowPhotoPopup(false);
     getUserProfile(currentUser.uid).then(setProfile);
-  }
-
-  async function handleLogout() {
-    try {
-      await logout();
-      navigate('/');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
   }
 
   if (!currentUser) {
@@ -124,16 +116,6 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-            <motion.button
-              onClick={handleLogout}
-              className="pressable inline-flex items-center gap-2 px-5 py-2.5 text-white font-medium rounded-xl transition-all duration-200 cursor-pointer"
-              style={{ background: '#dc2626' }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <FaSignOutAlt />
-              Sign Out
-            </motion.button>
           </motion.div>
         </div>
       </div>

@@ -52,7 +52,7 @@ export default function AdminDesignRequests() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <div style={{ background: 'var(--color-accent)' }}>
         <div className="px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <motion.div
@@ -73,9 +73,9 @@ export default function AdminDesignRequests() {
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
+      <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8 overflow-hidden">
         <motion.div
-          className="p-6 rounded-2xl glass-strong"
+          className="p-4 sm:p-6 rounded-2xl glass-strong overflow-hidden"
           style={{
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border-default)',
@@ -89,163 +89,159 @@ export default function AdminDesignRequests() {
           >
             All Design Requests ({designRequests.length})
           </h2>
-          <div className="space-y-4">
-            {designRequests.length === 0 ? (
-              <p className="text-sm text-center py-8" style={{ color: 'var(--text-secondary)' }}>
-                No design requests yet.
-              </p>
-            ) : (
-              [...designRequests].reverse().map((request) => (
-                <div
-                  key={request.id}
-                  className="p-4 rounded-xl hover-lift"
-                  style={{
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-default)',
-                  }}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                        style={{ background: 'var(--color-accent)' }}
-                      >
-                        {request.name?.split(' ').map(n => n[0]).join('') || '?'}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{request.name || 'Unknown'}</p>
-                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          {request.email}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className="text-xs px-2.5 py-1 rounded-full font-medium"
-                      style={getStatusBadge(request.status)}
-                    >
-                      {request.status}
-                    </span>
-                  </div>
-                  <div
-                    className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-2"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    <span><strong>Service:</strong> {request.service}</span>
-                    <span><strong>Budget:</strong> {request.budget || 'Not specified'}</span>
-                    <span><strong>Timeline:</strong> {request.timeline || 'Not specified'}</span>
-                    <span><strong>Phone:</strong> {request.phone || 'Not specified'}</span>
-                  </div>
-                  <p className="text-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
-                    <strong>Description:</strong> {request.description}
+              <div className="space-y-3">
+                {designRequests.length === 0 ? (
+                  <p className="text-xs text-center py-8" style={{ color: 'var(--text-secondary)' }}>
+                    No design requests yet.
                   </p>
-
-                  {request.status === 'Rejected' && request.rejectReason && (
-                    <p className="text-xs mt-2" style={{ color: '#dc2626' }}>
-                      <strong>Reject Reason:</strong> {request.rejectReason}
-                    </p>
-                  )}
-
-                  {request.status === 'Accepted' && (
-                    <div className="mt-2 text-xs space-y-1" style={{ color: '#059669' }}>
-                      <p><strong>Standard Price:</strong> ₦{request.standardPrice?.toLocaleString()}</p>
-                      <p><strong>Premium Price:</strong> ₦{request.premiumPrice?.toLocaleString()}</p>
-                      {request.adminComment && <p><strong>Admin Comment:</strong> {request.adminComment}</p>}
-                    </div>
-                  )}
-
-                  <div
-                    className="flex items-center justify-between mt-3 pt-3"
-                    style={{ borderTop: '1px solid var(--border-default)' }}
-                  >
-                    <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                      {new Date(request.createdAt).toLocaleString()}
-                    </p>
-                    <div className="flex gap-2">
-                      {request.status !== 'Rejected' && request.status !== 'Accepted' && (
-                        <>
-                          <button
-                            onClick={() => navigate(`/admin/design-requests/reply/${request.id}`)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-all duration-200 cursor-pointer pressable"
-                            style={{ background: '#059669' }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = '#047857'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = '#059669'; }}
-                          >
-                            <FaCheck /> Accept
-                          </button>
-                          <button
-                            onClick={() => {
-                              setRejectingId(rejectingId === request.id ? null : request.id);
-                              setRejectReason('');
-                            }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-all duration-200 cursor-pointer pressable"
-                            style={{ background: '#dc2626' }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = '#b91c1c'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = '#dc2626'; }}
-                          >
-                            <FaTimes /> Reject
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {rejectingId === request.id && (
+                ) : (
+                  [...designRequests].reverse().map((request) => (
                     <div
-                      className="mt-3 p-3 rounded-xl"
+                      key={request.id}
+                      className="p-3 sm:p-4 rounded-xl overflow-hidden"
                       style={{
-                        background: 'hsl(0 84% 60% / 0.06)',
-                        border: '1px solid hsl(0 84% 60% / 0.2)',
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-default)',
                       }}
                     >
-                      <label
-                        className="block text-xs font-medium mb-2"
-                        style={{ color: '#dc2626' }}
-                      >
-                        Reason for rejection
-                      </label>
-                      <textarea
-                        value={rejectReason}
-                        onChange={(e) => setRejectReason(e.target.value)}
-                        placeholder="Enter the reason for rejecting this request..."
-                        className="w-full px-3 py-2 text-sm rounded-lg resize-none"
-                        style={{
-                          background: 'var(--bg-elevated)',
-                          border: '1px solid var(--border-default)',
-                          color: 'var(--text-primary)',
-                        }}
-                        rows={3}
-                      />
-                      <div className="flex justify-end gap-2 mt-2">
-                        <button
-                          onClick={() => setRejectingId(null)}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 cursor-pointer pressable"
-                          style={{
-                            background: 'var(--bg-tertiary)',
-                            color: 'var(--text-secondary)',
-                          }}
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0"
+                            style={{ background: 'var(--color-accent)' }}
+                          >
+                            {request.name?.split(' ').map(n => n[0]).join('') || '?'}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium truncate">{request.name || 'Unknown'}</p>
+                            <p className="text-[10px] truncate" style={{ color: 'var(--text-secondary)' }}>
+                              {request.email}
+                            </p>
+                          </div>
+                        </div>
+                        <span
+                          className="text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0"
+                          style={getStatusBadge(request.status)}
                         >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (rejectReason.trim()) {
-                              setConfirmRejectId(request.id);
-                              setConfirmRejectReason(rejectReason);
-                            }
-                          }}
-                          disabled={!rejectReason.trim()}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer pressable"
-                          style={{ background: '#dc2626' }}
-                        >
-                          Reject Project
-                        </button>
+                          {request.status}
+                        </span>
                       </div>
-                    </div>
-                  )}
+                      <div
+                        className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] mb-1.5"
+                        style={{ color: 'var(--text-secondary)' }}
+                      >
+                        <span className="truncate"><strong>Service:</strong> {request.service}</span>
+                        <span className="truncate"><strong>Budget:</strong> {request.budget || 'N/A'}</span>
+                        <span className="truncate"><strong>Timeline:</strong> {request.timeline || 'N/A'}</span>
+                        <span className="truncate"><strong>Phone:</strong> {request.phone || 'N/A'}</span>
+                      </div>
+                      <p className="text-[10px] mt-1 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
+                        <strong>Description:</strong> {request.description}
+                      </p>
 
-                </div>
-              ))
-            )}
+                      {request.status === 'Rejected' && request.rejectReason && (
+                        <p className="text-[10px] mt-1 line-clamp-2" style={{ color: '#dc2626' }}>
+                          <strong>Reject Reason:</strong> {request.rejectReason}
+                        </p>
+                      )}
+
+                      {request.status === 'Accepted' && (
+                        <div className="mt-1.5 text-[10px] space-y-0.5" style={{ color: '#059669' }}>
+                          <p><strong>Standard:</strong> ₦{request.standardPrice?.toLocaleString()}</p>
+                          <p><strong>Premium:</strong> ₦{request.premiumPrice?.toLocaleString()}</p>
+                          {request.adminComment && <p className="line-clamp-1"><strong>Comment:</strong> {request.adminComment}</p>}
+                        </div>
+                      )}
+
+                      <div
+                        className="flex items-center justify-between mt-2 pt-2"
+                        style={{ borderTop: '1px solid var(--border-default)' }}
+                      >
+                        <p className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
+                          {new Date(request.createdAt).toLocaleDateString()}
+                        </p>
+                        <div className="flex gap-1.5">
+                          {request.status !== 'Rejected' && request.status !== 'Accepted' && (
+                            <>
+                              <button
+                                onClick={() => navigate(`/admin/design-requests/reply/${request.id}`)}
+                                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-medium rounded-md text-white transition-all duration-200 cursor-pointer pressable"
+                                style={{ background: '#059669' }}
+                              >
+                                <FaCheck /> Accept
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setRejectingId(rejectingId === request.id ? null : request.id);
+                                  setRejectReason('');
+                                }}
+                                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-medium rounded-md text-white transition-all duration-200 cursor-pointer pressable"
+                                style={{ background: '#dc2626' }}
+                              >
+                                <FaTimes /> Reject
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {rejectingId === request.id && (
+                        <div
+                          className="mt-2 p-2.5 rounded-lg"
+                          style={{
+                            background: 'hsl(0 84% 60% / 0.06)',
+                            border: '1px solid hsl(0 84% 60% / 0.2)',
+                          }}
+                        >
+                          <label
+                            className="block text-[10px] font-medium mb-1.5"
+                            style={{ color: '#dc2626' }}
+                          >
+                            Reason for rejection
+                          </label>
+                          <textarea
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                            placeholder="Enter reason..."
+                            className="w-full px-2.5 py-1.5 text-[11px] rounded-lg resize-none"
+                            style={{
+                              background: 'var(--bg-elevated)',
+                              border: '1px solid var(--border-default)',
+                              color: 'var(--text-primary)',
+                            }}
+                            rows={2}
+                          />
+                          <div className="flex justify-end gap-1.5 mt-1.5">
+                            <button
+                              onClick={() => setRejectingId(null)}
+                              className="px-2.5 py-1 text-[10px] font-medium rounded-md transition-all duration-200 cursor-pointer pressable"
+                              style={{
+                                background: 'var(--bg-tertiary)',
+                                color: 'var(--text-secondary)',
+                              }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (rejectReason.trim()) {
+                                  setConfirmRejectId(request.id);
+                                  setConfirmRejectReason(rejectReason);
+                                }
+                              }}
+                              disabled={!rejectReason.trim()}
+                              className="px-2.5 py-1 text-[10px] font-medium rounded-md text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer pressable"
+                              style={{ background: '#dc2626' }}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                    </div>
+                  ))
+                )}
           </div>
         </motion.div>
       </div>

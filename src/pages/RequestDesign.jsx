@@ -217,12 +217,13 @@ export default function RequestDesign() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Phone Number</label>
+                  <label className="block text-sm font-medium mb-1.5">Phone Number *</label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
+                    required
                     className="input-base"
                     placeholder="+1 (555) 000-0000"
                   />
@@ -246,11 +247,12 @@ export default function RequestDesign() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">Timeline</label>
+                <label className="block text-sm font-medium mb-1.5">Timeline *</label>
                 <select
                   name="timeline"
                   value={formData.timeline}
                   onChange={handleChange}
+                  required
                   className="input-base"
                 >
                   <option value="">Select timeline</option>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaPalette, FaUsers, FaCheck } from 'react-icons/fa';
+import { FaPalette, FaUsers, FaCheck, FaClock, FaCheckCircle } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 
@@ -9,6 +9,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [designRequests, setDesignRequests] = useState([]);
   const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [activeTab, setActiveTab] = useState('recent');
 
   useEffect(() => {
     getDesignRequests().then(setDesignRequests);
@@ -25,6 +26,7 @@ export default function AdminDashboard() {
 
   const activeUsers = registeredUsers.filter((u) => u.active !== false);
   const pendingRequests = designRequests.filter((r) => r.status === 'Pending');
+  const finishedRequests = designRequests.filter((r) => r.status === 'Accepted');
 
   const statCards = [
     {
@@ -36,8 +38,14 @@ export default function AdminDashboard() {
     {
       label: 'Pending Requests',
       value: pendingRequests.length,
-      icon: FaCheck,
-      iconBg: 'var(--color-accent)',
+      icon: FaClock,
+      iconBg: '#f59e0b',
+    },
+    {
+      label: 'Finished Projects',
+      value: finishedRequests.length,
+      icon: FaCheckCircle,
+      iconBg: '#10b981',
     },
     {
       label: 'Active Users',
@@ -45,6 +53,14 @@ export default function AdminDashboard() {
       icon: FaUsers,
       iconBg: '#2563eb',
     },
+  ];
+
+  const recentRequests = designRequests.slice(-5).reverse();
+  const displayRequests = activeTab === 'recent' ? recentRequests : finishedRequests;
+
+  const tabs = [
+    { id: 'recent', label: 'Recent Requests' },
+    { id: 'finished', label: 'Finished Projects' },
   ];
 
   return (
@@ -71,7 +87,7 @@ export default function AdminDashboard() {
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
@@ -118,19 +134,35 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <h2
-                className="text-lg font-semibold mb-6"
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
-                Recent Design Requests
-              </h2>
+              <div className="flex items-center gap-2 mb-6 border-b" style={{ borderColor: 'var(--border-default)' }}>
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="px-4 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer relative"
+                    style={{
+                      color: activeTab === tab.id ? 'var(--color-accent)' : 'var(--text-secondary)',
+                    }}
+                  >
+                    {tab.label}
+                    {activeTab === tab.id && (
+                      <motion.div
+                        className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full"
+                        style={{ background: 'var(--color-accent)' }}
+                        layoutId="activeTab"
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+
               <div className="space-y-4">
-                {designRequests.length === 0 ? (
+                {displayRequests.length === 0 ? (
                   <p className="text-sm text-center py-8" style={{ color: 'var(--text-secondary)' }}>
-                    No design requests yet.
+                    {activeTab === 'recent' ? 'No design requests yet.' : 'No finished projects yet.'}
                   </p>
                 ) : (
-                  designRequests.slice(-5).reverse().map((request) => (
+                  displayRequests.map((request) => (
                     <div
                       key={request.id}
                       className="flex items-center justify-between p-4 rounded-xl hover-lift"
@@ -160,11 +192,13 @@ export default function AdminDashboard() {
                             background:
                               request.status === 'Completed' ? 'hsl(160 84% 39% / 0.12)' :
                               request.status === 'In Progress' ? 'hsl(217 91% 60% / 0.12)' :
+                              request.status === 'Accepted' ? 'hsl(160 84% 39% / 0.12)' :
                               request.status === 'Rejected' ? 'hsl(0 84% 60% / 0.12)' :
                               'hsl(247 12% 50% / 0.12)',
                             color:
                               request.status === 'Completed' ? '#059669' :
                               request.status === 'In Progress' ? '#2563eb' :
+                              request.status === 'Accepted' ? '#059669' :
                               request.status === 'Rejected' ? '#dc2626' :
                               'var(--color-accent)',
                           }}

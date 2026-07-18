@@ -120,6 +120,14 @@ export function AuthProvider({ children }) {
     }
   }
 
+  function subscribeToDesignRequests(callback) {
+    const q = query(collection(db, 'designRequests'), orderBy('createdAt', 'desc'));
+    return onSnapshot(q, (snapshot) => {
+      const requests = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(requests);
+    });
+  }
+
   async function saveDesignRequest(request) {
     await addDoc(collection(db, 'designRequests'), {
       ...request,
@@ -355,6 +363,7 @@ export function AuthProvider({ children }) {
     hasProfilePicture,
     updateProfilePicture,
     getDesignRequests,
+    subscribeToDesignRequests,
     saveDesignRequest,
     updateDesignRequest,
     rejectDesignRequest,

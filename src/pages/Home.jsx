@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { HiArrowRight } from 'react-icons/hi';
 import { FaPalette, FaBullhorn, FaLaptopCode, FaQuoteLeft, FaPlay, FaTimes, FaExpand } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import Hero from '../components/Hero';
 
 const services = [
   {
@@ -85,30 +86,21 @@ function CountUp({ target, suffix = '', duration = 1.8 }) {
 }
 
 const galleryImages = [
-  { src: '/images/images/IMG-20260703-WA0002.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0003.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0004.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0005.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0006.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0007.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0008.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0009.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0010.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0011.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0012.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0013.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0014.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0034.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0035.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0036.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0037.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0038.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0039.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0040.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0041.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0043.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0044.jpg', alt: 'Project showcase' },
-  { src: '/images/images/IMG-20260703-WA0046.jpg', alt: 'Project showcase' },
+  { src: '/images/IMG-20260703-WA0003.jpg', alt: 'Branding project' },
+  { src: '/images/IMG-20260703-WA0005.jpg', alt: 'Design work' },
+  { src: '/images/IMG-20260703-WA0006.jpg', alt: 'Signage project' },
+  { src: '/images/IMG-20260703-WA0007.jpg', alt: 'Creative design' },
+  { src: '/images/IMG-20260703-WA0008.jpg', alt: 'Logo concept' },
+  { src: '/images/IMG-20260703-WA0009.jpg', alt: 'Brand collateral' },
+  { src: '/images/IMG-20260703-WA0010~2.jpg', alt: 'Print material' },
+  { src: '/images/IMG-20260703-WA0011~3.jpg', alt: 'Digital design' },
+  { src: '/images/IMG-20260703-WA0013~2.jpg', alt: 'Product design' },
+  { src: '/images/IMG-20260703-WA0014~2.jpg', alt: 'Brand guideline' },
+  { src: '/images/IMG-20260703-WA0034.jpg', alt: 'Identity design' },
+  { src: '/images/IMG-20260703-WA0038.jpg', alt: 'Packaging work' },
+  { src: '/images/IMG-20260703-WA0039.jpg', alt: 'Visual identity' },
+  { src: '/images/IMG-20260703-WA0040~2.jpg', alt: 'Marketing design' },
+  { src: '/images/IMG-20260703-WA0044~2.jpg', alt: 'Campaign creative' },
 ];
 
 const galleryVideos = [
@@ -171,117 +163,8 @@ export default function Home() {
 
   return (
     <div>
-      {/* ===== HERO ANIMATED SECTION ===== */}
-      <section className="relative min-h-screen lg:h-[85vh] overflow-hidden select-none flex flex-col" style={{ paddingTop: '100px' }}>
-        <div className="absolute inset-0" style={{ background: 'var(--bg-primary)' }} />
-
-        {/* Floating orbs */}
-        <motion.div
-          className="absolute rounded-full"
-          style={{
-            width: '600px', height: '600px',
-            background: 'radial-gradient(circle, hsl(270 60% 50% / 0.22), transparent 70%)',
-            top: '-15%', right: '-12%',
-            filter: 'blur(80px)',
-          }}
-          animate={{ x: [0, 40, -25, 0], y: [0, -25, 20, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute rounded-full"
-          style={{
-            width: '500px', height: '500px',
-            background: 'radial-gradient(circle, hsl(270 60% 50% / 0.14), transparent 70%)',
-            bottom: '-10%', left: '-8%',
-            filter: 'blur(60px)',
-          }}
-          animate={{ x: [0, -30, 20, 0], y: [0, 25, -15, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute rounded-full"
-          style={{
-            width: '350px', height: '350px',
-            background: 'radial-gradient(circle, hsl(280 70% 60% / 0.1), transparent 70%)',
-            top: '35%', left: '45%',
-            filter: 'blur(50px)',
-          }}
-          animate={{ x: [0, 50, -35, 0], y: [0, -35, 25, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {/* Subtle grid */}
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(hsl(270 60% 50% / 0.04) 1px, transparent 1px), linear-gradient(90deg, hsl(270 60% 50% / 0.04) 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
-        }} />
-
-        {/* Grain */}
-        <div className="grain-overlay absolute inset-0" />
-
-        {/* Content */}
-        <div className="relative z-10 flex-1 flex items-center justify-center px-4 pb-20">
-          <div className="text-center max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8" style={{ background: 'hsl(270 60% 50% / 0.12)', border: '1px solid hsl(270 60% 50% / 0.2)' }}>
-                <div className="w-2 h-2 rounded-full" style={{ background: 'hsl(270 60% 60%)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-                <span className="text-sm font-medium" style={{ color: 'hsl(270 60% 80%)' }}>Design studio for bold brands</span>
-              </div>
-            </motion.div>
-
-            <motion.h1
-              className="text-5xl sm:text-6xl lg:text-8xl"
-              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', letterSpacing: '-0.04em', lineHeight: 1.05 }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            >
-              Expand
-              <span className="block" style={{ color: 'hsl(270 60% 65%)' }}>Global</span>
-            </motion.h1>
-
-            <motion.p
-              className="text-lg sm:text-xl lg:text-2xl font-light max-w-2xl mx-auto mt-6 mb-10"
-              style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            >
-              We build identities, design experiences, and craft visuals that make brands impossible to ignore.
-            </motion.p>
-
-            <motion.div
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <Link
-                to="/auth"
-                className="inline-flex items-center gap-2 px-8 py-3.5 font-semibold rounded-xl transition-all duration-300 pressable"
-                style={{ background: 'hsl(270 60% 50%)', color: 'white', boxShadow: '0 8px 32px hsl(270 60% 50% / 0.35)' }}
-              >
-                Get Started
-                <HiArrowRight />
-              </Link>
-              <Link
-                to="/about"
-                className="inline-flex items-center gap-2 px-8 py-3.5 font-semibold rounded-xl transition-all duration-300 pressable"
-                style={{ border: '2px solid var(--border-default)', color: 'var(--text-primary)' }}
-              >
-                Learn More
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 z-10" style={{ background: 'linear-gradient(to top, var(--bg-primary), transparent)' }} />
-      </section>
+      {/* ===== HERO SECTION ===== */}
+      <Hero />
 
       {/* ===== STATS ===== */}
       <section className="py-16 md:py-20" style={{ background: 'var(--bg-secondary)' }}>
@@ -375,42 +258,47 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* Images Grid */}
+          {/* Images Bento Grid */}
           <motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-20"
+            className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-20 auto-rows-[140px] sm:auto-rows-[180px]"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            {galleryImages.map((img, i) => (
-              <motion.div
-                key={i}
-                custom={i % 6}
-                variants={itemVariants}
-                className={`group relative rounded-xl overflow-hidden cursor-pointer ${
-                  i % 5 === 0 ? 'sm:row-span-2 sm:col-span-1' : ''
-                }`}
-              >
-                <div className="relative overflow-hidden rounded-xl" style={{ border: '1px solid var(--border-default)' }}>
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    className={`w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out ${
-                      i % 5 === 0 ? 'h-64 sm:h-80' : 'h-40 sm:h-48'
-                    }`}
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out">
-                    <div className="flex items-center gap-1.5">
-                      <FaExpand className="text-white/70 text-[10px]" />
-                      <span className="text-white text-xs font-medium">View</span>
+            {galleryImages.map((img, i) => {
+              const isLarge = i % 7 === 0;
+              const isWide = i % 5 === 2;
+              const isTall = i % 4 === 1;
+              return (
+                <motion.div
+                  key={i}
+                  custom={i % 6}
+                  variants={itemVariants}
+                  className={`group relative rounded-2xl overflow-hidden cursor-pointer ${
+                    isLarge ? 'col-span-2 row-span-2' :
+                    isWide ? 'col-span-2' :
+                    isTall ? 'row-span-2' : ''
+                  }`}
+                >
+                  <div className="relative w-full h-full overflow-hidden rounded-2xl" style={{ border: '1px solid var(--border-default)' }}>
+                    <img
+                      src={img.src}
+                      alt={img.alt}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 flex items-end p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                      <div className="flex items-center gap-2">
+                        <FaExpand className="text-white/80 text-xs" />
+                        <span className="text-white text-sm font-medium">{img.alt}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {/* Videos Section */}

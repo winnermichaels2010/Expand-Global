@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom';
 import { HiArrowRight, HiSparkles } from 'react-icons/hi';
 import { motion, useInView } from 'framer-motion';
 
-const stats = [
-  { value: '150+', label: 'Happy Clients' },
-  { value: '300+', label: 'Projects Completed' },
-  { value: '5+', label: 'Years of Experience' },
-];
-
 const heroImages = [
   { src: '/images/IMG-20260703-WA0003.jpg', alt: 'Branding project' },
   { src: '/images/IMG-20260703-WA0006.jpg', alt: 'Signage design' },
@@ -374,6 +368,21 @@ export default function Hero() {
     >
       {/* ===== BACKGROUND EFFECTS ===== */}
       <div className="absolute inset-0 overflow-hidden">
+        {/* Mountain background image */}
+        <img
+          src="https://images.unsplash.com/photo-1511300636408-a63a89df3482?q=80&w=2400&auto=format&fit=crop"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Dark overlay for text readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(5,5,10,0.72) 0%, rgba(5,5,10,0.5) 45%, rgba(5,5,10,0.78) 100%)',
+          }}
+        />
         {/* Large ambient orbs */}
         <div
           className="absolute rounded-full"
@@ -440,12 +449,12 @@ export default function Hero() {
       </div>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className="relative z-10 flex-1 flex items-center pt-24 sm:pt-28 lg:pt-20">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      <div className="relative z-10 flex-1 flex items-center pt-20 sm:pt-24 lg:pt-16">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-6 lg:gap-8 items-center">
             {/* ===== LEFT COLUMN — TEXT ===== */}
             <motion.div
-              className="order-2 lg:order-1"
+              className="order-1"
               variants={containerVariants}
               initial="hidden"
               animate={isInView ? 'visible' : 'hidden'}
@@ -474,7 +483,7 @@ export default function Hero() {
                 style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontWeight: 700,
-                  color: 'var(--text-primary)',
+                  color: 'hsl(0 0% 100%)',
                 }}
               >
                 We Design Brands
@@ -501,7 +510,7 @@ export default function Hero() {
                 variants={fadeUpDelay(0.3)}
                 className="text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl mb-8 sm:mb-10"
                 style={{
-                  color: 'var(--text-secondary)',
+                  color: 'hsl(0 0% 100% / 0.78)',
                   fontFamily: "'Inter', sans-serif",
                 }}
               >
@@ -533,8 +542,8 @@ export default function Hero() {
                   to="/contact"
                   className="hero-btn-secondary inline-flex items-center gap-2.5 px-7 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-[0.9375rem] font-semibold rounded-full transition-all duration-300"
                   style={{
-                    color: 'var(--text-primary)',
-                    border: '1.5px solid var(--border-default)',
+                    color: 'hsl(0 0% 100%)',
+                    border: '1.5px solid hsl(0 0% 100% / 0.35)',
                     background: 'transparent',
                   }}
                 >
@@ -543,46 +552,11 @@ export default function Hero() {
                 </Link>
               </motion.div>
 
-              {/* Stats Row */}
-              <motion.div
-                variants={fadeUpDelay(0.6)}
-                className="mt-10 sm:mt-14 pt-8 sm:pt-10 flex items-center gap-6 sm:gap-0 sm:divide-x"
-                style={{
-                  borderTop: '1px solid var(--border-subtle)',
-                }}
-              >
-                {stats.map((stat, i) => (
-                  <div
-                    key={stat.label}
-                    className={`flex flex-col ${
-                      i === 0 ? 'sm:pr-8' : i === 1 ? 'sm:px-8' : 'sm:pl-8'
-                    } ${i === 0 ? '' : 'pt-4 sm:pt-0'} ${
-                      i < 2 ? 'sm:border-t-0' : ''
-                    }`}
-                  >
-                    <span
-                      className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight"
-                      style={{
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        color: 'var(--text-primary)',
-                      }}
-                    >
-                      {stat.value}
-                    </span>
-                    <span
-                      className="text-[11px] sm:text-xs font-medium tracking-wide mt-0.5"
-                      style={{ color: 'var(--text-tertiary)' }}
-                    >
-                      {stat.label}
-                    </span>
-                  </div>
-                ))}
-              </motion.div>
             </motion.div>
 
             {/* ===== RIGHT COLUMN — SHOWCASE ===== */}
             <motion.div
-              className="order-1 lg:order-2 relative"
+              className="order-2 relative"
               variants={scaleFade}
               initial="hidden"
               animate={isInView ? 'visible' : 'hidden'}

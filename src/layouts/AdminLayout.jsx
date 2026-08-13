@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import AdminSidebar from '../components/AdminSidebar';
+import Sidebar from '@/components/ui/sidebar';
 
 // eslint-disable-next-line react/prop-types
 export default function AdminLayout({ children }) {
@@ -25,9 +25,9 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex">
-      <AdminSidebar />
-      <div className="flex-1 md:ml-64 pt-14 md:pt-0">
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
+      <Sidebar />
+      <div className="md:ml-64 pt-16 md:pt-0">
         {children}
       </div>
     </div>

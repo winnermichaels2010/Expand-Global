@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
+import { FaCheckCircle } from 'react-icons/fa';
 import { doc, getDoc, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { useAuth } from '../../context/AuthContext';
+import AdminPageHeader from '../../components/AdminPageHeader';
 
 export default function AdminDesignRequestReply() {
   const { id } = useParams();
@@ -95,34 +96,12 @@ export default function AdminDesignRequestReply() {
 
   return (
     <div className="min-h-screen">
-      <div style={{ background: 'var(--color-accent)' }}>
-        <div className="px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <button
-              onClick={() => navigate('/admin/design-requests')}
-              className="flex items-center gap-2 mb-4 cursor-pointer transition-colors duration-200"
-              style={{ color: 'var(--color-accent-light)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-accent-light)'; }}
-            >
-              <FaArrowLeft /> Back to Design Requests
-            </button>
-            <h1
-              className="text-3xl sm:text-4xl font-bold text-white mb-2"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              Reply to Request
-            </h1>
-            <p style={{ color: 'var(--color-accent-light)' }}>
-              Review project details and set pricing
-            </p>
-          </motion.div>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Reply to Request"
+        subtitle="Review project details and set pricing"
+        onBack={() => navigate('/admin/design-requests')}
+        backLabel="Back to Design Requests"
+      />
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8 max-w-3xl mx-auto">
         <motion.div

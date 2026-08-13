@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
 // eslint-disable-next-line react/prop-types
-export default function NotificationPanel({ userId }) {
+export default function NotificationPanel({ userId, variant = 'light' }) {
   const {
     subscribeToNotifications,
     markNotificationAsRead,
@@ -58,7 +58,11 @@ export default function NotificationPanel({ userId }) {
         ref={btnRef}
         onClick={() => setOpen(!open)}
         className="relative p-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
-        style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-default)', color: 'var(--text-primary)' }}
+        style={
+          variant === 'dark'
+            ? { background: 'hsl(0 0% 100% / 0.1)', border: '1px solid hsl(0 0% 100% / 0.18)', color: '#ffffff' }
+            : { background: 'var(--bg-secondary)', border: '1px solid var(--border-default)', color: 'var(--text-primary)' }
+        }
         aria-label="Notifications"
       >
         <FaBell className="text-lg" />

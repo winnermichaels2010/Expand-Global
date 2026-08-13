@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
-import { FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { FaUsers } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import AdminPageHeader from '../../components/AdminPageHeader';
 
 export default function AdminUsers() {
-  const { currentUser, getRegisteredUsers, toggleUserStatus, ADMIN_EMAIL } = useAuth();
+  const { currentUser, getRegisteredUsers, ADMIN_EMAIL } = useAuth();
   const [registeredUsers, setRegisteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,11 +22,6 @@ export default function AdminUsers() {
     }
   }, [currentUser, ADMIN_EMAIL, fetchUsers]);
 
-  async function handleToggleUser(userId) {
-    await toggleUserStatus(userId);
-    fetchUsers();
-  }
-
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -36,16 +32,18 @@ export default function AdminUsers() {
 
   return (
     <div className="min-h-screen">
-      <div style={{ background: 'var(--color-accent)' }} className="px-4 sm:px-6 lg:px-8 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+      <AdminPageHeader
+        title="Users"
+        subtitle="Manage registered users"
+      >
+        <div
+          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white"
+          style={{ background: 'hsl(0 0% 100% / 0.12)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
         >
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-heading)' }}>Users</h1>
-          <p className="text-white/70">Manage registered users</p>
-        </motion.div>
-      </div>
+          <FaUsers size={14} />
+          {registeredUsers.length} total
+        </div>
+      </AdminPageHeader>
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
         <motion.div
@@ -94,19 +92,6 @@ export default function AdminUsers() {
                     >
                       {user.active === false ? 'Inactive' : 'Active'}
                     </span>
-                    <motion.button
-                      onClick={() => handleToggleUser(user.userId)}
-                      className="p-2 rounded-lg transition-colors duration-200 cursor-pointer"
-                      style={{ color: user.active === false ? '#ef4444' : '#10b981' }}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      title={user.active === false ? 'Activate' : 'Deactivate'}
-                    >
-                      {user.active === false
-                        ? <FaToggleOff className="text-lg" />
-                        : <FaToggleOn className="text-lg" />
-                      }
-                    </motion.button>
                   </div>
                 </div>
               ))

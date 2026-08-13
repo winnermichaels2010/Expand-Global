@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaExclamationTriangle, FaClipboardList } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import AdminPageHeader from '../../components/AdminPageHeader';
 
 export default function AdminDesignRequests() {
   const { currentUser, getDesignRequests, rejectDesignRequest, ADMIN_EMAIL } = useAuth();
@@ -53,25 +54,18 @@ export default function AdminDesignRequests() {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      <div style={{ background: 'var(--color-accent)' }}>
-        <div className="px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1
-              className="text-3xl sm:text-4xl font-bold text-white mb-2"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              Design Requests
-            </h1>
-            <p style={{ color: 'var(--color-accent-light)' }}>
-              Review and manage design requests
-            </p>
-          </motion.div>
+      <AdminPageHeader
+        title="Design Requests"
+        subtitle="Review and manage design requests"
+      >
+        <div
+          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white"
+          style={{ background: 'hsl(0 0% 100% / 0.12)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
+        >
+          <FaClipboardList size={14} />
+          {designRequests.length} total
         </div>
-      </div>
+      </AdminPageHeader>
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8 overflow-hidden">
         <motion.div

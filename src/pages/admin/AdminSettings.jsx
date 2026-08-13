@@ -2,7 +2,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { FaSun, FaMoon, FaUser, FaCog } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import AdminPageHeader from '../../components/AdminPageHeader';
+import PanelHeader from '../../components/PanelHeader';
 
 export default function AdminSettings() {
   const { currentUser, ADMIN_EMAIL } = useAuth();
@@ -18,7 +18,7 @@ export default function AdminSettings() {
 
   return (
     <div className="min-h-screen">
-      <AdminPageHeader title="Settings" subtitle="Manage admin preferences">
+      <PanelHeader title="Settings" subtitle="Manage admin preferences">
         <div
           className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-white"
           style={{ background: 'hsl(0 0% 100% / 0.12)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
@@ -26,7 +26,7 @@ export default function AdminSettings() {
           <FaCog size={14} />
           Preferences
         </div>
-      </AdminPageHeader>
+      </PanelHeader>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 space-y-5 pb-8">
         <motion.div

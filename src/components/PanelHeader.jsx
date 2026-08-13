@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa';
 
 // eslint-disable-next-line react/prop-types
-export default function AdminPageHeader({ title, subtitle, onBack, backLabel, children }) {
+export default function PanelHeader({ title, subtitle, onBack, backLabel, children }) {
   return (
     <div
       className="relative overflow-hidden"

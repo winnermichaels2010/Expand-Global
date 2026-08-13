@@ -5,7 +5,7 @@ import { FaCheckCircle } from 'react-icons/fa';
 import { doc, getDoc, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { useAuth } from '../../context/AuthContext';
-import AdminPageHeader from '../../components/AdminPageHeader';
+import PanelHeader from '../../components/PanelHeader';
 
 export default function AdminDesignRequestReply() {
   const { id } = useParams();
@@ -96,7 +96,7 @@ export default function AdminDesignRequestReply() {
 
   return (
     <div className="min-h-screen">
-      <AdminPageHeader
+      <PanelHeader
         title="Reply to Request"
         subtitle="Review project details and set pricing"
         onBack={() => navigate('/admin/design-requests')}

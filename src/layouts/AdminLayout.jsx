@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '@/components/ui/sidebar';
@@ -7,6 +7,7 @@ import Sidebar from '@/components/ui/sidebar';
 export default function AdminLayout({ children }) {
   const { currentUser, ADMIN_EMAIL } = useAuth();
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
@@ -26,8 +27,12 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
-      <Sidebar />
-      <div className="md:ml-64 pt-16 md:pt-0">
+      <Sidebar collapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <div
+        className={`pt-16 md:pt-0 transition-all duration-300 ease-in-out ${
+          isCollapsed ? 'md:ml-20' : 'md:ml-64'
+        }`}
+      >
         {children}
       </div>
     </div>

@@ -4,6 +4,7 @@ import { FaPalette, FaBullhorn } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import PanelHeader from '../components/PanelHeader';
 
 const designServices = [
   { icon: FaPalette, label: 'Logo Design' },
@@ -131,26 +132,20 @@ export default function RequestDesign() {
 
   return (
     <div>
-      <section className="py-16 relative overflow-hidden" style={{ background: 'var(--color-accent)' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            className="max-w-3xl mx-auto text-center"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <h1 className="text-4xl sm:text-5xl mb-4 text-white" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>
-              Request a design
-            </h1>
-            <p className="text-lg text-white/75">
-              Tell us about your project and we&apos;ll create a custom solution tailored to your brand.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PanelHeader
+        title="Request a design"
+        subtitle="Tell us about your project and we'll create a custom solution tailored to your brand."
+      />
 
       <section className="py-8 mb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <span className="label-caps block mb-2" style={{ color: 'var(--color-accent)' }}>Step 1 — Pick a service</span>
+            <h2 className="text-2xl sm:text-3xl" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>
+              What do you need?
+            </h2>
+          </div>
+
           <motion.div
             className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-16"
             variants={{
@@ -167,10 +162,11 @@ export default function RequestDesign() {
                   hidden: { opacity: 0, y: 16 },
                   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
                 }}
-                className="p-5 rounded-xl transition-all duration-300 text-center group cursor-pointer hover-lift"
+                className="p-5 rounded-2xl transition-all duration-300 text-center group cursor-pointer hover-lift"
                 style={{
                   background: formData.service === label ? 'var(--color-accent-light)' : 'var(--bg-elevated)',
-                  border: formData.service === label ? '2px solid var(--color-accent)' : '2px solid var(--border-default)',
+                  border: formData.service === label ? '2px solid var(--color-accent)' : '1px solid var(--border-default)',
+                  boxShadow: formData.service === label ? '0 8px 24px hsl(262 83% 55% / 0.12)' : 'none',
                 }}
                 onClick={() => setFormData({ ...formData, service: label })}
               >
@@ -181,16 +177,26 @@ export default function RequestDesign() {
           </motion.div>
 
           <div className="max-w-3xl mx-auto">
+            <div className="mb-8">
+              <span className="label-caps block mb-2" style={{ color: 'var(--color-accent)' }}>Step 2 — Project details</span>
+              <h2 className="text-2xl sm:text-3xl" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>
+                Tell us more
+              </h2>
+            </div>
             <motion.form
               onSubmit={handleSubmit}
-              className="space-y-5 glass-strong rounded-2xl p-8 shadow-lg"
+              className="space-y-5 rounded-2xl p-8 shadow-xl"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-default)',
+              }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Your Name *</label>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Your Name *</label>
                   <input
                     type="text"
                     name="name"
@@ -202,7 +208,7 @@ export default function RequestDesign() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Email Address *</label>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email Address *</label>
                   <input
                     type="email"
                     name="email"
@@ -217,7 +223,7 @@ export default function RequestDesign() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Phone Number *</label>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Phone Number *</label>
                   <input
                     type="tel"
                     name="phone"
@@ -231,7 +237,7 @@ export default function RequestDesign() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">Service Needed *</label>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Service Needed *</label>
                 <select
                   name="service"
                   value={formData.service}
@@ -247,7 +253,7 @@ export default function RequestDesign() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">Timeline *</label>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Timeline *</label>
                 <select
                   name="timeline"
                   value={formData.timeline}
@@ -265,7 +271,7 @@ export default function RequestDesign() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">Project Description *</label>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Project Description *</label>
                 <textarea
                   name="description"
                   rows={6}

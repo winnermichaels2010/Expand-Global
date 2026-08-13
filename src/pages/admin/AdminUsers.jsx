@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FaUsers } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
-import AdminPageHeader from '../../components/AdminPageHeader';
+import PanelHeader from '../../components/PanelHeader';
 
 export default function AdminUsers() {
   const { currentUser, getRegisteredUsers, ADMIN_EMAIL } = useAuth();
@@ -32,7 +32,7 @@ export default function AdminUsers() {
 
   return (
     <div className="min-h-screen">
-      <AdminPageHeader
+      <PanelHeader
         title="Users"
         subtitle="Manage registered users"
       >
@@ -43,7 +43,7 @@ export default function AdminUsers() {
           <FaUsers size={14} />
           {registeredUsers.length} total
         </div>
-      </AdminPageHeader>
+      </PanelHeader>
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
         <motion.div

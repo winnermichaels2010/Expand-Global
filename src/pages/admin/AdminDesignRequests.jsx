@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheck, FaTimes, FaExclamationTriangle, FaClipboardList } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
-import AdminPageHeader from '../../components/AdminPageHeader';
+import PanelHeader from '../../components/PanelHeader';
 
 export default function AdminDesignRequests() {
   const { currentUser, getDesignRequests, rejectDesignRequest, ADMIN_EMAIL } = useAuth();
@@ -54,7 +54,7 @@ export default function AdminDesignRequests() {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      <AdminPageHeader
+      <PanelHeader
         title="Design Requests"
         subtitle="Review and manage design requests"
       >
@@ -65,7 +65,7 @@ export default function AdminDesignRequests() {
           <FaClipboardList size={14} />
           {designRequests.length} total
         </div>
-      </AdminPageHeader>
+      </PanelHeader>
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8 overflow-hidden">
         <motion.div

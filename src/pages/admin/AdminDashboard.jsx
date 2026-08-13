@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaPalette, FaUsers, FaClock, FaCheckCircle } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import AdminPageHeader from '../../components/AdminPageHeader';
+import PanelHeader from '../../components/PanelHeader';
 
 export default function AdminDashboard() {
   const { currentUser, getDesignRequests, getRegisteredUsers, ADMIN_EMAIL } = useAuth();
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen">
-      <AdminPageHeader
+      <PanelHeader
         title="Dashboard"
         subtitle={`Welcome back, ${currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Admin'}`}
       >
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
           <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
           Admin
         </div>
-      </AdminPageHeader>
+      </PanelHeader>
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
         <motion.div

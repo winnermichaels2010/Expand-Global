@@ -20,9 +20,8 @@ const navItems = [
   { name: 'Settings', path: '/admin/settings', icon: Settings },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ collapsed = false, onToggleCollapse }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const { currentUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,7 +36,6 @@ const Sidebar = () => {
   };
 
   const toggleSidebar = () => setIsOpen(!isOpen);
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   async function handleLogout() {
     try {
@@ -76,7 +74,7 @@ const Sidebar = () => {
         className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-40 flex flex-col ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 ${
-          isCollapsed ? 'md:w-20' : 'md:w-64'
+          collapsed ? 'md:w-20' : 'md:w-64'
         } w-64 shadow-2xl`}
         style={{
           background: 'linear-gradient(180deg, hsl(262 83% 55%) 0%, hsl(263 70% 42%) 45%, hsl(262 80% 20%) 100%)',
@@ -94,7 +92,7 @@ const Sidebar = () => {
             >
               <img src="/expand-global-logo.jpg" alt="Expand Global" className="w-full h-full object-cover" />
             </div>
-            {!isCollapsed && (
+            {!collapsed && (
               <div className="min-w-0">
                 <h1
                   className="text-white font-bold tracking-tight truncate"
@@ -114,14 +112,14 @@ const Sidebar = () => {
 
           {/* Desktop Collapse Button */}
           <button
-            onClick={toggleCollapse}
+            onClick={onToggleCollapse}
             className="hidden md:block p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors duration-200 cursor-pointer"
             aria-label="Collapse sidebar"
           >
             <ChevronLeft
               size={18}
               className={`transition-transform duration-300 ${
-                isCollapsed ? 'rotate-180' : ''
+                collapsed ? 'rotate-180' : ''
               }`}
             />
           </button>
@@ -129,7 +127,7 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {!isCollapsed && (
+          {!collapsed && (
             <p
               className="px-3 pb-2 text-[10px] font-semibold tracking-[0.2em] uppercase"
               style={{ color: 'hsl(0 0% 100% / 0.45)' }}
@@ -146,7 +144,7 @@ const Sidebar = () => {
                 key={item.path}
                 to={item.path}
                 className={`group relative flex items-center gap-3 rounded-xl transition-all duration-200 ${
-                  isCollapsed ? 'justify-center px-0 py-3' : 'px-4 py-3'
+                  collapsed ? 'justify-center px-0 py-3' : 'px-4 py-3'
                 } ${
                   active
                     ? 'bg-white/15 text-white shadow-lg'
@@ -157,7 +155,7 @@ const Sidebar = () => {
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-white" />
                 )}
                 <Icon size={20} className="flex-shrink-0" />
-                {!isCollapsed && (
+                {!collapsed && (
                   <span className="text-sm font-medium truncate">
                     {item.name}
                   </span>
@@ -177,7 +175,7 @@ const Sidebar = () => {
           </div>
           <div
             className={`flex items-center gap-3 rounded-xl p-3 ${
-              isCollapsed ? 'justify-center' : ''
+              collapsed ? 'justify-center' : ''
             }`}
             style={{ background: 'hsl(0 0% 100% / 0.08)' }}
           >
@@ -187,7 +185,7 @@ const Sidebar = () => {
             >
               <span className="text-white font-semibold text-sm">{initials}</span>
             </div>
-            {!isCollapsed && (
+            {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
                   {displayName}
@@ -215,7 +213,7 @@ const Sidebar = () => {
             }}
           >
             <LogOut size={18} />
-            {!isCollapsed && 'Logout'}
+            {!collapsed && 'Logout'}
           </button>
         </div>
       </div>

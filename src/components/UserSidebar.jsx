@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaPalette, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaPalette, FaSignOutAlt, FaSun, FaMoon } from 'react-icons/fa';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import NotificationPanel from './NotificationPanel';
 
 const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: FaTachometerAlt },
   { name: 'Request Design', path: '/request-design', icon: FaPalette },
-  { name: 'Settings', path: '/settings', icon: FaCog },
 ];
 
 export default function UserSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const { currentUser, logout } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -54,9 +55,30 @@ export default function UserSidebar() {
 
   return (
     <>
+      {/* Mobile Brand Bar */}
+      <div
+        className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 pr-16 h-14"
+        style={{ background: 'linear-gradient(90deg, hsl(262 83% 55%) 0%, hsl(263 70% 42%) 100%)' }}
+      >
+        <div className="flex items-center gap-2">
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"
+            style={{ background: 'hsl(0 0% 100% / 0.15)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
+          >
+            <img src="/expand-global-logo.jpg" alt="Expand Global" className="w-full h-full object-cover" />
+          </div>
+          <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>
+            Expand Global
+          </span>
+        </div>
+        <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-white/70">
+          My Account
+        </span>
+      </div>
+
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer pressable hover:bg-white/90"
+        className="fixed top-3 right-4 z-50 md:hidden p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer pressable hover:bg-white/90"
         aria-label="Toggle sidebar"
       >
         {isOpen ? <HiX size={22} /> : <HiMenu size={22} />}
@@ -153,8 +175,22 @@ export default function UserSidebar() {
           className="px-4 py-4 space-y-3"
           style={{ borderTop: '1px solid hsl(0 0% 100% / 0.12)' }}
         >
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center gap-2">
             {currentUser && <NotificationPanel variant="dark" userId={currentUser.uid} />}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
+              style={{
+                background: 'hsl(0 0% 100% / 0.1)',
+                border: '1px solid hsl(0 0% 100% / 0.18)',
+                color: '#ffffff',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.2)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.1)'; }}
+              aria-label="Toggle theme"
+            >
+              {darkMode ? <FaSun /> : <FaMoon />}
+            </button>
           </div>
           <div
             className="flex items-center gap-3 rounded-xl p-3"
@@ -176,18 +212,9 @@ export default function UserSidebar() {
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-colors duration-200 cursor-pointer"
-            style={{
-              background: 'hsl(0 0% 100% / 0.1)',
-              border: '1px solid hsl(0 0% 100% / 0.18)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'hsl(358 70% 50%)';
-              e.currentTarget.style.borderColor = 'transparent';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'hsl(0 0% 100% / 0.1)';
-              e.currentTarget.style.border = '1px solid hsl(0 0% 100% / 0.18)';
-            }}
+            style={{ background: '#dc2626' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#b91c1c'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#dc2626'; }}
           >
             <FaSignOutAlt />
             Sign Out

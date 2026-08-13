@@ -17,14 +17,12 @@ const publicLinks = [
 const userLinks = [
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Request Design', path: '/request-design' },
-  { name: 'Settings', path: '/settings' },
 ];
 
 const adminLinks = [
   { name: 'Dashboard', path: '/admin' },
   { name: 'Users', path: '/admin/users' },
   { name: 'Requests', path: '/admin/design-requests' },
-  { name: 'Settings', path: '/admin/settings' },
 ];
 
 export default function Navbar() {

@@ -10,7 +10,6 @@ import Contact from './pages/Contact';
 import Terms from './pages/Terms';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
-import Settings from './pages/Settings';
 import RequestDesign from './pages/RequestDesign';
 import AdminLayout from './layouts/AdminLayout';
 import UserLayout from './layouts/UserLayout';
@@ -18,7 +17,6 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminDesignRequests from './pages/admin/AdminDesignRequests';
 import AdminDesignRequestReply from './pages/admin/AdminDesignRequestReply';
-import AdminSettings from './pages/admin/AdminSettings';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -39,7 +37,7 @@ function HomeRedirect() {
 function AppLayout() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isUserRoute = ['/dashboard', '/request-design', '/settings'].includes(location.pathname);
+  const isUserRoute = ['/dashboard', '/request-design'].includes(location.pathname);
   const showPublicLayout = !isAdminRoute && !isUserRoute;
 
   return (
@@ -58,11 +56,9 @@ function AppLayout() {
           <Route path="/admin/users" element={<AdminLayout><AdminUsers /></AdminLayout>} />
           <Route path="/admin/design-requests" element={<AdminLayout><AdminDesignRequests /></AdminLayout>} />
           <Route path="/admin/design-requests/reply/:id" element={<AdminLayout><AdminDesignRequestReply /></AdminLayout>} />
-          <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
 
           <Route path="/dashboard" element={<UserLayout><Dashboard /></UserLayout>} />
           <Route path="/request-design" element={<UserLayout><RequestDesign /></UserLayout>} />
-          <Route path="/settings" element={<UserLayout><Settings /></UserLayout>} />
         </Routes>
       </main>
       {showPublicLayout && <Footer />}

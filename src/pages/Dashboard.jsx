@@ -427,14 +427,14 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <h2 className="text-lg font-semibold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
               {activeFilter === 'All' ? 'All Requests' : `${activeFilter} Requests`}
               <span className="ml-2 text-sm font-normal" style={{ color: 'var(--text-tertiary)' }}>
                 ({filteredRequests.length})
               </span>
             </h2>
-            <div className="flex gap-1.5">
+            <div className="flex flex-wrap gap-1.5">
               {filters.map((f) => (
                 <button
                   key={f}
@@ -517,9 +517,9 @@ export default function Dashboard() {
 
                     {req.status === 'Accepted' && (
                       <div className="space-y-2 mb-3 pl-2">
-                        <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                           <div
-                            className="p-2.5 rounded-lg"
+                            className="p-2.5 rounded-lg break-words"
                             style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}
                           >
                             <span className="font-medium" style={{ color: '#10b981' }}>
@@ -527,7 +527,7 @@ export default function Dashboard() {
                             </span>
                           </div>
                           <div
-                            className="p-2.5 rounded-lg"
+                            className="p-2.5 rounded-lg break-words"
                             style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
                           >
                             <span className="font-medium" style={{ color: 'var(--color-accent)' }}>

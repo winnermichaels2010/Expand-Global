@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserSidebar from '../components/UserSidebar';
+import DashboardFooter from '../components/DashboardFooter';
 
 // eslint-disable-next-line react/prop-types
 export default function UserLayout({ children }) {
@@ -27,8 +28,11 @@ export default function UserLayout({ children }) {
   return (
     <div className="min-h-screen flex">
       <UserSidebar />
-      <div className="flex-1 md:ml-64 pt-14 md:pt-0">
-        {children}
+      <div className="flex-1 md:ml-64 pt-14 md:pt-0 flex flex-col overflow-x-hidden">
+        <main className="flex-1 w-full">
+          {children}
+        </main>
+        <DashboardFooter />
       </div>
     </div>
   );

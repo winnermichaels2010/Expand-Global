@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaCheckCircle } from 'react-icons/fa';
-import { doc, getDoc, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
-import { db } from '../../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import PanelHeader from '../../components/PanelHeader';
 
 export default function AdminDesignRequestReply() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentUser, updateDesignRequest, ADMIN_EMAIL } = useAuth();
+  const { currentUser, acceptDesignRequest, ADMIN_EMAIL, getDesignRequests } = useAuth();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [standardPrice, setStandardPrice] = useState('');
@@ -21,10 +19,8 @@ export default function AdminDesignRequestReply() {
   useEffect(() => {
     async function fetchRequest() {
       try {
-        const docSnap = await getDoc(doc(db, 'designRequests', id));
-        if (docSnap.exists()) {
-          setRequest({ id: docSnap.id, ...docSnap.data() });
-        }
+        const requests = await getDesignRequests();
+        setRequest(requests.find((r) => r.id === id) || null);
       } catch (err) {
         console.error('Failed to fetch design request:', err);
       } finally {
@@ -34,34 +30,14 @@ export default function AdminDesignRequestReply() {
     if (currentUser?.email === ADMIN_EMAIL) {
       fetchRequest();
     }
-  }, [id, currentUser, ADMIN_EMAIL]);
+  }, [id, currentUser, ADMIN_EMAIL, getDesignRequests]);
 
   async function handleAccept() {
     const standard = parseFloat(standardPrice);
     const premium = parseFloat(premiumPrice);
     if (isNaN(standard) || isNaN(premium)) return;
     setSubmitting(true);
-    await updateDesignRequest(id, {
-      status: 'Accepted',
-      standardPrice: standard,
-      premiumPrice: premium,
-      adminComment: adminComment.trim(),
-      repliedAt: new Date().toISOString(),
-    });
-    if (request?.email) {
-      const q = query(collection(db, 'users'), where('email', '==', request.email));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const user = snap.docs[0];
-        await addDoc(collection(db, 'notifications'), {
-          userId: user.id,
-          message: `Your design request "${request.service}" has been accepted! Standard: ₦${standard.toLocaleString()}, Premium: ₦${premium.toLocaleString()}`,
-          type: 'design_request',
-          read: false,
-          createdAt: new Date().toISOString(),
-        });
-      }
-    }
+    await acceptDesignRequest(id, { standardPrice: standard, premiumPrice: premium, adminComment });
     setSubmitting(false);
     navigate('/admin/design-requests');
   }

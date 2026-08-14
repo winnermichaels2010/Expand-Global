@@ -1,19 +1,86 @@
-const ADMIN_EMAIL = 'adminemail@gmail.com';
-
 import { createContext, useContext, useEffect, useState } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-} from 'firebase/auth';
-import { doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, onSnapshot, writeBatch } from 'firebase/firestore';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ref as dbRef, set, get } from 'firebase/database';
-import { auth, googleProvider, db, storage, rtdb } from '../../firebase';
+import { supabase, ADMIN_EMAIL } from '../lib/supabase';
 
 const AuthContext = createContext();
+
+function mapProfile(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    email: row.email,
+    surname: row.surname,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    profilePicture: row.profile_picture,
+    active: row.active,
+    createdAt: row.created_at,
+  };
+}
+
+function mapRequest(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    service: row.service,
+    description: row.description,
+    timeline: row.timeline,
+    budget: row.budget,
+    status: row.status,
+    standardPrice: row.standard_price,
+    premiumPrice: row.premium_price,
+    adminComment: row.admin_comment,
+    rejectReason: row.reject_reason,
+    rejectedAt: row.rejected_at,
+    repliedAt: row.replied_at,
+    createdAt: row.created_at,
+  };
+}
+
+function toRequestWrite(data) {
+  const payload = {};
+  if (data.name !== undefined) payload.name = data.name;
+  if (data.email !== undefined) payload.email = data.email;
+  if (data.phone !== undefined) payload.phone = data.phone;
+  if (data.service !== undefined) payload.service = data.service;
+  if (data.description !== undefined) payload.description = data.description;
+  if (data.timeline !== undefined) payload.timeline = data.timeline;
+  if (data.budget !== undefined) payload.budget = data.budget;
+  if (data.status !== undefined) payload.status = data.status;
+  if (data.standardPrice !== undefined) payload.standard_price = data.standardPrice;
+  if (data.premiumPrice !== undefined) payload.premium_price = data.premiumPrice;
+  if (data.adminComment !== undefined) payload.admin_comment = data.adminComment;
+  if (data.rejectReason !== undefined) payload.reject_reason = data.rejectReason;
+  if (data.rejectedAt !== undefined) payload.rejected_at = data.rejectedAt;
+  if (data.repliedAt !== undefined) payload.replied_at = data.repliedAt;
+  return payload;
+}
+
+function mapNotification(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    message: row.message,
+    type: row.type,
+    read: row.read,
+    createdAt: row.created_at,
+  };
+}
+
+function mapMessage(row) {
+  return {
+    id: row.id,
+    designRequestId: row.design_request_id,
+    senderId: row.sender_id,
+    senderEmail: row.sender_email,
+    senderName: row.sender_name,
+    message: row.message,
+    read: row.read,
+    createdAt: row.created_at,
+  };
+}
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -28,26 +95,45 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  function signup(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
+  // ---------- Auth ----------
+
+  async function signup(email, password, profile = {}) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: profile },
+    });
+    if (error) throw error;
+    return data;
   }
 
-  function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
+  async function login(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
   }
 
-  function loginWithGoogle() {
-    return signInWithPopup(auth, googleProvider);
+  async function loginWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) throw error;
   }
 
   function logout() {
-    return signOut(auth);
+    return supabase.auth.signOut();
   }
 
   async function getUserProfile(userId) {
     try {
-      const docSnap = await getDoc(doc(db, 'users', userId));
-      return docSnap.exists() ? docSnap.data() : null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      if (error) throw error;
+      return mapProfile(data);
     } catch {
       return null;
     }
@@ -55,20 +141,33 @@ export function AuthProvider({ children }) {
 
   async function saveUserProfile(userId, profile) {
     try {
-      await setDoc(doc(db, 'users', userId), {
-        ...profile,
-        active: true,
-        createdAt: profile.createdAt || new Date().toISOString(),
-      }, { merge: true });
+      const payload = { id: userId, email: profile.email, active: true };
+      if (profile.surname) payload.surname = profile.surname;
+      if (profile.firstName) payload.first_name = profile.firstName;
+      if (profile.lastName) payload.last_name = profile.lastName;
+      if (profile.profilePicture) payload.profile_picture = profile.profilePicture;
+      const { error } = await supabase.from('profiles').upsert(payload, { onConflict: 'id' });
+      if (error) throw error;
     } catch (err) {
       console.error('Failed to save user profile:', err);
     }
   }
 
+  async function getProfileByEmail(email) {
+    try {
+      const { data, error } = await supabase.rpc('get_user_id_by_email', { target_email: email });
+      if (error) throw error;
+      return data ? { id: data } : null;
+    } catch {
+      return null;
+    }
+  }
+
   async function getRegisteredUsers() {
     try {
-      const snap = await getDocs(collection(db, 'users'));
-      return snap.docs.map((d) => ({ userId: d.id, ...d.data() }));
+      const { data, error } = await supabase.from('profiles').select('*');
+      if (error) throw error;
+      return (data || []).map((row) => ({ userId: row.id, ...mapProfile(row) }));
     } catch (err) {
       console.error('Failed to fetch registered users:', err);
       return [];
@@ -77,43 +176,48 @@ export function AuthProvider({ children }) {
 
   async function deleteRegisteredUser(userId) {
     try {
-      await deleteDoc(doc(db, 'users', userId));
+      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      if (error) throw error;
     } catch (err) {
       console.error('Failed to delete user:', err);
     }
   }
 
   async function hasProfilePicture(userId) {
-    try {
-      const profile = await getUserProfile(userId);
-      return !!(profile && profile.profilePicture);
-    } catch {
-      return false;
-    }
+    const profile = await getUserProfile(userId);
+    return !!(profile && profile.profilePicture);
   }
 
   async function updateProfilePicture(userId, file) {
     try {
-      const imageRef = storageRef(storage, `profile-pictures/${userId}`);
-      await uploadBytes(imageRef, file);
-      const downloadUrl = await getDownloadURL(imageRef);
+      const path = `${userId}/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('profile-pictures')
+        .upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
 
-      await Promise.all([
-        setDoc(doc(db, 'users', userId), { profilePicture: downloadUrl }, { merge: true }),
-        set(dbRef(rtdb, `users/${userId}/profilePicture`), downloadUrl),
-      ]);
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-pictures')
+        .getPublicUrl(path);
 
-      return downloadUrl;
+      await supabase.from('profiles').update({ profile_picture: publicUrl }).eq('id', userId);
+      return publicUrl;
     } catch (err) {
       console.error('Failed to upload profile picture:', err);
       return null;
     }
   }
 
+  // ---------- Design Requests ----------
+
   async function getDesignRequests() {
     try {
-      const snap = await getDocs(collection(db, 'designRequests'));
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('design_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(mapRequest);
     } catch (err) {
       console.error('Failed to fetch design requests:', err);
       return [];
@@ -121,31 +225,37 @@ export function AuthProvider({ children }) {
   }
 
   function subscribeToDesignRequests(callback) {
-    const q = query(collection(db, 'designRequests'), orderBy('createdAt', 'desc'));
-    return onSnapshot(q, (snapshot) => {
-      const requests = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      callback(requests);
-    });
+    const fetchAll = async () => callback(await getDesignRequests());
+    fetchAll();
+    const channel = supabase
+      .channel('design-requests-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'design_requests' }, fetchAll)
+      .subscribe();
+    return () => supabase.removeChannel(channel);
   }
 
   async function saveDesignRequest(request) {
-    await addDoc(collection(db, 'designRequests'), {
-      ...request,
+    const { error } = await supabase.from('design_requests').insert({
+      user_id: currentUser?.id,
+      name: request.name,
+      email: request.email,
+      phone: request.phone,
+      service: request.service,
+      description: request.description,
+      timeline: request.timeline,
+      budget: request.budget || null,
       status: 'Pending',
-      createdAt: new Date().toISOString(),
     });
+    if (error) throw error;
+
     try {
-      const q = query(collection(db, 'users'), where('email', '==', ADMIN_EMAIL));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const adminUser = snap.docs[0];
-        await addDoc(collection(db, 'notifications'), {
-          userId: adminUser.id,
-          message: `New design request from ${request.name || 'a user'} (${request.service})`,
-          type: 'design_request',
-          read: false,
-          createdAt: new Date().toISOString(),
-        });
+      const adminProfile = await getProfileByEmail(ADMIN_EMAIL);
+      if (adminProfile) {
+        await addNotification(
+          adminProfile.id,
+          `New design request from ${request.name || 'a user'} (${request.service})`,
+          'design_request'
+        );
       }
     } catch (err) {
       console.error('Failed to notify admin:', err);
@@ -154,7 +264,11 @@ export function AuthProvider({ children }) {
 
   async function updateDesignRequest(id, data) {
     try {
-      await updateDoc(doc(db, 'designRequests', id), data);
+      const { error } = await supabase
+        .from('design_requests')
+        .update(toRequestWrite(data))
+        .eq('id', id);
+      if (error) throw error;
     } catch (err) {
       console.error('Failed to update design request:', err);
     }
@@ -162,25 +276,28 @@ export function AuthProvider({ children }) {
 
   async function rejectDesignRequest(id, reason) {
     try {
-      await updateDoc(doc(db, 'designRequests', id), {
+      await updateDesignRequest(id, {
         status: 'Rejected',
         rejectReason: reason,
         rejectedAt: new Date().toISOString(),
       });
-      const requestDoc = await getDoc(doc(db, 'designRequests', id));
-      const requestData = requestDoc.data();
-      if (requestData?.email) {
-        const q = query(collection(db, 'users'), where('email', '==', requestData.email));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          const user = snap.docs[0];
-          await addDoc(collection(db, 'notifications'), {
-            userId: user.id,
-            message: `Your design request "${requestData.service}" has been rejected. Reason: ${reason}`,
-            type: 'design_request',
-            read: false,
-            createdAt: new Date().toISOString(),
-          });
+
+      const { data, error } = await supabase
+        .from('design_requests')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      if (error) throw error;
+      const request = mapRequest(data);
+
+      if (request?.email) {
+        const userProfile = await getProfileByEmail(request.email);
+        if (userProfile) {
+          await addNotification(
+            userProfile.id,
+            `Your design request "${request.service}" has been rejected. Reason: ${reason}`,
+            'design_request'
+          );
         }
       }
     } catch (err) {
@@ -188,13 +305,53 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function acceptDesignRequest(id, { standardPrice, premiumPrice, adminComment }) {
+    try {
+      await updateDesignRequest(id, {
+        status: 'Accepted',
+        standardPrice,
+        premiumPrice,
+        adminComment: (adminComment || '').trim(),
+        repliedAt: new Date().toISOString(),
+      });
+
+      const { data, error } = await supabase
+        .from('design_requests')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      if (error) throw error;
+      const request = mapRequest(data);
+
+      if (request?.email) {
+        const userProfile = await getProfileByEmail(request.email);
+        if (userProfile) {
+          await addNotification(
+            userProfile.id,
+            `Your design request "${request.service}" has been accepted! Standard: ₦${Number(standardPrice).toLocaleString()}, Premium: ₦${Number(premiumPrice).toLocaleString()}`,
+            'design_request'
+          );
+        }
+      }
+    } catch (err) {
+      console.error('Failed to accept design request:', err);
+    }
+  }
+
   async function toggleUserStatus(userId) {
     try {
-      const docSnap = await getDoc(doc(db, 'users', userId));
-      if (docSnap.exists()) {
-        const current = docSnap.data().active !== false;
-        await updateDoc(doc(db, 'users', userId), { active: !current });
-      }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('active')
+        .eq('id', userId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return;
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ active: data.active === false })
+        .eq('id', userId);
+      if (updateError) throw updateError;
     } catch (err) {
       console.error('Failed to toggle user status:', err);
     }
@@ -204,13 +361,13 @@ export function AuthProvider({ children }) {
 
   async function getNotifications(userId) {
     try {
-      const q = query(
-        collection(db, 'notifications'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(mapNotification);
     } catch {
       return [];
     }
@@ -218,13 +375,13 @@ export function AuthProvider({ children }) {
 
   async function getUnreadNotificationCount(userId) {
     try {
-      const q = query(
-        collection(db, 'notifications'),
-        where('userId', '==', userId),
-        where('read', '==', false)
-      );
-      const snap = await getDocs(q);
-      return snap.size;
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('read', false);
+      if (error) throw error;
+      return count || 0;
     } catch {
       return 0;
     }
@@ -232,7 +389,11 @@ export function AuthProvider({ children }) {
 
   async function markNotificationAsRead(notifId) {
     try {
-      await updateDoc(doc(db, 'notifications', notifId), { read: true });
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notifId);
+      if (error) throw error;
     } catch (err) {
       console.error('Failed to mark notification as read:', err);
     }
@@ -240,7 +401,8 @@ export function AuthProvider({ children }) {
 
   async function deleteNotification(notifId) {
     try {
-      await deleteDoc(doc(db, 'notifications', notifId));
+      const { error } = await supabase.from('notifications').delete().eq('id', notifId);
+      if (error) throw error;
     } catch (err) {
       console.error('Failed to delete notification:', err);
     }
@@ -248,11 +410,8 @@ export function AuthProvider({ children }) {
 
   async function deleteAllNotifications(userId) {
     try {
-      const q = query(collection(db, 'notifications'), where('userId', '==', userId));
-      const snap = await getDocs(q);
-      const batch = writeBatch(db);
-      snap.docs.forEach((d) => batch.delete(d.ref));
-      await batch.commit();
+      const { error } = await supabase.from('notifications').delete().eq('user_id', userId);
+      if (error) throw error;
     } catch (err) {
       console.error('Failed to delete all notifications:', err);
     }
@@ -260,28 +419,26 @@ export function AuthProvider({ children }) {
 
   async function addNotification(userId, message, type = 'info') {
     try {
-      await addDoc(collection(db, 'notifications'), {
-        userId,
+      const { error } = await supabase.from('notifications').insert({
+        user_id: userId,
         message,
         type,
         read: false,
-        createdAt: new Date().toISOString(),
       });
+      if (error) throw error;
     } catch (err) {
       console.error('Failed to add notification:', err);
     }
   }
 
   function subscribeToNotifications(userId, callback) {
-    const q = query(
-      collection(db, 'notifications'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
-    return onSnapshot(q, (snapshot) => {
-      const notifs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      callback(notifs);
-    });
+    const fetchAll = async () => callback(await getNotifications(userId));
+    fetchAll();
+    const channel = supabase
+      .channel(`notifications-${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, fetchAll)
+      .subscribe();
+    return () => supabase.removeChannel(channel);
   }
 
   // ---------- Messages ----------
@@ -292,38 +449,39 @@ export function AuthProvider({ children }) {
         ? [currentUserProfile.surname, currentUserProfile.firstName, currentUserProfile.lastName].filter(Boolean).join(' ') || currentUser.email
         : currentUser.displayName || currentUser.email;
 
-      await addDoc(collection(db, 'messages'), {
-        designRequestId,
-        senderId: currentUser.uid,
-        senderEmail: currentUser.email,
-        senderName,
+      const { error: insertError } = await supabase.from('messages').insert({
+        design_request_id: designRequestId,
+        sender_id: currentUser.id,
+        sender_email: currentUser.email,
+        sender_name: senderName,
         message,
         read: false,
-        createdAt: new Date().toISOString(),
       });
+      if (insertError) throw insertError;
 
-      const requestDoc = await getDoc(doc(db, 'designRequests', designRequestId));
-      const requestData = requestDoc.data();
-      if (!requestData) return;
+      const { data: requestData, error: reqError } = await supabase
+        .from('design_requests')
+        .select('*')
+        .eq('id', designRequestId)
+        .maybeSingle();
+      if (reqError) throw reqError;
+      const request = mapRequest(requestData);
+      if (!request) return;
 
-      let recipientQuery;
-      if (currentUser.email === ADMIN_EMAIL) {
-        recipientQuery = query(collection(db, 'users'), where('email', '==', requestData.email));
+      const isFromAdmin = currentUser.email === ADMIN_EMAIL;
+      let recipient;
+      if (isFromAdmin) {
+        recipient = await getProfileByEmail(request.email);
       } else {
-        recipientQuery = query(collection(db, 'users'), where('email', '==', ADMIN_EMAIL));
+        recipient = await getProfileByEmail(ADMIN_EMAIL);
       }
 
-      const recipientSnap = await getDocs(recipientQuery);
-      if (!recipientSnap.empty) {
-        const recipient = recipientSnap.docs[0];
-        const isFromAdmin = currentUser.email === ADMIN_EMAIL;
-        await addDoc(collection(db, 'notifications'), {
-          userId: recipient.id,
-          message: `New message from ${isFromAdmin ? 'Admin' : senderName} regarding "${requestData.service}" request`,
-          type: 'message',
-          read: false,
-          createdAt: new Date().toISOString(),
-        });
+      if (recipient) {
+        await addNotification(
+          recipient.id,
+          `New message from ${isFromAdmin ? 'Admin' : senderName} regarding "${request.service}" request`,
+          'message'
+        );
       }
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -331,24 +489,88 @@ export function AuthProvider({ children }) {
   }
 
   function subscribeToMessages(designRequestId, callback) {
-    const q = query(
-      collection(db, 'messages'),
-      where('designRequestId', '==', designRequestId),
-      orderBy('createdAt', 'asc')
-    );
-    return onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      callback(msgs);
-    });
+    const fetchAll = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('design_request_id', designRequestId)
+          .order('created_at', { ascending: true });
+        if (error) throw error;
+        callback((data || []).map(mapMessage));
+      } catch (err) {
+        console.error('Failed to fetch messages:', err);
+      }
+    };
+    fetchAll();
+    const channel = supabase
+      .channel(`messages-${designRequestId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchAll)
+      .subscribe();
+    return () => supabase.removeChannel(channel);
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setCurrentUser(compatUser(session.user));
+        syncGoogleProfile(session.user);
+      }
       setLoading(false);
     });
-    return unsubscribe;
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setCurrentUser(compatUser(session.user));
+        syncGoogleProfile(session.user);
+      } else {
+        setCurrentUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => listener.subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function compatUser(user) {
+    const meta = user.user_metadata || {};
+    return {
+      id: user.id,
+      uid: user.id,
+      email: user.email,
+      displayName: meta.full_name || meta.name || null,
+      photoURL: meta.avatar_url || meta.picture || null,
+      metadata: { creationTime: user.created_at },
+    };
+  }
+
+  async function syncGoogleProfile(user) {
+    try {
+      if ((user.app_metadata?.provider !== 'google' && (user.user_metadata?.iss !== 'https://accounts.google.com')) || !user.email) {
+        return;
+      }
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (existing) return;
+
+      const meta = user.user_metadata || {};
+      const fullName = meta.full_name || meta.name || '';
+      const parts = fullName.split(' ').filter(Boolean);
+      await saveUserProfile(user.id, {
+        email: user.email,
+        surname: parts.slice(1).join(' ') || '',
+        firstName: parts[0] || '',
+        lastName: '',
+        profilePicture: meta.avatar_url || meta.picture || '',
+      });
+    } catch {
+      // non-critical backfill
+    }
+  }
 
   const value = {
     currentUser,
@@ -367,6 +589,7 @@ export function AuthProvider({ children }) {
     saveDesignRequest,
     updateDesignRequest,
     rejectDesignRequest,
+    acceptDesignRequest,
     toggleUserStatus,
     ADMIN_EMAIL,
     getNotifications,

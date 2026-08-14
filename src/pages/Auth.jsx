@@ -111,8 +111,8 @@ export default function Auth() {
         const userCred = await login(email, password);
         redirectUser(userCred.user.email);
       } else {
-        const userCred = await signup(email, password);
-        await saveUserProfile(userCred.user.uid, {
+        const userCred = await signup(email, password, { surname, first_name: firstName, last_name: lastName });
+        await saveUserProfile(userCred.user?.id, {
           email,
           surname,
           firstName,
@@ -128,9 +128,9 @@ export default function Auth() {
         setLastName('');
       }
     } catch (err) {
-      const msg = err.message
-        .replace('Firebase: ', '')
-        .replace(/\(auth\/.*\)/, '')
+      const msg = (err.message || '')
+        .replace(/^Auth[A-Za-z]*Error: /, '')
+        .replace(/^[^:]+: /, '')
         .replace(/\.$/, '')
         .trim();
       setError(msg || 'Something went wrong. Please try again.');
@@ -145,20 +145,13 @@ export default function Auth() {
     }
     setLoading(true);
     try {
-      const result = await loginWithGoogle();
-      await saveUserProfile(result.user.uid, {
-        email: result.user.email,
-        surname: result.user.displayName?.split(' ').slice(1).join(' ') || '',
-        firstName: result.user.displayName?.split(' ')[0] || '',
-        lastName: '',
-        profilePicture: result.user.photoURL || '',
-        createdAt: new Date().toISOString(),
-      });
-      redirectUser(result.user.email);
+      await loginWithGoogle();
+      // The browser redirects to Google, then back to the app where the
+      // restored session triggers the currentUser redirect below.
     } catch {
       setError('Google sign-in failed. Please try again.');
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

@@ -60,8 +60,6 @@ export default function AdminDashboard() {
       ? 'conic-gradient(hsl(247 12% 85%) 0% 100%)'
       : `conic-gradient(${donutStops.join(', ')})`;
 
-  const userActivePct = registeredUsers.length ? (activeUsers.length / registeredUsers.length) * 100 : 0;
-
   const statCards = [
     {
       label: 'Total Design Requests',
@@ -238,17 +236,6 @@ export default function AdminDashboard() {
                   ))
                 )}
               </div>
-              <div className="w-full pt-4 border-t" style={{ borderColor: 'var(--border-default)' }}>
-                <p className="label-caps mb-3">Users</p>
-                <div className="flex h-2.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
-                  <div style={{ width: `${userActivePct}%`, background: '#10b981' }} />
-                  <div style={{ width: `${100 - userActivePct}%`, background: '#dc2626' }} />
-                </div>
-                <div className="flex justify-between mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  <span>{activeUsers.length} active</span>
-                  <span>{registeredUsers.length - activeUsers.length} inactive</span>
-                </div>
-              </div>
             </div>
           </motion.div>
         </div>
@@ -389,7 +376,7 @@ export default function AdminDashboard() {
                   </div>
                 </button>
                 <button
-                  onClick={() => navigate('/admin/users')}
+                  onClick={() => navigate('/admin/design-requests')}
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover-lift pressable text-left cursor-pointer"
                   style={{
                     background: 'var(--bg-primary)',
@@ -400,12 +387,12 @@ export default function AdminDashboard() {
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ background: 'hsl(217 91% 60% / 0.12)' }}
                   >
-                    <FaUsers style={{ color: '#2563eb' }} />
+                    <FaClock style={{ color: '#2563eb' }} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Manage Users</p>
+                    <p className="text-sm font-medium">Pending Requests</p>
                     <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      {activeUsers.length} active
+                      {pendingRequests.length} pending
                     </p>
                   </div>
                 </button>

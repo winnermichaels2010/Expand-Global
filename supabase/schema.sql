@@ -57,6 +57,16 @@ create table if not exists public.messages (
   created_at timestamptz not null default now()
 );
 
+-- Reply + delete support (also safe to re-run on an existing database)
+alter table public.messages
+  add column if not exists reply_to_id uuid references public.messages (id) on delete set null,
+  add column if not exists reply_to_name text,
+  add column if not exists reply_to_message text,
+  add column if not exists deleted boolean not null default false,
+  add column if not exists deleted_by uuid,
+  add column if not exists deleted_by_label text,
+  add column if not exists deleted_for uuid[] not null default '{}';
+
 -- ---------------------------------------------------------------------------
 -- Indexes
 -- ---------------------------------------------------------------------------
@@ -120,6 +130,42 @@ stable
 as $$
   select coalesce(auth.jwt() ->> 'email', '') = 'adminemail@gmail.com';
 $$;
+
+-- Security-definer helper so a participant can hide a message "for me" even
+-- when they are not the sender. Only the sender, the admin, or the owner of
+-- the linked design request may mark a message as deleted for their own view.
+create or replace function public.delete_message_for_me(p_message_id uuid, p_user_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1
+    from public.messages m
+    where m.id = p_message_id
+      and (
+        m.sender_id = p_user_id
+        or public.is_admin()
+        or exists (
+          select 1 from public.design_requests dr
+          where dr.id = m.design_request_id and dr.user_id = p_user_id
+        )
+      )
+  ) then
+    raise exception 'Not allowed to delete this message';
+  end if;
+
+  update public.messages
+  set deleted_for = array_append(coalesce(deleted_for, '{}'), p_user_id)
+  where id = p_message_id
+    and not (p_user_id = any(coalesce(deleted_for, '{}')));
+end;
+$$;
+
+revoke all on function public.delete_message_for_me(uuid, uuid) from public;
+grant execute on function public.delete_message_for_me(uuid, uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Row Level Security

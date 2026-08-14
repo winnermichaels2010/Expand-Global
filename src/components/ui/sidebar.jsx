@@ -4,25 +4,23 @@ import {
   Menu,
   X,
   LayoutDashboard,
-  Users,
   Palette,
   LogOut,
   ChevronLeft,
+  ChevronRight,
   Sun,
   Moon,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import NotificationPanel from '../NotificationPanel';
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-  { name: 'Users', path: '/admin/users', icon: Users },
   { name: 'Design Requests', path: '/admin/design-requests', icon: Palette },
 ];
 
 // eslint-disable-next-line react/prop-types
-const Sidebar = ({ collapsed = false, onToggleCollapse }) => {
+const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onToggleClients }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { currentUser, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
@@ -57,7 +55,7 @@ const Sidebar = ({ collapsed = false, onToggleCollapse }) => {
     <>
       {/* Mobile Brand Bar */}
       <div
-        className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 pr-16 h-14"
+        className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 pr-28 h-14"
         style={{ background: 'linear-gradient(90deg, hsl(262 83% 55%) 0%, hsl(263 70% 42%) 100%)' }}
       >
         <div className="flex items-center gap-2">
@@ -78,13 +76,27 @@ const Sidebar = ({ collapsed = false, onToggleCollapse }) => {
         </span>
       </div>
 
-      {/* Mobile Hamburger Button */}
+      {/* Mobile Menu Button */}
       <button
         onClick={toggleSidebar}
-        className="md:hidden fixed top-3 right-4 z-50 p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer hover:bg-white/90"
+        className={`md:hidden fixed top-3 right-16 z-[60] p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer hover:bg-white/90 ${
+          clientsOpen ? 'hidden' : ''
+        }`}
         aria-label="Toggle sidebar"
       >
         {isOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
+
+      {/* Mobile Clients Arrow */}
+      <button
+        onClick={onToggleClients}
+        className={`lg:hidden fixed top-3 right-4 z-[60] p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer hover:bg-white/90 ${
+          clientsOpen ? 'hidden' : ''
+        }`}
+        aria-label={clientsOpen ? 'Close clients' : 'Open clients'}
+        title={clientsOpen ? 'Close clients' : 'Clients'}
+      >
+        {clientsOpen ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
       </button>
 
       {/* Mobile Overlay */}
@@ -136,19 +148,21 @@ const Sidebar = ({ collapsed = false, onToggleCollapse }) => {
             )}
           </div>
 
-          {/* Desktop Collapse Button */}
-          <button
-            onClick={onToggleCollapse}
-            className="hidden md:block p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors duration-200 cursor-pointer"
-            aria-label="Collapse sidebar"
-          >
-            <ChevronLeft
-              size={18}
-              className={`transition-transform duration-300 ${
-                collapsed ? 'rotate-180' : ''
-              }`}
-            />
-          </button>
+          <div className="hidden md:flex items-center gap-2">
+            {/* Desktop Collapse Button */}
+            <button
+              onClick={onToggleCollapse}
+              className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors duration-200 cursor-pointer"
+              aria-label="Collapse sidebar"
+            >
+              <ChevronLeft
+                size={18}
+                className={`transition-transform duration-300 ${
+                  collapsed ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -197,7 +211,6 @@ const Sidebar = ({ collapsed = false, onToggleCollapse }) => {
           style={{ borderTop: '1px solid hsl(0 0% 100% / 0.12)' }}
         >
           <div className="flex items-center justify-center gap-2">
-            {currentUser?.uid && <NotificationPanel variant="dark" userId={currentUser.uid} />}
             <button
               onClick={toggleDarkMode}
               className="p-2.5 rounded-xl transition-colors duration-200 cursor-pointer"

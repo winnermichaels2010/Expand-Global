@@ -79,6 +79,13 @@ function mapMessage(row) {
     message: row.message,
     read: row.read,
     createdAt: row.created_at,
+    replyToId: row.reply_to_id,
+    replyToName: row.reply_to_name,
+    replyToMessage: row.reply_to_message,
+    deleted: row.deleted,
+    deletedBy: row.deleted_by,
+    deletedByLabel: row.deleted_by_label,
+    deletedFor: row.deleted_for || [],
   };
 }
 
@@ -227,8 +234,9 @@ export function AuthProvider({ children }) {
   function subscribeToDesignRequests(callback) {
     const fetchAll = async () => callback(await getDesignRequests());
     fetchAll();
+    const topic = `design-requests-${Math.random().toString(36).slice(2)}`;
     const channel = supabase
-      .channel('design-requests-changes')
+      .channel(topic)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'design_requests' }, fetchAll)
       .subscribe();
     return () => supabase.removeChannel(channel);
@@ -408,6 +416,19 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function markAllNotificationsAsRead(userId) {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', userId)
+        .eq('read', false);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Failed to mark all notifications as read:', err);
+    }
+  }
+
   async function deleteAllNotifications(userId) {
     try {
       const { error } = await supabase.from('notifications').delete().eq('user_id', userId);
@@ -434,8 +455,9 @@ export function AuthProvider({ children }) {
   function subscribeToNotifications(userId, callback) {
     const fetchAll = async () => callback(await getNotifications(userId));
     fetchAll();
+    const topic = `notifications-${userId}-${Math.random().toString(36).slice(2)}`;
     const channel = supabase
-      .channel(`notifications-${userId}`)
+      .channel(topic)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, fetchAll)
       .subscribe();
     return () => supabase.removeChannel(channel);
@@ -443,7 +465,7 @@ export function AuthProvider({ children }) {
 
   // ---------- Messages ----------
 
-  async function sendMessage(designRequestId, message, currentUserProfile) {
+  async function sendMessage(designRequestId, message, currentUserProfile, replyTo = null) {
     try {
       const senderName = currentUserProfile
         ? [currentUserProfile.surname, currentUserProfile.firstName, currentUserProfile.lastName].filter(Boolean).join(' ') || currentUser.email
@@ -456,6 +478,9 @@ export function AuthProvider({ children }) {
         sender_name: senderName,
         message,
         read: false,
+        reply_to_id: replyTo?.id ?? null,
+        reply_to_name: replyTo?.senderName ?? null,
+        reply_to_message: replyTo?.message ?? null,
       });
       if (insertError) throw insertError;
 
@@ -503,11 +528,41 @@ export function AuthProvider({ children }) {
       }
     };
     fetchAll();
+    const topic = `messages-${designRequestId}-${Math.random().toString(36).slice(2)}`;
     const channel = supabase
-      .channel(`messages-${designRequestId}`)
+      .channel(topic)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchAll)
       .subscribe();
     return () => supabase.removeChannel(channel);
+  }
+
+  async function deleteMessageForEveryone(messageId, deleterLabel) {
+    try {
+      const isAdmin = currentUser?.email === ADMIN_EMAIL;
+      const { error } = await supabase
+        .from('messages')
+        .update({
+          deleted: true,
+          deleted_by: currentUser.id,
+          deleted_by_label: isAdmin ? 'Admin deleted this message' : deleterLabel || 'This message was deleted',
+        })
+        .eq('id', messageId);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Failed to delete message for everyone:', err);
+    }
+  }
+
+  async function deleteMessageForMe(messageId) {
+    try {
+      const { error } = await supabase.rpc('delete_message_for_me', {
+        p_message_id: messageId,
+        p_user_id: currentUser.id,
+      });
+      if (error) throw error;
+    } catch (err) {
+      console.error('Failed to delete message for me:', err);
+    }
   }
 
   useEffect(() => {
@@ -595,12 +650,15 @@ export function AuthProvider({ children }) {
     getNotifications,
     getUnreadNotificationCount,
     markNotificationAsRead,
+    markAllNotificationsAsRead,
     deleteNotification,
     deleteAllNotifications,
     addNotification,
     subscribeToNotifications,
     sendMessage,
     subscribeToMessages,
+    deleteMessageForEveryone,
+    deleteMessageForMe,
   };
 
   return (

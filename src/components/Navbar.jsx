@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { BsSun, BsMoonStars } from 'react-icons/bs';
 import { motion, AnimatePresence } from 'framer-motion';
-import NotificationPanel from './NotificationPanel';
 
 const publicLinks = [
   { name: 'Home', path: '/' },
@@ -21,7 +20,6 @@ const userLinks = [
 
 const adminLinks = [
   { name: 'Dashboard', path: '/admin' },
-  { name: 'Users', path: '/admin/users' },
   { name: 'Requests', path: '/admin/design-requests' },
 ];
 
@@ -126,9 +124,6 @@ export default function Navbar() {
           </div>
 
           <div className="md:hidden flex items-center gap-1.5">
-            {currentUser && !isAdmin && (
-              <NotificationPanel userId={currentUser.uid} />
-            )}
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors duration-200 cursor-pointer"

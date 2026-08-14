@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaPalette, FaSignOutAlt, FaSun, FaMoon } from 'react-icons/fa';
+import { FaTachometerAlt, FaPalette, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import NotificationPanel from './NotificationPanel';
 
 const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: FaTachometerAlt },
   { name: 'Request Design', path: '/request-design', icon: FaPalette },
 ];
 
-export default function UserSidebar() {
+// eslint-disable-next-line react/prop-types
+export default function UserSidebar({ requestsOpen = false, onToggleRequests }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const { currentUser, logout } = useAuth();
@@ -57,7 +57,7 @@ export default function UserSidebar() {
     <>
       {/* Mobile Brand Bar */}
       <div
-        className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 pr-16 h-14"
+        className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 pr-28 h-14"
         style={{ background: 'linear-gradient(90deg, hsl(262 83% 55%) 0%, hsl(263 70% 42%) 100%)' }}
       >
         <div className="flex items-center gap-2">
@@ -78,10 +78,23 @@ export default function UserSidebar() {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-3 right-4 z-50 md:hidden p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer pressable hover:bg-white/90"
+        className={`fixed top-3 right-16 z-[60] md:hidden p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer pressable hover:bg-white/90 ${
+          requestsOpen ? 'hidden' : ''
+        }`}
         aria-label="Toggle sidebar"
       >
         {isOpen ? <HiX size={22} /> : <HiMenu size={22} />}
+      </button>
+
+      <button
+        onClick={onToggleRequests}
+        className={`fixed top-3 right-4 z-[60] lg:hidden p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer pressable hover:bg-white/90 ${
+          requestsOpen ? 'hidden' : ''
+        }`}
+        aria-label={requestsOpen ? 'Close my requests' : 'Open my requests'}
+        title={requestsOpen ? 'Close my requests' : 'My Requests'}
+      >
+        {requestsOpen ? <FaChevronLeft size={20} /> : <FaChevronRight size={20} />}
       </button>
 
       <AnimatePresence>
@@ -103,28 +116,30 @@ export default function UserSidebar() {
       >
         {/* Brand */}
         <div
-          className="flex items-center gap-3 px-5 py-5"
+          className="flex items-center justify-between gap-3 px-5 py-5"
           style={{ borderBottom: '1px solid hsl(0 0% 100% / 0.12)' }}
         >
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0"
-            style={{ background: 'hsl(0 0% 100% / 0.15)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
-          >
-            <img src="/expand-global-logo.jpg" alt="Expand Global" className="w-full h-full object-cover" />
-          </div>
-          <div className="min-w-0">
-            <p
-              className="text-white font-bold tracking-tight truncate"
-              style={{ fontFamily: 'var(--font-heading)' }}
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0"
+              style={{ background: 'hsl(0 0% 100% / 0.15)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
             >
-              Expand Global
-            </p>
-            <p
-              className="text-[10px] font-semibold tracking-[0.18em] uppercase"
-              style={{ color: 'hsl(0 0% 100% / 0.6)' }}
-            >
-              My Account
-            </p>
+              <img src="/expand-global-logo.jpg" alt="Expand Global" className="w-full h-full object-cover" />
+            </div>
+            <div className="min-w-0">
+              <p
+                className="text-white font-bold tracking-tight truncate"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                Expand Global
+              </p>
+              <p
+                className="text-[10px] font-semibold tracking-[0.18em] uppercase"
+                style={{ color: 'hsl(0 0% 100% / 0.6)' }}
+              >
+                My Account
+              </p>
+            </div>
           </div>
         </div>
 
@@ -176,7 +191,6 @@ export default function UserSidebar() {
           style={{ borderTop: '1px solid hsl(0 0% 100% / 0.12)' }}
         >
           <div className="flex items-center justify-center gap-2">
-            {currentUser && <NotificationPanel variant="dark" userId={currentUser.uid} />}
             <button
               onClick={toggleDarkMode}
               className="p-2.5 rounded-xl transition-colors duration-200 cursor-pointer"

@@ -4,10 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheck, FaTimes, FaExclamationTriangle, FaClipboardList } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import PanelHeader from '../../components/PanelHeader';
+import ProfileAvatar from '../../components/ProfileAvatar';
+import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 
 export default function AdminDesignRequests() {
   const { currentUser, getDesignRequests, rejectDesignRequest, ADMIN_EMAIL } = useAuth();
   const [designRequests, setDesignRequests] = useState([]);
+  const profilePicsByEmail = useProfilePicsByEmail();
   const [rejectingId, setRejectingId] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
   const [confirmRejectId, setConfirmRejectId] = useState(null);
@@ -100,12 +103,11 @@ export default function AdminDesignRequests() {
                     >
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0"
-                            style={{ background: 'var(--color-accent)' }}
-                          >
-                            {request.name?.split(' ').map(n => n[0]).join('') || '?'}
-                          </div>
+                          <ProfileAvatar
+                            src={profilePicsByEmail[request.email?.toLowerCase()]}
+                            alt={request.name || 'Client'}
+                            size={32}
+                          />
                           <div className="min-w-0">
                             <p className="text-xs font-medium truncate">{request.name || 'Unknown'}</p>
                             <p className="text-[10px] truncate" style={{ color: 'var(--text-secondary)' }}>

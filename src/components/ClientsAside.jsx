@@ -1,14 +1,13 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaUserFriends, FaChevronRight, FaArrowLeft, FaTimes, FaHome, FaEllipsisV } from 'react-icons/fa';
+import { FaUserFriends, FaChevronRight, FaArrowLeft, FaTimes, FaEllipsisV } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from './StatusBadge';
 import MessageThread from './MessageThread';
+import ProfileAvatar from './ProfileAvatar';
 
 export default function ClientsAside({ open, onClose }) {
   const { getRegisteredUsers, getDesignRequests, ADMIN_EMAIL } = useAuth();
-  const navigate = useNavigate();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState(null);
@@ -106,37 +105,25 @@ export default function ClientsAside({ open, onClose }) {
   }, [selectedClient, getDesignRequests]);
 
   const clientName = (c) => [c.surname, c.firstName, c.lastName].filter(Boolean).join(' ') || c.email;
-  const initials = (c) => (clientName(c).split(' ').map((w) => w.charAt(0)).join('').slice(0, 2) || '?').toUpperCase();
 
-  const avatarButton = (client, sizeClass, fontClass, onOpen) => (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (client.profilePicture) setPreviewPicture(client.profilePicture);
-        onOpen?.();
-      }}
-      className="flex-shrink-0 rounded-full cursor-pointer"
-      aria-label="View profile picture"
-    >
-      {client.profilePicture ? (
-        <img
-          src={client.profilePicture}
-          alt=""
-          className={`${sizeClass} rounded-full object-cover`}
-          style={{ border: '2px solid var(--border-default)' }}
-        />
-      ) : (
-        <div
-          className={`${sizeClass} rounded-full flex items-center justify-center text-white font-bold ${fontClass}`}
-          style={{ background: 'var(--color-accent)' }}
-        >
-          {initials(client)}
-        </div>
-      )}
-    </div>
-  );
+  const avatarButton = (client, sizeClass, onOpen) => {
+    const size = sizeClass.includes('w-9') ? 36 : 24;
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (client.profilePicture) setPreviewPicture(client.profilePicture);
+          onOpen?.();
+        }}
+        className="flex-shrink-0 rounded-full cursor-pointer"
+        aria-label="View profile picture"
+      >
+        <ProfileAvatar src={client.profilePicture} alt={clientName(client)} size={size} />
+      </div>
+    );
+  };
 
   const backButton = (onBack, label) => (
     <button
@@ -150,20 +137,6 @@ export default function ClientsAside({ open, onClose }) {
     >
       <FaArrowLeft className="text-[9px]" />
       {label}
-    </button>
-  );
-
-  const dashboardButton = (
-    <button
-      onClick={() => { onClose(); navigate('/admin'); }}
-      className="p-2 rounded-lg transition-colors duration-200 cursor-pointer"
-      style={{ color: 'var(--text-tertiary)' }}
-      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--bg-secondary)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.background = 'transparent'; }}
-      aria-label="Back to dashboard"
-      title="Back to dashboard"
-    >
-      <FaHome className="text-xs" />
     </button>
   );
 
@@ -247,7 +220,7 @@ export default function ClientsAside({ open, onClose }) {
           >
             <div className="flex items-center gap-1.5 min-w-0">
               {backButton(() => setSelectedProject(null), 'Projects')}
-              {selectedClient ? avatarButton(selectedClient, 'w-6 h-6', 'text-[9px]') : null}
+              {selectedClient ? avatarButton(selectedClient, 'w-6 h-6') : null}
               <span className="text-sm font-semibold truncate" style={{ fontFamily: 'var(--font-heading)' }}>
                 {selectedProject.service || 'Project'}
               </span>
@@ -345,7 +318,6 @@ export default function ClientsAside({ open, onClose }) {
               >
                 {clients.length}
               </span>
-              {dashboardButton}
               {closeButton}
             </div>
           </div>
@@ -373,7 +345,7 @@ export default function ClientsAside({ open, onClose }) {
                       border: '1px solid var(--border-default)',
                     }}
                   >
-                    {avatarButton(client, 'w-9 h-9', 'text-xs')}
+                    {avatarButton(client, 'w-9 h-9')}
                     <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                       {clientName(client)}
                     </p>

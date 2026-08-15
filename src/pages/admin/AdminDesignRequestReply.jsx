@@ -4,11 +4,14 @@ import { motion } from 'framer-motion';
 import { FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import PanelHeader from '../../components/PanelHeader';
+import ProfileAvatar from '../../components/ProfileAvatar';
+import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 
 export default function AdminDesignRequestReply() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser, acceptDesignRequest, ADMIN_EMAIL, getDesignRequests } = useAuth();
+  const profilePicsByEmail = useProfilePicsByEmail();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [standardPrice, setStandardPrice] = useState('');
@@ -103,12 +106,11 @@ export default function AdminDesignRequestReply() {
             }}
           >
             <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                style={{ background: 'var(--color-accent)' }}
-              >
-                {request.name?.split(' ').map(n => n[0]).join('') || '?'}
-              </div>
+              <ProfileAvatar
+                src={profilePicsByEmail[request.email?.toLowerCase()]}
+                alt={request.name || 'Client'}
+                size={40}
+              />
               <div>
                 <p className="text-sm font-medium">{request.name || 'Unknown'}</p>
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>

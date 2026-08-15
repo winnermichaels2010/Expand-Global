@@ -1,14 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaPalette, FaChevronRight, FaArrowLeft, FaTimes, FaClock, FaCheckCircle, FaTimesCircle, FaHome, FaEllipsisV } from 'react-icons/fa';
+import { FaPalette, FaChevronRight, FaArrowLeft, FaTimes, FaClock, FaCheckCircle, FaTimesCircle, FaEllipsisV } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from './StatusBadge';
 import MessageThread from './MessageThread';
 
 export default function MyRequestsAside({ open, onClose }) {
   const { currentUser, subscribeToDesignRequests } = useAuth();
-  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -84,20 +82,6 @@ export default function MyRequestsAside({ open, onClose }) {
     >
       <FaArrowLeft className="text-[9px]" />
       {label}
-    </button>
-  );
-
-  const dashboardButton = (
-    <button
-      onClick={() => { onClose(); navigate('/dashboard'); }}
-      className="p-2 rounded-lg transition-colors duration-200 cursor-pointer"
-      style={{ color: 'var(--text-tertiary)' }}
-      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--bg-secondary)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.background = 'transparent'; }}
-      aria-label="Back to dashboard"
-      title="Back to dashboard"
-    >
-      <FaHome className="text-xs" />
     </button>
   );
 
@@ -267,7 +251,6 @@ export default function MyRequestsAside({ open, onClose }) {
               >
                 {requests.length}
               </span>
-              {dashboardButton}
               {closeButton}
             </div>
           </div>

@@ -5,6 +5,8 @@ import { HiMenu, HiX } from 'react-icons/hi';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import ProfileAvatar from './ProfileAvatar';
+import { useProfilePicsByEmail } from '../hooks/useProfilePics';
 
 const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: FaTachometerAlt },
@@ -17,6 +19,7 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const { currentUser, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
+  const profilePicsByEmail = useProfilePicsByEmail();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -51,7 +54,7 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
 
   const displayName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User';
   const email = currentUser?.email || '';
-  const initials = (displayName.split(' ').map((w) => w.charAt(0)).join('').slice(0, 2) || 'U').toUpperCase();
+  const profilePic = profilePicsByEmail[currentUser?.email?.toLowerCase()];
 
   return (
     <>
@@ -210,12 +213,12 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
             className="flex items-center gap-3 rounded-xl p-3"
             style={{ background: 'hsl(0 0% 100% / 0.08)' }}
           >
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: 'hsl(0 0% 100% / 0.2)', border: '1px solid hsl(0 0% 100% / 0.3)' }}
-            >
-              <span className="text-white font-semibold text-sm">{initials}</span>
-            </div>
+            <ProfileAvatar
+              src={profilePic}
+              alt={displayName}
+              size={36}
+              style={{ border: '1px solid hsl(0 0% 100% / 0.3)' }}
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{displayName}</p>
               <p className="text-[11px] truncate" style={{ color: 'hsl(0 0% 100% / 0.55)' }}>

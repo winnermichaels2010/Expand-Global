@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaPalette, FaUsers, FaClock, FaCheckCircle } from 'react-icons/fa';
+import { FaPalette, FaProjectDiagram, FaClock, FaCheckCircle, FaChevronRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import PanelHeader from '../../components/PanelHeader';
+import ProfileAvatar from '../../components/ProfileAvatar';
+import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 
 export default function AdminDashboard() {
-  const { currentUser, getDesignRequests, getRegisteredUsers, ADMIN_EMAIL } = useAuth();
+  const { currentUser, getDesignRequests, ADMIN_EMAIL } = useAuth();
   const navigate = useNavigate();
   const [designRequests, setDesignRequests] = useState([]);
-  const [registeredUsers, setRegisteredUsers] = useState([]);
+  const profilePicsByEmail = useProfilePicsByEmail();
   const [activeTab, setActiveTab] = useState('recent');
 
   useEffect(() => {
     getDesignRequests().then(setDesignRequests);
-    getRegisteredUsers().then(setRegisteredUsers);
-  }, [getDesignRequests, getRegisteredUsers]);
+  }, [getDesignRequests]);
 
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
     return (
@@ -25,9 +26,11 @@ export default function AdminDashboard() {
     );
   }
 
-  const activeUsers = registeredUsers.filter((u) => u.active !== false);
+  const activeProjects = designRequests.filter(
+    (r) => r.status === 'Accepted' || r.status === 'In Progress'
+  );
   const pendingRequests = designRequests.filter((r) => r.status === 'Pending');
-  const finishedRequests = designRequests.filter((r) => r.status === 'Accepted');
+  const finishedRequests = designRequests.filter((r) => r.status === 'Completed');
 
   const statusCounts = {
     Pending: designRequests.filter((r) => r.status === 'Pending').length,
@@ -68,6 +71,12 @@ export default function AdminDashboard() {
       iconBg: 'var(--color-accent)',
     },
     {
+      label: 'Active Projects',
+      value: activeProjects.length,
+      icon: FaProjectDiagram,
+      iconBg: '#2563eb',
+    },
+    {
       label: 'Pending Requests',
       value: pendingRequests.length,
       icon: FaClock,
@@ -78,12 +87,6 @@ export default function AdminDashboard() {
       value: finishedRequests.length,
       icon: FaCheckCircle,
       iconBg: '#10b981',
-    },
-    {
-      label: 'Active Users',
-      value: activeUsers.length,
-      icon: FaUsers,
-      iconBg: '#2563eb',
     },
   ];
 
@@ -292,12 +295,11 @@ export default function AdminDashboard() {
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                          style={{ background: 'var(--color-accent)' }}
-                        >
-                          {request.name?.split(' ').map(n => n[0]).join('') || '?'}
-                        </div>
+                        <ProfileAvatar
+                          src={profilePicsByEmail[request.email?.toLowerCase()]}
+                          alt={request.name || 'Client'}
+                          size={40}
+                        />
                         <div>
                           <p className="text-sm font-medium">{request.name || 'Unknown'}</p>
                           <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
@@ -355,28 +357,7 @@ export default function AdminDashboard() {
               </h2>
               <div className="space-y-3">
                 <button
-                  onClick={() => navigate('/admin/design-requests')}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover-lift pressable text-left cursor-pointer"
-                  style={{
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-default)',
-                  }}
-                >
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ background: 'var(--color-accent-muted)' }}
-                  >
-                    <FaPalette style={{ color: 'var(--color-accent)' }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Design Requests</p>
-                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      {designRequests.length} total
-                    </p>
-                  </div>
-                </button>
-                <button
-                  onClick={() => navigate('/admin/design-requests')}
+                  onClick={() => navigate('/admin/projects/active')}
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover-lift pressable text-left cursor-pointer"
                   style={{
                     background: 'var(--bg-primary)',
@@ -387,7 +368,29 @@ export default function AdminDashboard() {
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ background: 'hsl(217 91% 60% / 0.12)' }}
                   >
-                    <FaClock style={{ color: '#2563eb' }} />
+                    <FaProjectDiagram style={{ color: '#2563eb' }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Active Projects</p>
+                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {activeProjects.length} active
+                    </p>
+                  </div>
+                  <FaChevronRight className="ml-auto flex-shrink-0" style={{ color: 'var(--text-tertiary)' }} />
+                </button>
+                <button
+                  onClick={() => navigate('/admin/projects/pending')}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover-lift pressable text-left cursor-pointer"
+                  style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-default)',
+                  }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ background: 'hsl(38 92% 50% / 0.12)' }}
+                  >
+                    <FaClock style={{ color: '#f59e0b' }} />
                   </div>
                   <div>
                     <p className="text-sm font-medium">Pending Requests</p>
@@ -395,6 +398,29 @@ export default function AdminDashboard() {
                       {pendingRequests.length} pending
                     </p>
                   </div>
+                  <FaChevronRight className="ml-auto flex-shrink-0" style={{ color: 'var(--text-tertiary)' }} />
+                </button>
+                <button
+                  onClick={() => navigate('/admin/projects/finished')}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover-lift pressable text-left cursor-pointer"
+                  style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-default)',
+                  }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ background: 'hsl(160 84% 39% / 0.12)' }}
+                  >
+                    <FaCheckCircle style={{ color: '#10b981' }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Finished Projects</p>
+                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {finishedRequests.length} finished
+                    </p>
+                  </div>
+                  <FaChevronRight className="ml-auto flex-shrink-0" style={{ color: 'var(--text-tertiary)' }} />
                 </button>
               </div>
             </motion.div>

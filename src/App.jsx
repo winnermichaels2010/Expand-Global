@@ -16,6 +16,7 @@ import UserLayout from './layouts/UserLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminDesignRequests from './pages/admin/AdminDesignRequests';
 import AdminDesignRequestReply from './pages/admin/AdminDesignRequestReply';
+import AdminProjects from './pages/admin/AdminProjects';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -54,6 +55,9 @@ function AppLayout() {
           <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
           <Route path="/admin/design-requests" element={<AdminLayout><AdminDesignRequests /></AdminLayout>} />
           <Route path="/admin/design-requests/reply/:id" element={<AdminLayout><AdminDesignRequestReply /></AdminLayout>} />
+          <Route path="/admin/projects/active" element={<AdminLayout><AdminProjects variant="active" /></AdminLayout>} />
+          <Route path="/admin/projects/pending" element={<AdminLayout><AdminProjects variant="pending" /></AdminLayout>} />
+          <Route path="/admin/projects/finished" element={<AdminLayout><AdminProjects variant="finished" /></AdminLayout>} />
 
           <Route path="/dashboard" element={<UserLayout><Dashboard /></UserLayout>} />
           <Route path="/request-design" element={<UserLayout><RequestDesign /></UserLayout>} />

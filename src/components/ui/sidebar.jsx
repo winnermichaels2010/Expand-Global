@@ -5,6 +5,9 @@ import {
   X,
   LayoutDashboard,
   Palette,
+  Hammer,
+  Clock,
+  BadgeCheck,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -13,10 +16,15 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import ProfileAvatar from '../ProfileAvatar';
+import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
   { name: 'Design Requests', path: '/admin/design-requests', icon: Palette },
+  { name: 'Active Projects', path: '/admin/projects/active', icon: Hammer },
+  { name: 'Pending Requests', path: '/admin/projects/pending', icon: Clock },
+  { name: 'Finished Projects', path: '/admin/projects/finished', icon: BadgeCheck },
 ];
 
 // eslint-disable-next-line react/prop-types
@@ -24,6 +32,7 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
   const [isOpen, setIsOpen] = useState(false);
   const { currentUser, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
+  const profilePicsByEmail = useProfilePicsByEmail();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -48,8 +57,7 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
   }
 
   const displayName = currentUser?.displayName || currentUser?.email || 'Admin';
-  const email = currentUser?.email || '';
-  const initials = (displayName.split(' ').map((w) => w.charAt(0)).join('').slice(0, 2) || 'A').toUpperCase();
+  const profilePic = profilePicsByEmail[currentUser?.email?.toLowerCase()];
 
   return (
     <>
@@ -206,14 +214,12 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
         </nav>
 
         {/* Footer */}
-        <div
-          className="p-4 space-y-3"
-          style={{ borderTop: '1px solid hsl(0 0% 100% / 0.12)' }}
-        >
-          <div className="flex items-center justify-center gap-2">
+          <div className="p-4 space-y-3" style={{ borderTop: '1px solid hsl(0 0% 100% / 0.12)' }}>
             <button
               onClick={toggleDarkMode}
-              className="p-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
+              className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-colors duration-200 cursor-pointer ${
+                collapsed ? 'justify-center' : ''
+              }`}
               style={{
                 background: 'hsl(0 0% 100% / 0.1)',
                 border: '1px solid hsl(0 0% 100% / 0.18)',
@@ -221,34 +227,31 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.2)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.1)'; }}
-              aria-label="Toggle theme"
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+              {!collapsed && (darkMode ? 'Dark Mode' : 'Light Mode')}
             </button>
-          </div>
-          <div
-            className={`flex items-center gap-3 rounded-xl p-3 ${
-              collapsed ? 'justify-center' : ''
-            }`}
-            style={{ background: 'hsl(0 0% 100% / 0.08)' }}
-          >
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: 'hsl(0 0% 100% / 0.2)', border: '1px solid hsl(0 0% 100% / 0.3)' }}
+              className={`flex items-center gap-3 rounded-xl p-3 ${
+                collapsed ? 'justify-center' : ''
+              }`}
+              style={{ background: 'hsl(0 0% 100% / 0.08)' }}
             >
-              <span className="text-white font-semibold text-sm">{initials}</span>
+              <ProfileAvatar
+                src={profilePic}
+                alt={displayName}
+                size={36}
+                style={{ border: '1px solid hsl(0 0% 100% / 0.3)' }}
+              />
+              {!collapsed && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">
+                    {displayName}
+                  </p>
+                </div>
+              )}
             </div>
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
-                  {displayName}
-                </p>
-                <p className="text-[11px] truncate" style={{ color: 'hsl(0 0% 100% / 0.55)' }}>
-                  {email}
-                </p>
-              </div>
-            )}
-          </div>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-colors duration-200 cursor-pointer"

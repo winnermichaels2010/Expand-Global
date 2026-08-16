@@ -7,7 +7,7 @@ const sections = [
   { icon: HiScale, title: 'Services', content: 'Expand Global provides graphic design and branding services including but not limited to logo design, brand identity development, print design, digital design, and UI/UX design. The scope, timeline, and deliverables for each project will be outlined in a separate agreement or proposal.' },
   { icon: HiLockClosed, title: 'Intellectual Property', content: 'Upon full payment for services rendered, the client receives full ownership rights to the final deliverables. Expand Global retains the right to display completed work in our portfolio unless otherwise agreed upon in writing. All preliminary concepts, drafts, and unused ideas remain the intellectual property of Expand Global.' },
   { icon: HiShieldCheck, title: 'Client Responsibilities', content: 'Clients are responsible for providing timely feedback, necessary materials, and accurate information required for project completion. Delays caused by the client may affect project timelines. Clients must ensure they have the legal right to use any materials, images, or content provided to Expand Global.' },
-  { icon: HiDocumentText, title: 'Payment Terms', content: 'Payment terms are outlined in individual project proposals. Typically, a deposit is required before work begins, with the remaining balance due upon project completion. Late payments may result in project delays or suspension of services. All prices are in USD unless otherwise specified.' },
+  { icon: HiDocumentText, title: 'Payment Terms', content: 'Payment for every project is split into two equal instalments. A deposit of 50% of the total cost is required before work on your project begins, and the remaining 50% is due once the project has been completed and delivered to you. All payments are final and non-refundable. Once payment has been made, no refunds will be issued under any circumstances. Late payments may result in project delays or suspension of services.' },
   { icon: HiScale, title: 'Revisions & Modifications', content: 'Our standard process includes a set number of revision rounds as specified in the project agreement. Additional revisions beyond the agreed scope may incur extra charges. Major changes to project scope after work has begun may require a revised proposal and additional fees.' },
   { icon: HiLockClosed, title: 'Confidentiality', content: 'Expand Global respects the confidentiality of our clients. Any proprietary information shared during the course of a project will be kept confidential and used solely for the purpose of completing the project. We will not share client information with third parties without explicit consent.' },
   { icon: HiShieldCheck, title: 'Limitation of Liability', content: 'Expand Global shall not be liable for any indirect, incidental, or consequential damages arising from the use of our services or inability to deliver services due to circumstances beyond our control. Our total liability is limited to the amount paid by the client for the specific project giving rise to the claim.' },
@@ -51,7 +51,7 @@ export default function Terms() {
               Please read these terms carefully before using our services.
             </p>
             <p className="text-sm mt-4" style={{ color: 'hsl(0 0% 100% / 0.5)' }}>
-              Last updated: June 2026
+              Last updated: August 2026
             </p>
           </motion.div>
         </div>

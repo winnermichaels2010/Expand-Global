@@ -69,7 +69,12 @@ export default function Dashboard() {
       getUserProfile(currentUser.uid).then(setProfile);
       const unsub = subscribeToDesignRequests((requests) => {
         setDesignRequests(
-          requests.filter((r) => r.email === currentUser.email && r.status !== 'Rejected')
+          requests.filter(
+            (r) =>
+              r.email === currentUser.email &&
+              r.status !== 'Rejected' &&
+              r.status !== 'Completed'
+          )
         );
       });
       return unsub;

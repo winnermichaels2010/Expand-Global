@@ -76,7 +76,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const { signup, login, loginWithGoogle, currentUser, saveUserProfile } = useAuth();
+  const { signup, login, currentUser, saveUserProfile } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
 
@@ -138,22 +138,6 @@ export default function Auth() {
     setLoading(false);
   }
 
-  async function handleGoogleLogin() {
-    setError('');
-    if (!isLogin && !agreedToTerms) {
-      return setError('You must agree to the Terms & Conditions');
-    }
-    setLoading(true);
-    try {
-      await loginWithGoogle();
-      // The browser redirects to Google, then back to the app where the
-      // restored session triggers the currentUser redirect below.
-    } catch {
-      setError('Google sign-in failed. Please try again.');
-      setLoading(false);
-    }
-  }
-
   return (
     <div
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
@@ -183,10 +167,10 @@ export default function Auth() {
           <div className="text-center mb-8">
             <div className="relative flex items-center justify-center">
               <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                className="w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden ring-2 ring-white/20 shadow-lg"
                 style={{ background: 'var(--color-accent)' }}
               >
-                <span className="text-white font-bold text-xl">EG</span>
+                <img src="/expand-global-logo.jpg" alt="Expand Global" className="w-full h-full object-cover" />
               </div>
               <motion.button
                 onClick={toggleDarkMode}
@@ -440,35 +424,6 @@ export default function Auth() {
               )}
             </motion.button>
           </form>
-
-          <div className="my-6 flex items-center gap-4">
-            <div className="flex-1 h-px" style={{ background: 'var(--border-default)' }} />
-            <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--text-tertiary)' }}>
-              or
-            </span>
-            <div className="flex-1 h-px" style={{ background: 'var(--border-default)' }} />
-          </div>
-
-          <motion.button
-            onClick={handleGoogleLogin}
-            disabled={loading || (!isLogin && !agreedToTerms)}
-            className="pressable w-full py-3 rounded-xl font-medium flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer disabled:opacity-60"
-            style={{
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border-default)',
-              color: 'var(--text-primary)',
-            }}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 48 48">
-              <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
-              <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
-              <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
-              <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
-            </svg>
-            {isLogin ? 'Continue with Google' : 'Sign up with Google'}
-          </motion.button>
 
           <p className="mt-6 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
             {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}

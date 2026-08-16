@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCheck, FaTimes, FaExclamationTriangle, FaClipboardList } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaExclamationTriangle, FaClipboardList, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import PanelHeader from '../../components/PanelHeader';
 import ProfileAvatar from '../../components/ProfileAvatar';
@@ -15,7 +15,15 @@ export default function AdminDesignRequests() {
   const [rejectReason, setRejectReason] = useState('');
   const [confirmRejectId, setConfirmRejectId] = useState(null);
   const [confirmRejectReason, setConfirmRejectReason] = useState('');
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
   const navigate = useNavigate();
+
+  function showToast(type, message) {
+    setToast({ type, message });
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 3500);
+  }
 
   useEffect(() => {
     if (currentUser?.email === ADMIN_EMAIL) {
@@ -25,14 +33,19 @@ export default function AdminDesignRequests() {
 
   async function handleConfirmReject() {
     if (!confirmRejectId || !confirmRejectReason.trim()) return;
-    await rejectDesignRequest(confirmRejectId, confirmRejectReason.trim());
-    setDesignRequests((prev) =>
-      prev.map((r) =>
-        r.id === confirmRejectId
-          ? { ...r, status: 'Rejected', rejectReason: confirmRejectReason.trim(), rejectedAt: new Date().toISOString() }
-          : r
-      )
-    );
+    const ok = await rejectDesignRequest(confirmRejectId, confirmRejectReason.trim());
+    if (ok) {
+      setDesignRequests((prev) =>
+        prev.map((r) =>
+          r.id === confirmRejectId
+            ? { ...r, status: 'Rejected', rejectReason: confirmRejectReason.trim(), rejectedAt: new Date().toISOString() }
+            : r
+        )
+      );
+      showToast('success', 'Request rejected successfully.');
+    } else {
+      showToast('error', 'Failed to reject request. Please try again.');
+    }
     setConfirmRejectId(null);
     setConfirmRejectReason('');
   }
@@ -55,6 +68,8 @@ export default function AdminDesignRequests() {
     return styles[status] || styles.Pending;
   };
 
+  const activeRequests = designRequests.filter((r) => r.status !== 'Rejected');
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       <PanelHeader
@@ -66,7 +81,7 @@ export default function AdminDesignRequests() {
           style={{ background: 'hsl(0 0% 100% / 0.12)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
         >
           <FaClipboardList size={14} />
-          {designRequests.length} total
+          {activeRequests.length} total
         </div>
       </PanelHeader>
 
@@ -84,15 +99,15 @@ export default function AdminDesignRequests() {
             className="text-lg font-semibold mb-6"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            All Design Requests ({designRequests.length})
+            Design Requests ({activeRequests.length})
           </h2>
               <div className="space-y-3">
-                {designRequests.length === 0 ? (
+                {activeRequests.length === 0 ? (
                   <p className="text-xs text-center py-8" style={{ color: 'var(--text-secondary)' }}>
                     No design requests yet.
                   </p>
                 ) : (
-                  [...designRequests].reverse().map((request) => (
+                  [...activeRequests].reverse().map((request) => (
                     <div
                       key={request.id}
                       className="p-3 sm:p-4 rounded-xl overflow-hidden"
@@ -243,8 +258,7 @@ export default function AdminDesignRequests() {
       </div>
 
       <AnimatePresence>
-        {confirmRejectId && (
-          <motion.div
+        {confirmRejectId && (          <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -301,6 +315,21 @@ export default function AdminDesignRequests() {
                 </button>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            className="fixed bottom-6 right-6 z-[90] flex items-center gap-2.5 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-medium text-white"
+            style={{ background: toast.type === 'success' ? '#059669' : '#dc2626' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+          >
+            {toast.type === 'success' ? <FaCheckCircle /> : <FaExclamationTriangle />}
+            {toast.message}
           </motion.div>
         )}
       </AnimatePresence>

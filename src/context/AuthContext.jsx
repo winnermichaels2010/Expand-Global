@@ -35,6 +35,10 @@ function mapRequest(row) {
     rejectReason: row.reject_reason,
     rejectedAt: row.rejected_at,
     repliedAt: row.replied_at,
+    submittedFileUrl: row.submitted_file_url,
+    submittedFileName: row.submitted_file_name,
+    submittedMessage: row.submitted_message,
+    submittedAt: row.submitted_at,
     createdAt: row.created_at,
   };
 }
@@ -55,6 +59,10 @@ function toRequestWrite(data) {
   if (data.rejectReason !== undefined) payload.reject_reason = data.rejectReason;
   if (data.rejectedAt !== undefined) payload.rejected_at = data.rejectedAt;
   if (data.repliedAt !== undefined) payload.replied_at = data.repliedAt;
+  if (data.submittedFileUrl !== undefined) payload.submitted_file_url = data.submittedFileUrl;
+  if (data.submittedFileName !== undefined) payload.submitted_file_name = data.submittedFileName;
+  if (data.submittedMessage !== undefined) payload.submitted_message = data.submittedMessage;
+  if (data.submittedAt !== undefined) payload.submitted_at = data.submittedAt;
   return payload;
 }
 
@@ -65,6 +73,7 @@ function mapNotification(row) {
     message: row.message,
     type: row.type,
     read: row.read,
+    link: row.link,
     createdAt: row.created_at,
   };
 }
@@ -243,7 +252,7 @@ export function AuthProvider({ children }) {
   }
 
   async function saveDesignRequest(request) {
-    const { error } = await supabase.from('design_requests').insert({
+    const { data, error } = await supabase.from('design_requests').insert({
       user_id: currentUser?.id,
       name: request.name,
       email: request.email,
@@ -253,8 +262,10 @@ export function AuthProvider({ children }) {
       timeline: request.timeline,
       budget: request.budget || null,
       status: 'Pending',
-    });
+    }).select('id');
     if (error) throw error;
+
+    const requestId = data?.[0]?.id;
 
     try {
       const adminProfile = await getProfileByEmail(ADMIN_EMAIL);
@@ -262,7 +273,8 @@ export function AuthProvider({ children }) {
         await addNotification(
           adminProfile.id,
           `New design request from ${request.name || 'a user'} (${request.service})`,
-          'design_request'
+          'design_request',
+          requestId ? `/admin/design-requests/reply/${requestId}` : '/admin/design-requests'
         );
       }
     } catch (err) {
@@ -277,18 +289,21 @@ export function AuthProvider({ children }) {
         .update(toRequestWrite(data))
         .eq('id', id);
       if (error) throw error;
+      return true;
     } catch (err) {
       console.error('Failed to update design request:', err);
+      return false;
     }
   }
 
   async function rejectDesignRequest(id, reason) {
     try {
-      await updateDesignRequest(id, {
+      const ok = await updateDesignRequest(id, {
         status: 'Rejected',
         rejectReason: reason,
         rejectedAt: new Date().toISOString(),
       });
+      if (!ok) return false;
 
       const { data, error } = await supabase
         .from('design_requests')
@@ -304,12 +319,15 @@ export function AuthProvider({ children }) {
           await addNotification(
             userProfile.id,
             `Your design request "${request.service}" has been rejected. Reason: ${reason}`,
-            'design_request'
+            'design_request',
+            '/rejected-projects'
           );
         }
       }
+      return true;
     } catch (err) {
       console.error('Failed to reject design request:', err);
+      return false;
     }
   }
 
@@ -337,12 +355,69 @@ export function AuthProvider({ children }) {
           await addNotification(
             userProfile.id,
             `Your design request "${request.service}" has been accepted! Standard: ₦${Number(standardPrice).toLocaleString()}, Premium: ₦${Number(premiumPrice).toLocaleString()}`,
-            'design_request'
+            'design_request',
+            '/dashboard'
           );
         }
       }
     } catch (err) {
       console.error('Failed to accept design request:', err);
+    }
+  }
+
+  async function uploadProjectFile(file) {
+    try {
+      const path = `${currentUser?.id}/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('project-files')
+        .upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('project-files')
+        .getPublicUrl(path);
+
+      return { url: publicUrl, name: file.name };
+    } catch (err) {
+      console.error('Failed to upload project file:', err);
+      return null;
+    }
+  }
+
+  async function submitProject(requestId, { fileUrl, fileName, message }) {
+    try {
+      const updated = await updateDesignRequest(requestId, {
+        status: 'Completed',
+        submittedFileUrl: fileUrl,
+        submittedFileName: fileName,
+        submittedMessage: (message || '').trim(),
+        submittedAt: new Date().toISOString(),
+      });
+      if (!updated) return false;
+
+      const { data, error } = await supabase
+        .from('design_requests')
+        .select('*')
+        .eq('id', requestId)
+        .maybeSingle();
+      if (error) throw error;
+      const request = mapRequest(data);
+
+      if (request?.email) {
+        const userProfile = await getProfileByEmail(request.email);
+        if (userProfile) {
+          await addNotification(
+            userProfile.id,
+            `Your project "${request.service}" has been submitted! View the finished design in your Completed Projects.`,
+            'design_request',
+            '/completed-projects'
+          );
+        }
+      }
+      return true;
+    } catch (err) {
+      console.error('Failed to submit project:', err);
+      return false;
     }
   }
 
@@ -438,15 +513,20 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function addNotification(userId, message, type = 'info') {
+  async function addNotification(userId, message, type = 'info', link = '') {
+    const payload = { user_id: userId, message, type, read: false };
     try {
-      const { error } = await supabase.from('notifications').insert({
-        user_id: userId,
-        message,
-        type,
-        read: false,
-      });
-      if (error) throw error;
+      if (link) {
+        const { error } = await supabase.from('notifications').insert({ ...payload, link });
+        if (error) {
+          console.warn('Notification link insert failed, retrying without link:', error.message);
+          const { error: fallbackError } = await supabase.from('notifications').insert(payload);
+          if (fallbackError) throw fallbackError;
+        }
+      } else {
+        const { error } = await supabase.from('notifications').insert(payload);
+        if (error) throw error;
+      }
     } catch (err) {
       console.error('Failed to add notification:', err);
     }
@@ -502,10 +582,14 @@ export function AuthProvider({ children }) {
       }
 
       if (recipient) {
+        const snippet = (message || '').trim();
         await addNotification(
           recipient.id,
-          `New message from ${isFromAdmin ? 'Admin' : senderName} regarding "${request.service}" request`,
-          'message'
+          `New message from ${isFromAdmin ? 'Admin' : senderName} regarding "${request.service}" request${snippet ? `: "${snippet.slice(0, 80)}"` : ''}`,
+          'message',
+          isFromAdmin
+            ? `/dashboard?thread=${designRequestId}`
+            : `/admin?client=${request.userId}&thread=${designRequestId}`
         );
       }
     } catch (err) {
@@ -645,6 +729,8 @@ export function AuthProvider({ children }) {
     updateDesignRequest,
     rejectDesignRequest,
     acceptDesignRequest,
+    uploadProjectFile,
+    submitProject,
     toggleUserStatus,
     ADMIN_EMAIL,
     getNotifications,

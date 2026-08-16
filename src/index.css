@@ -41,6 +41,11 @@
 }
 
 .dark {
+  --color-accent: hsl(270 70% 74%);
+  --color-accent-hover: hsl(270 65% 66%);
+  --color-accent-light: hsl(270 45% 19%);
+  --color-accent-muted: hsl(270 45% 66%);
+
   --bg-primary: hsl(0 0% 5%);
   --bg-secondary: hsl(0 0% 8%);
   --bg-tertiary: hsl(0 0% 11%);

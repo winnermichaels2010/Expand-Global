@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '@/components/ui/sidebar';
 import ClientsAside from '../components/ClientsAside';
+import NotificationBell from '../components/NotificationBell';
 
 // eslint-disable-next-line react/prop-types
 export default function AdminLayout({ children }) {
@@ -11,6 +12,7 @@ export default function AdminLayout({ children }) {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isClientsOpen, setIsClientsOpen] = useState(false);
+  const [asideInitial, setAsideInitial] = useState(null);
   const touchStart = useRef(null);
 
   useEffect(() => {
@@ -24,6 +26,20 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     setIsClientsOpen(false);
   }, [location.pathname]);
+
+  const searchParams = new URLSearchParams(location.search);
+  const clientParam = searchParams.get('client');
+  const threadParam = searchParams.get('thread');
+
+  useEffect(() => {
+    if (!clientParam || !threadParam) return;
+    setAsideInitial({
+      clientId: clientParam,
+      projectId: threadParam,
+      nonce: `${location.search}-${Date.now()}`,
+    });
+    setIsClientsOpen(true);
+  }, [location.search, clientParam, threadParam]);
 
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
     return (
@@ -66,7 +82,9 @@ export default function AdminLayout({ children }) {
       <ClientsAside
         open={isClientsOpen}
         onClose={() => setIsClientsOpen(false)}
+        initial={asideInitial}
       />
+      <NotificationBell asideOpen={isClientsOpen} />
       <div
         className={`pt-14 md:pt-0 transition-all duration-300 ease-in-out lg:mr-64 ${
           isCollapsed ? 'md:ml-20' : 'md:ml-64'

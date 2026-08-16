@@ -1,13 +1,15 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState, useRef } from 'react';
-import { FaUserFriends, FaChevronRight, FaArrowLeft, FaTimes, FaEllipsisV } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaUserFriends, FaChevronRight, FaArrowLeft, FaTimes, FaEllipsisV, FaCheck, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from './StatusBadge';
 import MessageThread from './MessageThread';
 import ProfileAvatar from './ProfileAvatar';
 
-export default function ClientsAside({ open, onClose }) {
-  const { getRegisteredUsers, getDesignRequests, ADMIN_EMAIL } = useAuth();
+export default function ClientsAside({ open, onClose, initial = null }) {
+  const { getRegisteredUsers, getDesignRequests, rejectDesignRequest, ADMIN_EMAIL } = useAuth();
+  const navigate = useNavigate();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState(null);
@@ -16,9 +18,16 @@ export default function ClientsAside({ open, onClose }) {
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [previewPicture, setPreviewPicture] = useState(null);
+  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectingBusy, setRejectingBusy] = useState(false);
+  const [asideToast, setAsideToast] = useState(null);
   const [viewportHeight, setViewportHeight] = useState('100vh');
   const touchStart = useRef(null);
   const infoRef = useRef(null);
+  const toastTimer = useRef(null);
+  const appliedClientRef = useRef(null);
+  const appliedProjectRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return;
@@ -48,6 +57,8 @@ export default function ClientsAside({ open, onClose }) {
   useEffect(() => {
     setInfoOpen(false);
     setPreviewPicture(null);
+    setShowRejectForm(false);
+    setRejectReason('');
   }, [selectedClient, selectedProject]);
 
   useEffect(() => {
@@ -98,11 +109,53 @@ export default function ClientsAside({ open, onClose }) {
     setLoadingProjects(true);
     getDesignRequests().then((all) => {
       if (!mounted) return;
-      setProjects(all.filter((r) => r.email === selectedClient.email));
+      setProjects(
+        all.filter(
+          (r) =>
+            r.email === selectedClient.email &&
+            r.status !== 'Completed' &&
+            r.status !== 'Rejected'
+        )
+      );
       setLoadingProjects(false);
     });
     return () => { mounted = false; };
   }, [selectedClient, getDesignRequests]);
+
+  useEffect(() => {
+    if (!open || !initial?.projectId) return;
+    if (appliedClientRef.current === initial.nonce) return;
+    if (clients.length === 0) return;
+    const client = clients.find((c) => c.userId === initial.clientId);
+    if (!client) return;
+    setSelectedClient(client);
+    appliedClientRef.current = initial.nonce;
+  }, [open, initial, clients]);
+
+  useEffect(() => {
+    if (!open || !initial?.projectId) return;
+    if (appliedProjectRef.current === initial.nonce) return;
+    if (!selectedClient) return;
+    if (loadingProjects) return;
+    const project = projects.find((p) => p.id === initial.projectId);
+    if (project) {
+      setSelectedProject(project);
+      appliedProjectRef.current = initial.nonce;
+      return;
+    }
+    let cancelled = false;
+    getDesignRequests().then((all) => {
+      if (cancelled) return;
+      const p = all.find((r) => r.id === initial.projectId);
+      if (p && p.status !== 'Rejected') {
+        setSelectedProject(p);
+        appliedProjectRef.current = initial.nonce;
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, initial, selectedClient, projects, loadingProjects, getDesignRequests]);
 
   const clientName = (c) => [c.surname, c.firstName, c.lastName].filter(Boolean).join(' ') || c.email;
 
@@ -199,6 +252,33 @@ export default function ClientsAside({ open, onClose }) {
     </div>
   ) : null;
 
+  function showAsideToast(type, message) {
+    setAsideToast({ type, message });
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setAsideToast(null), 3500);
+  }
+
+  async function handleAsideReject() {
+    if (!selectedProject || !rejectReason.trim()) return;
+    setRejectingBusy(true);
+    const ok = await rejectDesignRequest(selectedProject.id, rejectReason.trim());
+    setRejectingBusy(false);
+    if (ok) {
+      const rejectedId = selectedProject.id;
+      setProjects((prev) => prev.filter((p) => p.id !== rejectedId));
+      setShowRejectForm(false);
+      setRejectReason('');
+      setSelectedProject(null);
+      showAsideToast('success', 'Request rejected successfully.');
+    } else {
+      showAsideToast('error', 'Failed to reject request. Please try again.');
+    }
+  }
+
+  const canChat =
+    selectedProject &&
+    ['Accepted', 'In Progress', 'Completed'].includes(selectedProject.status);
+
   return (
     <aside
       className={`fixed right-0 top-0 w-full lg:w-64 flex flex-col z-50 transition-transform duration-300 ease-in-out shadow-2xl ${
@@ -233,7 +313,101 @@ export default function ClientsAside({ open, onClose }) {
           </div>
 
           <div className="flex-1 min-h-0 flex flex-col">
-            <MessageThread fill designRequestId={selectedProject.id} />
+            {canChat ? (
+              <MessageThread fill designRequestId={selectedProject.id} />
+            ) : (
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="px-4 py-3">
+                  <p className="text-[10px] mb-2" style={{ color: 'var(--text-tertiary)' }}>
+                    Submitted{' '}
+                    {new Date(selectedProject.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </p>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    <span><strong>Timeline:</strong> {selectedProject.timeline || 'N/A'}</span>
+                    <span><strong>Budget:</strong> {selectedProject.budget || 'N/A'}</span>
+                    <span><strong>Phone:</strong> {selectedProject.phone || 'N/A'}</span>
+                  </div>
+                  <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>
+                    <strong>Description:</strong>
+                  </p>
+                  <p className="text-xs line-clamp-3" style={{ color: 'var(--text-primary)' }}>
+                    {selectedProject.description}
+                  </p>
+                </div>
+
+                <div className="px-4 py-4 space-y-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                  <p className="text-[10px] text-center mb-1" style={{ color: 'var(--text-tertiary)' }}>
+                    This request is awaiting your review.
+                  </p>
+                  <button
+                    onClick={() => navigate(`/admin/design-requests/reply/${selectedProject.id}`)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-white transition-all duration-200 cursor-pointer pressable"
+                    style={{ background: '#059669' }}
+                  >
+                    <FaCheck /> Accept Request
+                  </button>
+                  <button
+                    onClick={() => setShowRejectForm((v) => !v)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-white transition-all duration-200 cursor-pointer pressable"
+                    style={{ background: '#dc2626' }}
+                  >
+                    <FaTimes /> Reject Request
+                  </button>
+
+                  {showRejectForm && (
+                    <div
+                      className="p-2.5 rounded-lg"
+                      style={{
+                        background: 'hsl(0 84% 60% / 0.06)',
+                        border: '1px solid hsl(0 84% 60% / 0.2)',
+                      }}
+                    >
+                      <label
+                        className="block text-[10px] font-medium mb-1.5"
+                        style={{ color: '#dc2626' }}
+                      >
+                        Reason for rejection
+                      </label>
+                      <textarea
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        placeholder="Enter reason..."
+                        className="w-full px-2.5 py-1.5 text-[11px] rounded-lg resize-none"
+                        style={{
+                          background: 'var(--bg-elevated)',
+                          border: '1px solid var(--border-default)',
+                          color: 'var(--text-primary)',
+                        }}
+                        rows={2}
+                      />
+                      <div className="flex justify-end gap-1.5 mt-1.5">
+                        <button
+                          onClick={() => {
+                            setShowRejectForm(false);
+                            setRejectReason('');
+                          }}
+                          className="px-2.5 py-1 text-[10px] font-medium rounded-md transition-all duration-200 cursor-pointer pressable"
+                          style={{
+                            background: 'var(--bg-tertiary)',
+                            color: 'var(--text-secondary)',
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleAsideReject}
+                          disabled={!rejectReason.trim() || rejectingBusy}
+                          className="px-2.5 py-1 text-[10px] font-medium rounded-md text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer pressable"
+                          style={{ background: '#dc2626' }}
+                        >
+                          {rejectingBusy ? 'Rejecting...' : 'Confirm Reject'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </>
       ) : selectedClient ? (
@@ -376,6 +550,16 @@ export default function ClientsAside({ open, onClose }) {
           >
             <FaTimes className="text-sm" />
           </button>
+        </div>
+      )}
+
+      {asideToast && (
+        <div
+          className="fixed bottom-6 right-6 z-[90] flex items-center gap-2.5 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-medium text-white"
+          style={{ background: asideToast.type === 'success' ? '#059669' : '#dc2626' }}
+        >
+          {asideToast.type === 'success' ? <FaCheckCircle /> : <FaExclamationTriangle />}
+          {asideToast.message}
         </div>
       )}
     </aside>

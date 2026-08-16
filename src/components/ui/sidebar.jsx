@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Sun,
   Moon,
+  XCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -22,6 +23,7 @@ import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
   { name: 'Design Requests', path: '/admin/design-requests', icon: Palette },
+  { name: 'Rejected Requests', path: '/admin/design-requests/rejected', icon: XCircle },
   { name: 'Active Projects', path: '/admin/projects/active', icon: Hammer },
   { name: 'Pending Requests', path: '/admin/projects/pending', icon: Clock },
   { name: 'Finished Projects', path: '/admin/projects/finished', icon: BadgeCheck },
@@ -40,9 +42,13 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
     setIsOpen(false);
   }, [location.pathname]);
 
-  const isActive = (path) => {
+  const isActive = (item) => {
+    const { path } = item;
     if (path === '/admin') return location.pathname === '/admin';
-    return location.pathname.startsWith(path);
+    const hasLongerMatch = navItems.some(
+      (other) => other.path.length > path.length && location.pathname.startsWith(other.path)
+    );
+    return location.pathname.startsWith(path) && !hasLongerMatch;
   };
 
   const toggleSidebar = () => setIsOpen(!isOpen);
@@ -185,7 +191,7 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
           )}
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = isActive(item.path);
+            const active = isActive(item);
 
             return (
               <Link

@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import {
   FaCamera,
@@ -9,6 +9,7 @@ import {
   FaClock,
   FaCommentDots,
   FaPaperPlane,
+  FaDownload,
   FaChartPie,
   FaCoins,
   FaFire,
@@ -27,20 +28,37 @@ const statusMeta = {
   Rejected: { color: '#ef4444', icon: FaTimesCircle },
 };
 
-const filters = ['All', 'Pending', 'Accepted', 'Rejected'];
+const filters = ['All', 'Pending', 'Accepted'];
 
 const statusOrder = ['Pending', 'In Progress', 'Accepted', 'Completed', 'Rejected'];
 
 export default function Dashboard() {
   const { currentUser, updateProfilePicture, getUserProfile, subscribeToDesignRequests } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const threadParam = searchParams.get('thread');
   const [profile, setProfile] = useState(null);
   const [designRequests, setDesignRequests] = useState([]);
   const [showPhotoPopup, setShowPhotoPopup] = useState(false);
+  const [showPhotoPreview, setShowPhotoPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
   const [openThreadId, setOpenThreadId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('All');
+  const scrolledRef = useRef(null);
+
+  useEffect(() => {
+    if (!threadParam) return;
+    setOpenThreadId(threadParam);
+    if (scrolledRef.current === threadParam || designRequests.length === 0) return;
+    scrolledRef.current = threadParam;
+    const t = setTimeout(() => {
+      document
+        .getElementById(`request-${threadParam}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [threadParam, designRequests]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -50,7 +68,9 @@ export default function Dashboard() {
     } else {
       getUserProfile(currentUser.uid).then(setProfile);
       const unsub = subscribeToDesignRequests((requests) => {
-        setDesignRequests(requests.filter((r) => r.email === currentUser.email));
+        setDesignRequests(
+          requests.filter((r) => r.email === currentUser.email && r.status !== 'Rejected')
+        );
       });
       return unsub;
     }
@@ -86,7 +106,6 @@ export default function Dashboard() {
     All: designRequests.length,
     Pending: designRequests.filter((r) => r.status === 'Pending').length,
     Accepted: designRequests.filter((r) => r.status === 'Accepted').length,
-    Rejected: designRequests.filter((r) => r.status === 'Rejected').length,
   };
 
   // ---- Analytics ----
@@ -152,14 +171,6 @@ export default function Dashboard() {
       chipBg: 'linear-gradient(135deg, #10b981, #059669)',
       filter: 'Accepted',
       caption: 'In progress',
-    },
-    {
-      label: 'Rejected',
-      value: counts.Rejected,
-      icon: FaTimesCircle,
-      chipBg: 'linear-gradient(135deg, #ef4444, #dc2626)',
-      filter: 'Rejected',
-      caption: 'Needs attention',
     },
   ];
 
@@ -467,7 +478,8 @@ export default function Dashboard() {
                 return (
                   <motion.div
                     key={req.id}
-                    className="relative p-5 rounded-xl transition-all duration-300 hover-lift"
+                    id={`request-${req.id}`}
+                    className="relative p-5 rounded-xl transition-all duration-300 hover-lift scroll-mt-24"
                     style={{
                       background: 'var(--bg-primary)',
                       border: '1px solid var(--border-default)',
@@ -547,6 +559,34 @@ export default function Dashboard() {
                       </div>
                     )}
 
+                    {req.status === 'Completed' && req.submittedFileUrl && (
+                      <div className="space-y-2 mb-3 pl-2">
+                        <div
+                          className="p-3 rounded-lg text-xs"
+                          style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)' }}
+                        >
+                          <p className="font-medium mb-1" style={{ color: '#10b981' }}>Finished Design</p>
+                          {req.submittedMessage && (
+                            <p style={{ color: 'var(--text-secondary)' }}>{req.submittedMessage}</p>
+                          )}
+                          {req.submittedAt && (
+                            <p className="text-[10px] mt-1" style={{ color: 'var(--text-tertiary)' }}>
+                              Submitted on {new Date(req.submittedAt).toLocaleDateString()}
+                            </p>
+                          )}
+                          <a
+                            href={req.submittedFileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 text-[11px] font-medium rounded-lg text-white"
+                            style={{ background: 'var(--color-accent)' }}
+                          >
+                            <FaDownload /> View / Download Design
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
                     {req.status === 'Rejected' && req.rejectReason && (
                       <div
                         className="p-3 rounded-lg text-xs mb-3 pl-2"
@@ -557,20 +597,26 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    <div className="flex items-center gap-2 pl-2">
-                      <button
-                        onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
-                        style={{
-                          background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--color-accent-light)',
-                          color: openThreadId === req.id ? '#fff' : 'var(--color-accent)',
-                          border: '1px solid ' + (openThreadId === req.id ? 'transparent' : 'hsl(262 60% 80%)'),
-                        }}
-                      >
-                        <FaCommentDots />
-                        {openThreadId === req.id ? 'Hide Messages' : 'Message Admin'}
-                      </button>
-                    </div>
+                    {req.status === 'Pending' ? (
+                      <p className="text-xs pl-2" style={{ color: 'var(--text-tertiary)' }}>
+                        Chat becomes available once the admin accepts this project.
+                      </p>
+                    ) : (
+                      <div className="flex items-center gap-2 pl-2">
+                        <button
+                          onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
+                          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
+                          style={{
+                            background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--color-accent-light)',
+                            color: openThreadId === req.id ? '#fff' : 'var(--color-accent)',
+                            border: '1px solid ' + (openThreadId === req.id ? 'transparent' : 'hsl(262 60% 80%)'),
+                          }}
+                        >
+                          <FaCommentDots />
+                          {openThreadId === req.id ? 'Hide Messages' : 'Message Admin'}
+                        </button>
+                      </div>
+                    )}
 
                     {openThreadId === req.id && (
                       <div className="pl-2">
@@ -618,8 +664,12 @@ export default function Dashboard() {
                 <FaTimes />
               </button>
               <div
-                className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl"
+                className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl ${profile?.profilePicture ? 'cursor-zoom-in' : ''}`}
                 style={{ background: 'var(--color-accent)' }}
+                onClick={() => { if (profile?.profilePicture) setShowPhotoPreview(true); }}
+                title={profile?.profilePicture ? 'View full picture' : undefined}
+                role="button"
+                aria-label={profile?.profilePicture ? 'View full profile picture' : undefined}
               >
                 {profile?.profilePicture ? (
                   <img src={profile.profilePicture} alt="Profile" className="w-24 h-24 rounded-full object-cover" />
@@ -651,16 +701,37 @@ export default function Dashboard() {
                   disabled={uploading}
                 />
               </label>
-              <button
-                onClick={() => setShowPhotoPopup(false)}
-                className="block w-full mt-3 px-6 py-2.5 text-sm transition-colors duration-200 cursor-pointer"
-                style={{ color: 'var(--text-secondary)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-              >
-                Skip
-              </button>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showPhotoPreview && profile?.profilePicture && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPhotoPreview(false)}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.img
+              src={profile.profilePicture}
+              alt="Profile preview"
+              className="relative max-w-full max-h-full object-contain rounded-xl shadow-2xl"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+            <button
+              onClick={() => setShowPhotoPreview(false)}
+              className="absolute top-4 right-4 p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
+              aria-label="Close preview"
+            >
+              <FaTimes />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

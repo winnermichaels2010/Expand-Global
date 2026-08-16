@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import UserSidebar from '../components/UserSidebar';
 import MyRequestsAside from '../components/MyRequestsAside';
 import DashboardFooter from '../components/DashboardFooter';
+import NotificationBell from '../components/NotificationBell';
 
 // eslint-disable-next-line react/prop-types
 export default function UserLayout({ children }) {
@@ -63,6 +64,7 @@ export default function UserLayout({ children }) {
         open={isRequestsOpen}
         onClose={() => setIsRequestsOpen(false)}
       />
+      <NotificationBell asideOpen={isRequestsOpen} />
       <div
         className="flex-1 pt-14 md:pt-0 md:ml-64 lg:mr-64 flex flex-col overflow-x-hidden"
         onTouchStart={handleTouchStart}

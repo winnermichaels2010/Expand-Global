@@ -61,10 +61,16 @@ export default function MyRequestsAside({ open, onClose }) {
   useEffect(() => {
     if (!currentUser) return;
     const unsub = subscribeToDesignRequests((all) => {
-      setRequests(all.filter((r) => r.email === currentUser.email));
+      setRequests(all.filter((r) => r.email === currentUser.email && r.status !== 'Rejected'));
     });
     return unsub;
   }, [currentUser, subscribeToDesignRequests]);
+
+  useEffect(() => {
+    if (!selectedRequest) return;
+    const fresh = requests.find((r) => r.id === selectedRequest.id);
+    if (fresh) setSelectedRequest(fresh);
+  }, [requests, selectedRequest]);
 
   useEffect(() => {
     if (!open) setSelectedRequest(null);
@@ -196,7 +202,7 @@ export default function MyRequestsAside({ open, onClose }) {
             </div>
 
             <div className="flex-1 min-h-0 flex flex-col" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-              {selectedRequest.status === 'Accepted' ? (
+              {['Accepted', 'In Progress', 'Completed'].includes(selectedRequest.status) ? (
                 <MessageThread fill designRequestId={selectedRequest.id} />
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">

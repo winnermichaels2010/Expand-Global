@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaPalette, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaTachometerAlt, FaPalette, FaClipboardCheck, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight, FaTimesCircle } from 'react-icons/fa';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,8 @@ import { useProfilePicsByEmail } from '../hooks/useProfilePics';
 const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: FaTachometerAlt },
   { name: 'Request Design', path: '/request-design', icon: FaPalette },
+  { name: 'Completed Projects', path: '/completed-projects', icon: FaClipboardCheck },
+  { name: 'Rejected Requests', path: '/rejected-projects', icon: FaTimesCircle },
 ];
 
 // eslint-disable-next-line react/prop-types

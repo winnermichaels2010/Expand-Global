@@ -86,7 +86,7 @@ export default function Navbar() {
             />
             <span
               className="text-lg tracking-tight transition-all duration-300"
-              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-secondary)' }}
             >
               Expand Global
             </span>

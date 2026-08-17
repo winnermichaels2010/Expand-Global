@@ -525,7 +525,7 @@ export default function Hero() {
                 className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4"
               >
                 <Link
-                  to="/auth"
+                  to="/gallery"
                   className="hero-btn-primary group inline-flex items-center gap-2.5 px-7 sm:px-8 py-3 sm:py-3.5 text-white text-sm sm:text-[0.9375rem] font-semibold rounded-full transition-all duration-300"
                   style={{
                     background:
@@ -538,7 +538,7 @@ export default function Hero() {
                   <HiArrowRight className="text-sm transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
                 <Link
-                  to="/contact"
+                  to="/auth"
                   className="hero-btn-secondary inline-flex items-center gap-2.5 px-7 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-[0.9375rem] font-semibold rounded-full transition-all duration-300"
                   style={{
                     color: 'hsl(0 0% 100%)',
@@ -547,7 +547,7 @@ export default function Hero() {
                   }}
                 >
                   <HiSparkles className="text-sm" style={{ color: 'var(--color-accent)' }} />
-                  Get a Free Consultation
+                  Get Your Design
                 </Link>
               </motion.div>
 

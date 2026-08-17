@@ -173,26 +173,31 @@ export default function Gallery() {
             </p>
           </div>
         ) : (
-          <motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
-            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05 } } }}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-          >
-            {allImages.map((image) => (
-              <motion.div
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {allImages.map((image, index) => (
+              <div
                 key={image.id}
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
-                className="group relative aspect-square rounded-2xl overflow-hidden cursor-zoom-in hover-lift"
-                style={{ border: '1px solid var(--border-default)' }}
+                className="group relative rounded-2xl overflow-hidden cursor-zoom-in hover-lift animate-fade-in-up"
+                style={{
+                  border: '1px solid var(--border-default)',
+                  aspectRatio: '1 / 1',
+                  animationDelay: `${Math.min(index * 50, 400)}ms`,
+                  background: 'var(--bg-secondary)',
+                }}
                 onClick={() => setLightbox(image)}
               >
                 <img
                   src={image.src}
                   alt={image.alt}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  loading="eager"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-0 flex items-end p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
@@ -205,7 +210,7 @@ export default function Gallery() {
                       handleDelete(image);
                     }}
                     disabled={deletingId === image.id}
-                    className="absolute top-2 right-2 p-2 rounded-lg text-white cursor-pointer disabled:opacity-60"
+                    className="absolute top-2 right-2 p-2 rounded-lg text-white cursor-pointer disabled:opacity-60 z-10"
                     style={{ background: 'hsl(0 84% 60% / 0.9)' }}
                     aria-label="Delete image"
                     title="Delete image"
@@ -213,9 +218,9 @@ export default function Gallery() {
                     <FaTrash className="text-xs" />
                   </button>
                 )}
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
 

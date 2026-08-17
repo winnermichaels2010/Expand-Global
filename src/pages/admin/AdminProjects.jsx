@@ -130,8 +130,7 @@ export default function AdminProjects({ variant = 'active' }) {
 
                   {(request.status === 'Accepted' || request.status === 'In Progress') && (
                     <div className="mt-1.5 text-[10px] space-y-0.5" style={{ color: '#059669' }}>
-                      <p><strong>Standard:</strong> ₦{request.standardPrice?.toLocaleString()}</p>
-                      <p><strong>Premium:</strong> ₦{request.premiumPrice?.toLocaleString()}</p>
+                      <p><strong>Price:</strong> ₦{request.standardPrice?.toLocaleString()}</p>
                       {request.adminComment && <p className="line-clamp-1"><strong>Comment:</strong> {request.adminComment}</p>}
                     </div>
                   )}

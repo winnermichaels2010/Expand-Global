@@ -44,6 +44,10 @@ alter table public.design_requests
   add column if not exists submitted_message text,
   add column if not exists submitted_at timestamptz;
 
+-- Payment tracking (also safe to re-run on an existing database)
+alter table public.design_requests
+  add column if not exists half_paid boolean not null default false;
+
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,

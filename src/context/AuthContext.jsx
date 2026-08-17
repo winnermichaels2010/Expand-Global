@@ -49,6 +49,7 @@ function mapRequest(row) {
     submittedFiles,
     submittedMessage: row.submitted_message,
     submittedAt: row.submitted_at,
+    halfPaid: row.half_paid,
     createdAt: row.created_at,
   };
 }
@@ -73,6 +74,7 @@ function toRequestWrite(data) {
   if (data.submittedFileName !== undefined) payload.submitted_file_name = data.submittedFileName;
   if (data.submittedMessage !== undefined) payload.submitted_message = data.submittedMessage;
   if (data.submittedAt !== undefined) payload.submitted_at = data.submittedAt;
+  if (data.halfPaid !== undefined) payload.half_paid = data.halfPaid;
   return payload;
 }
 
@@ -351,12 +353,12 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function acceptDesignRequest(id, { standardPrice, premiumPrice, adminComment }) {
+  async function acceptDesignRequest(id, { price, adminComment }) {
     try {
       await updateDesignRequest(id, {
         status: 'Accepted',
-        standardPrice,
-        premiumPrice,
+        standardPrice: price,
+        premiumPrice: price,
         adminComment: (adminComment || '').trim(),
         repliedAt: new Date().toISOString(),
       });
@@ -374,7 +376,7 @@ export function AuthProvider({ children }) {
         if (userProfile) {
           await addNotification(
             userProfile.id,
-            `Your design request "${request.service}" has been accepted! Standard: ₦${Number(standardPrice).toLocaleString()}, Premium: ₦${Number(premiumPrice).toLocaleString()}`,
+            `Your design request "${request.service}" has been accepted! Price: ₦${Number(price).toLocaleString()}`,
             'design_request',
             '/dashboard'
           );
@@ -439,6 +441,34 @@ export function AuthProvider({ children }) {
       console.error('Failed to submit project:', err);
       return false;
     }
+  }
+
+  async function processHalfPayment(requestId) {
+    const ok = await updateDesignRequest(requestId, {
+      halfPaid: true,
+    });
+    if (!ok) throw new Error('Failed to update payment status');
+
+    const { data, error } = await supabase
+      .from('design_requests')
+      .select('*')
+      .eq('id', requestId)
+      .maybeSingle();
+    if (error) throw error;
+    const request = mapRequest(data);
+
+    if (request?.email) {
+      const userProfile = await getProfileByEmail(request.email);
+      if (userProfile) {
+        await addNotification(
+          userProfile.id,
+          `Payment received for "${request.service}"! Your design is now being worked on.`,
+          'payment',
+          '/completed-projects'
+        );
+      }
+    }
+    return true;
   }
 
   async function toggleUserStatus(userId) {
@@ -837,6 +867,7 @@ export function AuthProvider({ children }) {
     acceptDesignRequest,
     uploadProjectFile,
     submitProject,
+    processHalfPayment,
     toggleUserStatus,
     ADMIN_EMAIL,
     getNotifications,

@@ -15,6 +15,7 @@ import {
   FaFire,
   FaCalendarAlt,
   FaPalette,
+  FaCreditCard,
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import PanelHeader from '../components/PanelHeader';
@@ -534,24 +535,23 @@ export default function Dashboard() {
 
                     {req.status === 'Accepted' && (
                       <div className="space-y-2 mb-3 pl-2">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                          <div
-                            className="p-2.5 rounded-lg break-words"
-                            style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}
-                          >
-                            <span className="font-medium" style={{ color: '#10b981' }}>
-                              Standard: ₦{req.standardPrice?.toLocaleString()}
-                            </span>
-                          </div>
-                          <div
-                            className="p-2.5 rounded-lg break-words"
-                            style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
-                          >
-                            <span className="font-medium" style={{ color: 'var(--color-accent)' }}>
-                              Premium: ₦{req.premiumPrice?.toLocaleString()}
-                            </span>
-                          </div>
+                        <div
+                          className="p-2.5 rounded-lg break-words inline-block text-xs"
+                          style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}
+                        >
+                          <span className="font-medium" style={{ color: '#10b981' }}>
+                            Price: ₦{req.standardPrice?.toLocaleString()}
+                          </span>
                         </div>
+                        {!req.halfPaid && (
+                          <button
+                            onClick={() => navigate(`/payment/${req.id}`)}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white cursor-pointer pressable"
+                            style={{ background: '#059669' }}
+                          >
+                            <FaCreditCard /> Pay Now
+                          </button>
+                        )}
                         {req.adminComment && (
                           <div
                             className="p-3 rounded-lg text-xs"

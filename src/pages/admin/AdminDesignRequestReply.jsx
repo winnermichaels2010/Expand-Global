@@ -14,8 +14,7 @@ export default function AdminDesignRequestReply() {
   const profilePicsByEmail = useProfilePicsByEmail();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [standardPrice, setStandardPrice] = useState('');
-  const [premiumPrice, setPremiumPrice] = useState('');
+  const [price, setPrice] = useState('');
   const [adminComment, setAdminComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -36,11 +35,10 @@ export default function AdminDesignRequestReply() {
   }, [id, currentUser, ADMIN_EMAIL, getDesignRequests]);
 
   async function handleAccept() {
-    const standard = parseFloat(standardPrice);
-    const premium = parseFloat(premiumPrice);
-    if (isNaN(standard) || isNaN(premium)) return;
+    const amount = parseFloat(price);
+    if (isNaN(amount) || amount <= 0) return;
     setSubmitting(true);
-    await acceptDesignRequest(id, { standardPrice: standard, premiumPrice: premium, adminComment });
+    await acceptDesignRequest(id, { price: amount, adminComment });
     setSubmitting(false);
     navigate('/admin/design-requests');
   }
@@ -69,9 +67,8 @@ export default function AdminDesignRequestReply() {
     );
   }
 
-  const standard = parseFloat(standardPrice);
-  const premium = parseFloat(premiumPrice);
-  const isValid = !isNaN(standard) && standard > 0 && !isNaN(premium) && premium > 0;
+  const amount = parseFloat(price);
+  const isValid = !isNaN(amount) && amount > 0;
 
   return (
     <div className="min-h-screen">
@@ -139,49 +136,26 @@ export default function AdminDesignRequestReply() {
             Set Project Pricing
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label
-                className="block text-sm font-medium mb-1.5"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                Standard Price (₦)
-              </label>
-              <input
-                type="number"
-                value={standardPrice}
-                onChange={(e) => setStandardPrice(e.target.value)}
-                placeholder="e.g. 50000"
-                className="w-full px-4 py-2.5 text-sm rounded-xl input-base"
-                style={{
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-default)',
-                  color: 'var(--text-primary)',
-                }}
-                min="0"
-              />
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1.5"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                Premium Price (₦)
-              </label>
-              <input
-                type="number"
-                value={premiumPrice}
-                onChange={(e) => setPremiumPrice(e.target.value)}
-                placeholder="e.g. 100000"
-                className="w-full px-4 py-2.5 text-sm rounded-xl input-base"
-                style={{
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-default)',
-                  color: 'var(--text-primary)',
-                }}
-                min="0"
-              />
-            </div>
+          <div className="mb-4">
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Price (₦)
+            </label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="e.g. 50000"
+              className="w-full px-4 py-2.5 text-sm rounded-xl input-base"
+              style={{
+                background: 'var(--bg-primary)',
+                border: '1px solid var(--border-default)',
+                color: 'var(--text-primary)',
+              }}
+              min="0"
+            />
           </div>
 
           <div className="mb-6">
@@ -212,7 +186,7 @@ export default function AdminDesignRequestReply() {
             <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               {isValid && (
                 <span className="font-medium" style={{ color: '#059669' }}>
-                  Prices set: ₦{standard.toLocaleString()} / ₦{premium.toLocaleString()}
+                  Price set: ₦{amount.toLocaleString()}
                 </span>
               )}
             </div>

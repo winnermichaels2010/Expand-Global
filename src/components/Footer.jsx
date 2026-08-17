@@ -121,20 +121,17 @@ export default function Footer() {
               href="https://www.instagram.com/expandcolours?igsh=cnkzZ3pyMWpzMGs5"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 group"
-              style={{ color: 'var(--text-secondary)' }}
+              className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+              style={{ color: '#E1306C' }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--color-accent)';
                 e.currentTarget.style.background = 'var(--color-accent-light)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-secondary)';
                 e.currentTarget.style.background = 'transparent';
               }}
-              aria-label="See our work on Instagram"
+              aria-label="See our works on Instagram"
             >
-              <FaInstagram size={14} />
-              See our work on Instagram
+              See our works on Instagram <FaInstagram size={14} />
             </a>
           </motion.div>
         </div>

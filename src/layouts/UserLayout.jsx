@@ -6,6 +6,7 @@ import MyRequestsAside from '../components/MyRequestsAside';
 import DashboardFooter from '../components/DashboardFooter';
 import NotificationBell from '../components/NotificationBell';
 
+
 // eslint-disable-next-line react/prop-types
 export default function UserLayout({ children }) {
   const { currentUser, ADMIN_EMAIL } = useAuth();

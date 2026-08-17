@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTimes, FaPaperPlane, FaDownload, FaFile, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaPlus, FaTimes, FaPaperPlane, FaDownload, FaFile, FaImage, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import PanelHeader from '../../components/PanelHeader';
 import StatusBadge from '../../components/StatusBadge';
@@ -10,6 +10,17 @@ import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 
 function isImage(url) {
   return /\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(url);
+}
+
+function parseSubmittedFiles(request) {
+  if (!request.submittedFileUrl) return [];
+  try {
+    const parsed = JSON.parse(request.submittedFileUrl);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {
+    // legacy single-file format
+  }
+  return [{ url: request.submittedFileUrl, name: request.submittedFileName || 'Finished design file' }];
 }
 
 // eslint-disable-next-line react/prop-types
@@ -21,7 +32,7 @@ export default function AdminSubmitProject({ mode = 'submit' }) {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const fileInputRef = useRef(null);
@@ -69,18 +80,27 @@ export default function AdminSubmitProject({ mode = 'submit' }) {
   }
 
   async function handleSubmit() {
-    if (!file || submitting) return;
+    if (files.length === 0 || submitting) return;
     setSubmitting(true);
     setFeedback(null);
-    const uploaded = await uploadProjectFile(file);
-    if (!uploaded) {
-      setSubmitting(false);
-      setFeedback({ type: 'error', text: 'Failed to upload the file. Please try again.' });
-      return;
+
+    const uploadedFiles = [];
+    for (const f of files) {
+      const uploaded = await uploadProjectFile(f);
+      if (!uploaded) {
+        setSubmitting(false);
+        setFeedback({ type: 'error', text: `Failed to upload "${f.name}". Please try again.` });
+        return;
+      }
+      uploadedFiles.push(uploaded);
     }
+
+    const fileUrlJson = JSON.stringify(uploadedFiles.map((f) => ({ url: f.url, name: f.name })));
+    const fileNames = uploadedFiles.map((f) => f.name).join(', ');
+
     const ok = await submitProject(request.id, {
-      fileUrl: uploaded.url,
-      fileName: uploaded.name,
+      fileUrl: fileUrlJson,
+      fileName: fileNames,
       message,
     });
     setSubmitting(false);
@@ -191,36 +211,40 @@ export default function AdminSubmitProject({ mode = 'submit' }) {
                 Submitted Design
               </div>
               <div className="p-4 space-y-3">
-                {isImage(request.submittedFileUrl) ? (
-                  <a
-                    href={request.submittedFileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block rounded-xl overflow-hidden hover-lift"
-                  >
-                    <img
-                      src={request.submittedFileUrl}
-                      alt="Finished design"
-                      className="w-full max-h-80 object-contain rounded-xl"
-                    />
-                  </a>
-                ) : (
-                  <a
-                    href={request.submittedFileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 rounded-xl"
-                    style={{
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-subtle)',
-                    }}
-                  >
-                    <FaFile style={{ color: 'var(--color-accent)' }} />
-                    <span className="text-xs font-medium truncate">
-                      {request.submittedFileName || 'Finished design file'}
-                    </span>
-                  </a>
-                )}
+                {parseSubmittedFiles(request).map((file, idx) => (
+                  <div key={idx}>
+                    {isImage(file.url) ? (
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block rounded-xl overflow-hidden hover-lift"
+                      >
+                        <img
+                          src={file.url}
+                          alt={file.name || 'Finished design'}
+                          className="w-full max-h-80 object-contain rounded-xl"
+                        />
+                      </a>
+                    ) : (
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 rounded-xl"
+                        style={{
+                          background: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-subtle)',
+                        }}
+                      >
+                        {isImage(file.url) ? <FaImage style={{ color: 'var(--color-accent)' }} /> : <FaFile style={{ color: 'var(--color-accent)' }} />}
+                        <span className="text-xs font-medium truncate">
+                          {file.name || 'Finished design file'}
+                        </span>
+                      </a>
+                    )}
+                  </div>
+                ))}
                 {request.submittedMessage && (
                   <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                     {request.submittedMessage}
@@ -231,15 +255,20 @@ export default function AdminSubmitProject({ mode = 'submit' }) {
                     Submitted on {new Date(request.submittedAt).toLocaleString()}
                   </p>
                 )}
-                <a
-                  href={request.submittedFileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white"
-                  style={{ background: 'var(--color-accent)' }}
-                >
-                  <FaDownload /> Download
-                </a>
+                <div className="flex flex-wrap gap-2">
+                  {parseSubmittedFiles(request).map((file, idx) => (
+                    <a
+                      key={idx}
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white"
+                      style={{ background: 'var(--color-accent)' }}
+                    >
+                      <FaDownload /> {file.name || 'Download'}
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
           ) : isView ? (
@@ -270,22 +299,25 @@ export default function AdminSubmitProject({ mode = 'submit' }) {
               </div>
 
               <div className="flex-1 px-4 py-3 space-y-3">
-                {file ? (
-                  <div
-                    className="flex items-center gap-3 p-3 rounded-xl"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
-                  >
-                    <FaFile style={{ color: 'var(--color-accent)' }} />
-                    <span className="text-xs font-medium truncate flex-1">{file.name}</span>
-                    <button
-                      onClick={() => setFile(null)}
-                      className="p-1.5 rounded-lg cursor-pointer hover:bg-black/5"
-                      style={{ color: 'var(--text-tertiary)' }}
-                      aria-label="Remove file"
+                {files.length > 0 ? (
+                  files.map((f, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 p-3 rounded-xl"
+                      style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
                     >
-                      <FaTimes className="text-xs" />
-                    </button>
-                  </div>
+                      {isImage(f.name) ? <FaImage style={{ color: 'var(--color-accent)' }} /> : <FaFile style={{ color: 'var(--color-accent)' }} />}
+                      <span className="text-xs font-medium truncate flex-1">{f.name}</span>
+                      <button
+                        onClick={() => setFiles((prev) => prev.filter((_, i) => i !== idx))}
+                        className="p-1.5 rounded-lg cursor-pointer hover:bg-black/5"
+                        style={{ color: 'var(--text-tertiary)' }}
+                        aria-label="Remove file"
+                      >
+                        <FaTimes className="text-xs" />
+                      </button>
+                    </div>
+                  ))
                 ) : (
                   <p className="text-xs text-center py-8" style={{ color: 'var(--text-tertiary)' }}>
                     Tap the + to attach the finished design, then add a note and submit.
@@ -310,7 +342,11 @@ export default function AdminSubmitProject({ mode = 'submit' }) {
                   ref={fileInputRef}
                   type="file"
                   className="hidden"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                  onChange={(e) => {
+                    const selected = e.target.files?.[0];
+                    if (selected) setFiles((prev) => [...prev, selected]);
+                    e.target.value = '';
+                  }}
                 />
                 <textarea
                   value={message}
@@ -326,7 +362,7 @@ export default function AdminSubmitProject({ mode = 'submit' }) {
                 />
                 <button
                   onClick={handleSubmit}
-                  disabled={!file || submitting}
+                  disabled={files.length === 0 || submitting}
                   className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-lg text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer pressable"
                   style={{ background: '#059669' }}
                 >

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase, ADMIN_EMAIL } from '../lib/supabase';
 
 const AuthContext = createContext();
@@ -18,6 +18,15 @@ function mapProfile(row) {
 }
 
 function mapRequest(row) {
+  let submittedFiles = null;
+  if (row.submitted_file_url) {
+    try {
+      const parsed = JSON.parse(row.submitted_file_url);
+      if (Array.isArray(parsed)) submittedFiles = parsed;
+    } catch {
+      // legacy single-file format
+    }
+  }
   return {
     id: row.id,
     userId: row.user_id,
@@ -37,6 +46,7 @@ function mapRequest(row) {
     repliedAt: row.replied_at,
     submittedFileUrl: row.submitted_file_url,
     submittedFileName: row.submitted_file_name,
+    submittedFiles,
     submittedMessage: row.submitted_message,
     submittedAt: row.submitted_at,
     createdAt: row.created_at,
@@ -74,6 +84,16 @@ function mapNotification(row) {
     type: row.type,
     read: row.read,
     link: row.link,
+    createdAt: row.created_at,
+  };
+}
+
+function mapGalleryImage(row) {
+  return {
+    id: row.id,
+    url: row.url,
+    name: row.name,
+    uploadedBy: row.uploaded_by,
     createdAt: row.created_at,
   };
 }
@@ -649,6 +669,92 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // ---------- Gallery ----------
+
+  const isAdmin = () => currentUser?.email === ADMIN_EMAIL;
+
+  async function getGalleryImages() {
+    try {
+      const { data, error } = await supabase
+        .from('gallery_images')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(mapGalleryImage);
+    } catch (err) {
+      console.error('Failed to fetch gallery images:', err);
+      return [];
+    }
+  }
+
+  const subscribeToGalleryImages = useCallback((callback) => {
+    const fetchAll = async () => {
+      const images = await getGalleryImages();
+      callback(images);
+    };
+    fetchAll();
+    const topic = `gallery-images-${Math.random().toString(36).slice(2)}`;
+    const channel = supabase
+      .channel(topic)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery_images' }, fetchAll)
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, []);
+
+  async function uploadGalleryImage(file) {
+    if (!isAdmin() || !file) return null;
+    try {
+      const path = `uploads/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const { error: uploadError } = await supabase.storage
+        .from('gallery-images')
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery-images')
+        .getPublicUrl(path);
+
+      const { data, error } = await supabase
+        .from('gallery_images')
+        .insert({
+          url: publicUrl,
+          name: file.name,
+          uploaded_by: currentUser.id,
+        })
+        .select('*')
+        .single();
+      if (error) throw error;
+      return mapGalleryImage(data);
+    } catch (err) {
+      console.error('Failed to upload gallery image:', err);
+      return null;
+    }
+  }
+
+  async function deleteGalleryImage(image) {
+    if (!isAdmin() || !image) return false;
+    try {
+      const { error: deleteError } = await supabase
+        .from('gallery_images')
+        .delete()
+        .eq('id', image.id);
+      if (deleteError) throw deleteError;
+
+      const marker = '/gallery-images/';
+      const markerIndex = image.url.indexOf(marker);
+      if (markerIndex !== -1) {
+        const path = image.url.slice(markerIndex + marker.length).split('?')[0];
+        if (path) {
+          await supabase.storage.from('gallery-images').remove([path]);
+        }
+      }
+      return true;
+    } catch (err) {
+      console.error('Failed to delete gallery image:', err);
+      return false;
+    }
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
@@ -745,6 +851,10 @@ export function AuthProvider({ children }) {
     subscribeToMessages,
     deleteMessageForEveryone,
     deleteMessageForMe,
+    getGalleryImages,
+    subscribeToGalleryImages,
+    uploadGalleryImage,
+    deleteGalleryImage,
   };
 
   return (

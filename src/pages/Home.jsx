@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HiArrowRight } from 'react-icons/hi';
-import { FaPalette, FaBullhorn, FaLaptopCode, FaQuoteLeft, FaPlay, FaTimes, FaExpand } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import { FaPalette, FaBullhorn, FaLaptopCode, FaQuoteLeft, FaExpand } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import Hero from '../components/Hero';
+import { staticGalleryImages, HOME_GALLERY_LIMIT } from '../lib/galleryImages';
 
 const services = [
   {
@@ -85,81 +86,8 @@ function CountUp({ target, suffix = '', duration = 1.8 }) {
   return <span ref={ref}>{count}{suffix}</span>;
 }
 
-const galleryImages = [
-  { src: '/images/IMG-20260703-WA0003.jpg', alt: 'Branding project' },
-  { src: '/images/IMG-20260703-WA0005.jpg', alt: 'Design work' },
-  { src: '/images/IMG-20260703-WA0006.jpg', alt: 'Signage project' },
-  { src: '/images/IMG-20260703-WA0007.jpg', alt: 'Creative design' },
-  { src: '/images/IMG-20260703-WA0008.jpg', alt: 'Logo concept' },
-  { src: '/images/IMG-20260703-WA0009.jpg', alt: 'Brand collateral' },
-  { src: '/images/IMG-20260703-WA0010~2.jpg', alt: 'Print material' },
-  { src: '/images/IMG-20260703-WA0011~3.jpg', alt: 'Digital design' },
-  { src: '/images/IMG-20260703-WA0013~2.jpg', alt: 'Product design' },
-  { src: '/images/IMG-20260703-WA0014~2.jpg', alt: 'Brand guideline' },
-  { src: '/images/IMG-20260703-WA0034.jpg', alt: 'Identity design' },
-  { src: '/images/IMG-20260703-WA0038.jpg', alt: 'Packaging work' },
-  { src: '/images/IMG-20260703-WA0039.jpg', alt: 'Visual identity' },
-  { src: '/images/IMG-20260703-WA0040~2.jpg', alt: 'Marketing design' },
-  { src: '/images/IMG-20260703-WA0044~2.jpg', alt: 'Campaign creative' },
-];
-
-const galleryVideos = [
-  '/videos/VID-1.mp4',
-  '/videos/VID-2.mp4',
-  '/videos/VID-3.mp4',
-  '/videos/VID-4.mp4',
-  '/videos/VID-5.mp4',
-  '/videos/VID-6.mp4',
-  '/videos/VID-7.mp4',
-  '/videos/VID-8.mp4',
-  '/videos/VID-9.mp4',
-  '/videos/VID-10.mp4',
-  '/videos/VID-11.mp4',
-  '/videos/VID-12.mp4',
-  '/videos/VID-13.mp4',
-  '/videos/VID-14.mp4',
-  '/videos/VID-15.mp4',
-  '/videos/VID-16.mp4',
-  '/videos/VID-17.mp4',
-  '/videos/VID-18.mp4',
-  '/videos/VID-19.mp4',
-  '/videos/VID-20.mp4',
-  '/videos/VID-21.mp4',
-];
-
 export default function Home() {
-  const [videoModal, setVideoModal] = useState({ open: false, src: '' });
-  const videoRef = useRef(null);
-  const marqueeRef = useRef(null);
-  const dragState = useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
-
-  const handleDragStart = (e) => {
-    const el = marqueeRef.current;
-    if (!el) return;
-    dragState.current = { isDragging: true, startX: e.pageX || e.touches?.[0]?.pageX || 0, scrollLeft: el.scrollLeft };
-    el.classList.add('paused');
-  };
-
-  const handleDragMove = (e) => {
-    if (!dragState.current.isDragging) return;
-    e.preventDefault();
-    const el = marqueeRef.current;
-    if (!el) return;
-    const x = e.pageX || e.touches?.[0]?.pageX || 0;
-    const walk = (dragState.current.startX - x) * 1.5;
-    el.scrollLeft = dragState.current.scrollLeft + walk;
-  };
-
-  const handleDragEnd = () => {
-    dragState.current.isDragging = false;
-    if (marqueeRef.current) marqueeRef.current.classList.remove('paused');
-  };
-
-  const openVideoModal = (src) => setVideoModal({ open: true, src });
-  const closeVideoModal = () => {
-    if (videoRef.current) { videoRef.current.pause(); videoRef.current.currentTime = 0; }
-    setVideoModal({ open: false, src: '' });
-  };
+  const featuredImages = staticGalleryImages.slice(0, HOME_GALLERY_LIMIT);
 
   return (
     <div>
@@ -254,153 +182,61 @@ export default function Home() {
               A glimpse into our work
             </h2>
             <p className="text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Projects we&apos;ve brought to life across industries.
+              Real designs we&apos;ve brought to life for our clients.
             </p>
           </motion.div>
 
-          {/* Images Bento Grid */}
           <motion.div
-            className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-20 auto-rows-[140px] sm:auto-rows-[180px]"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            {galleryImages.map((img, i) => {
-              const isLarge = i % 7 === 0;
-              const isWide = i % 5 === 2;
-              const isTall = i % 4 === 1;
-              return (
-                <motion.div
-                  key={i}
-                  custom={i % 6}
-                  variants={itemVariants}
-                  className={`group relative rounded-2xl overflow-hidden cursor-pointer ${
-                    isLarge ? 'col-span-2 row-span-2' :
-                    isWide ? 'col-span-2' :
-                    isTall ? 'row-span-2' : ''
-                  }`}
-                >
-                  <div className="relative w-full h-full overflow-hidden rounded-2xl" style={{ border: '1px solid var(--border-default)' }}>
-                    <img
-                      src={img.src}
-                      alt={img.alt}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute inset-0 flex items-end p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                      <div className="flex items-center gap-2">
-                        <FaExpand className="text-white/80 text-xs" />
-                        <span className="text-white text-sm font-medium">{img.alt}</span>
-                      </div>
+            {featuredImages.map((img, i) => (
+              <motion.div
+                key={`${img.src}-${i}`}
+                variants={itemVariants}
+                className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
+                style={{ border: '1px solid var(--border-default)' }}
+              >
+                <div className="relative w-full h-full overflow-hidden rounded-2xl">
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 flex items-end p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                    <div className="flex items-center gap-2">
+                      <FaExpand className="text-white/80 text-xs" />
+                      <span className="text-white text-sm font-medium line-clamp-1">{img.alt}</span>
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
 
-          {/* Videos Section */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            className="flex justify-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h3 className="text-3xl sm:text-4xl mb-3" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}>
-              Video highlights
-            </h3>
-            <p className="text-lg mb-12" style={{ color: 'var(--text-secondary)' }}>
-              Watch our creative process in action.
-            </p>
-            <div
-              ref={marqueeRef}
-              className="video-marquee-wrap"
-              onMouseDown={handleDragStart}
-              onMouseMove={handleDragMove}
-              onMouseUp={handleDragEnd}
-              onMouseLeave={handleDragEnd}
-              onTouchStart={handleDragStart}
-              onTouchMove={handleDragMove}
-              onTouchEnd={handleDragEnd}
+            <Link
+              to="/gallery"
+              className="inline-flex items-center gap-2 px-7 py-3 font-semibold rounded-xl transition-all duration-200 pressable"
+              style={{ background: 'var(--color-accent)', color: 'white' }}
             >
-              <div className="video-marquee-track">
-                {[...galleryVideos, ...galleryVideos].map((src, i) => (
-                  <div
-                    key={i}
-                    className="video-marquee-item group relative rounded-xl overflow-hidden cursor-pointer flex-shrink-0"
-                    onClick={() => openVideoModal(src)}
-                  >
-                    <video
-                      src={src}
-                      className="w-full h-full object-cover"
-                      muted
-                      preload="metadata"
-                      onMouseEnter={(e) => e.target.play()}
-                      onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/5 group-hover:from-black/30 transition-all duration-400" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-400"
-                        style={{ background: 'hsl(0 0% 100% / 0.12)', backdropFilter: 'blur(8px)', border: '1px solid hsl(0 0% 100% / 0.15)' }}
-                      >
-                        <FaPlay className="text-white text-sm ml-0.5" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+              View More
+              <HiArrowRight />
+            </Link>
           </motion.div>
         </div>
       </section>
-
-      {/* ===== VIDEO MODAL ===== */}
-      <AnimatePresence>
-        {videoModal.open && (
-          <motion.div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <motion.div
-              className="absolute inset-0"
-              style={{ background: 'hsl(0 0% 5% / 0.85)', backdropFilter: 'blur(8px)' }}
-              onClick={closeVideoModal}
-            />
-            <motion.div
-              className="relative w-full max-w-2xl z-10"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <button
-                onClick={closeVideoModal}
-                className="absolute -top-12 right-0 w-9 h-9 rounded-full flex items-center justify-center text-white transition-all duration-200 cursor-pointer z-20"
-                style={{ background: 'hsl(0 0% 100% / 0.1)', border: '1px solid hsl(0 0% 100% / 0.15)' }}
-              >
-                <FaTimes className="text-sm" />
-              </button>
-              <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid hsl(0 0% 100% / 0.08)', boxShadow: '0 25px 50px hsl(0 0% 0% / 0.5)' }}>
-                <video
-                  ref={videoRef}
-                  src={videoModal.src}
-                  className="w-full aspect-video object-cover"
-                  style={{ background: 'black' }}
-                  controls
-                  autoPlay
-                  playsInline
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ===== TESTIMONIALS ===== */}
       <section className="py-24 md:py-32">

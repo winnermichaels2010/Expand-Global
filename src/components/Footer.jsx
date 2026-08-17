@@ -87,7 +87,7 @@ export default function Footer() {
               {[
                 { icon: HiMail, value: 'esenichijindu53@gmail.com' },
                 { icon: HiPhone, value: '+2348160740145' },
-                { icon: HiLocationMarker, value: 'Lagos, Nigeria' },
+                { icon: HiLocationMarker, value: 'Aba, Nigeria' },
               ].map(({ icon: Icon, value }) => (
                 <li key={value} className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   <Icon className="text-[var(--color-accent-muted)] text-sm flex-shrink-0" />

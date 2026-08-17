@@ -1,13 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaCheckCircle, FaDownload, FaFile, FaCommentDots, FaClipboardCheck } from 'react-icons/fa';
+import { FaCheckCircle, FaDownload, FaFile, FaImage, FaCommentDots, FaClipboardCheck } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
 import MessageThread from '../components/MessageThread';
 
 function isImage(url) {
   return /\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(url);
+}
+
+function parseSubmittedFiles(req) {
+  if (req.submittedFiles) return req.submittedFiles;
+  if (!req.submittedFileUrl) return [];
+  try {
+    const parsed = JSON.parse(req.submittedFileUrl);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {
+    // legacy single-file format
+  }
+  return [{ url: req.submittedFileUrl, name: req.submittedFileName || 'Finished design file' }];
 }
 
 export default function CompletedProjects() {
@@ -115,33 +127,37 @@ export default function CompletedProjects() {
                       Finished Design
                     </div>
                     <div className="p-4 space-y-3">
-                      {isImage(req.submittedFileUrl) ? (
-                        <a
-                          href={req.submittedFileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block rounded-xl overflow-hidden hover-lift"
-                        >
-                          <img
-                            src={req.submittedFileUrl}
-                            alt="Finished design"
-                            className="w-full max-h-80 object-contain rounded-xl"
-                          />
-                        </a>
-                      ) : (
-                        <a
-                          href={req.submittedFileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-4 rounded-xl"
-                          style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
-                        >
-                          <FaFile style={{ color: 'var(--color-accent)' }} />
-                          <span className="text-xs font-medium truncate">
-                            {req.submittedFileName || 'Finished design file'}
-                          </span>
-                        </a>
-                      )}
+                      {parseSubmittedFiles(req).map((file, idx) => (
+                        <div key={idx}>
+                          {isImage(file.url) ? (
+                            <a
+                              href={file.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block rounded-xl overflow-hidden hover-lift"
+                            >
+                              <img
+                                src={file.url}
+                                alt={file.name || 'Finished design'}
+                                className="w-full max-h-80 object-contain rounded-xl"
+                              />
+                            </a>
+                          ) : (
+                            <a
+                              href={file.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-3 p-4 rounded-xl"
+                              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
+                            >
+                              {isImage(file.url) ? <FaImage style={{ color: 'var(--color-accent)' }} /> : <FaFile style={{ color: 'var(--color-accent)' }} />}
+                              <span className="text-xs font-medium truncate">
+                                {file.name || 'Finished design file'}
+                              </span>
+                            </a>
+                          )}
+                        </div>
+                      ))}
                       {req.submittedMessage && (
                         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                           {req.submittedMessage}
@@ -152,15 +168,20 @@ export default function CompletedProjects() {
                           Submitted on {new Date(req.submittedAt).toLocaleString()}
                         </p>
                       )}
-                      <a
-                        href={req.submittedFileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white"
-                        style={{ background: 'var(--color-accent)' }}
-                      >
-                        <FaDownload /> Download
-                      </a>
+                      <div className="flex flex-wrap gap-2">
+                        {parseSubmittedFiles(req).map((file, idx) => (
+                          <a
+                            key={idx}
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white"
+                            style={{ background: 'var(--color-accent)' }}
+                          >
+                            <FaDownload /> {file.name || 'Download'}
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   </div>
 

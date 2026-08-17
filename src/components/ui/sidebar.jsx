@@ -14,6 +14,7 @@ import {
   Sun,
   Moon,
   XCircle,
+  Images,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -27,6 +28,7 @@ const navItems = [
   { name: 'Active Projects', path: '/admin/projects/active', icon: Hammer },
   { name: 'Pending Requests', path: '/admin/projects/pending', icon: Clock },
   { name: 'Finished Projects', path: '/admin/projects/finished', icon: BadgeCheck },
+  { name: 'Gallery', path: '/admin/gallery', icon: Images },
 ];
 
 // eslint-disable-next-line react/prop-types

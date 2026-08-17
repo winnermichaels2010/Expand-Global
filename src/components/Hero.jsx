@@ -4,13 +4,12 @@ import { HiArrowRight, HiSparkles } from 'react-icons/hi';
 import { motion, useInView } from 'framer-motion';
 
 const heroImages = [
-  { src: '/images/IMG-20260703-WA0003.jpg', alt: 'Branding project' },
-  { src: '/images/IMG-20260703-WA0006.jpg', alt: 'Signage design' },
-  { src: '/images/IMG-20260703-WA0008.jpg', alt: 'Logo design' },
-  { src: '/images/IMG-20260703-WA0010~2.jpg', alt: 'Print design' },
-  { src: '/images/IMG-20260703-WA0034.jpg', alt: 'Brand identity' },
-  { src: '/images/IMG-20260703-WA0038.jpg', alt: 'Packaging design' },
-  { src: '/images/IMG-20260703-WA0044~2.jpg', alt: 'Visual identity' },
+  { src: '/homepage-media-files/IMG-20260814-WA0001.jpg', alt: 'Branding project' },
+  { src: '/homepage-media-files/IMG-20260814-WA0003.jpg', alt: 'Signage design' },
+  { src: '/homepage-media-files/IMG-20260814-WA0008.jpg', alt: 'Logo design' },
+  { src: '/homepage-media-files/IMG-20260817-WA0000.jpg', alt: 'Brand identity' },
+  { src: '/homepage-media-files/IMG-20260817-WA0001.jpg', alt: 'Creative design' },
+  { src: '/homepage-media-files/IMG-20260817-WA0002.jpg', alt: 'Visual identity' },
 ];
 
 const containerVariants = {

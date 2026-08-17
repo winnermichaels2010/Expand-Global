@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaPalette, FaClipboardCheck, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight, FaTimesCircle } from 'react-icons/fa';
+import { FaTachometerAlt, FaPalette, FaClipboardCheck, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight, FaTimesCircle, FaImages } from 'react-icons/fa';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,7 @@ const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: FaTachometerAlt },
   { name: 'Request Design', path: '/request-design', icon: FaPalette },
   { name: 'Completed Projects', path: '/completed-projects', icon: FaClipboardCheck },
+  { name: 'Gallery', path: '/gallery', icon: FaImages },
   { name: 'Rejected Requests', path: '/rejected-projects', icon: FaTimesCircle },
 ];
 

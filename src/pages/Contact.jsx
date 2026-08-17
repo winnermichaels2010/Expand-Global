@@ -18,7 +18,7 @@ const itemVariants = {
 const contactDetails = [
   { icon: HiMail, label: 'Email', value: 'esenichijindu53@gmail.com', href: 'mailto:esenichijindu53@gmail.com' },
   { icon: HiPhone, label: 'Phone', value: '+234 816 074 0145', href: 'tel:+2348160740145' },
-  { icon: HiLocationMarker, label: 'Location', value: 'Lagos, Nigeria', href: null },
+  { icon: HiLocationMarker, label: 'Location', value: 'Aba, Nigeria', href: null },
   { icon: HiClock, label: 'Response Time', value: 'Within 24 hours', href: null },
 ];
 

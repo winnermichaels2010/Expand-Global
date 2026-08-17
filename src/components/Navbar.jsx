@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const publicLinks = [
   { name: 'Home', path: '/' },
   { name: 'About', path: '/about' },
+  { name: 'Gallery', path: '/gallery' },
   { name: 'Contact', path: '/contact' },
   { name: 'Terms', path: '/terms' },
 ];

@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard';
 import RequestDesign from './pages/RequestDesign';
 import CompletedProjects from './pages/CompletedProjects';
 import RejectedProjects from './pages/RejectedProjects';
+import Gallery from './pages/Gallery';
 import AdminLayout from './layouts/AdminLayout';
 import UserLayout from './layouts/UserLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -38,11 +39,23 @@ function HomeRedirect() {
   return <Home />;
 }
 
+function GalleryRoute() {
+  const { currentUser } = useAuth();
+  if (currentUser) {
+    return currentUser.email === 'adminemail@gmail.com'
+      ? <Navigate to="/admin/gallery" replace />
+      : <UserLayout><Gallery /></UserLayout>;
+  }
+  return <Gallery />;
+}
+
 function AppLayout() {
   const location = useLocation();
+  const { currentUser } = useAuth();
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isUserRoute = ['/dashboard', '/request-design', '/completed-projects', '/rejected-projects'].includes(location.pathname);
-  const showPublicLayout = !isAdminRoute && !isUserRoute;
+  const isAuthedGallery = location.pathname === '/gallery' && !!currentUser;
+  const showPublicLayout = !isAdminRoute && !isUserRoute && !isAuthedGallery;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -54,6 +67,7 @@ function AppLayout() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/gallery" element={<GalleryRoute />} />
           <Route path="/auth" element={<Auth />} />
 
           <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
@@ -65,6 +79,7 @@ function AppLayout() {
           <Route path="/admin/projects/finished" element={<AdminLayout><AdminProjects variant="finished" /></AdminLayout>} />
           <Route path="/admin/projects/submit/:id" element={<AdminLayout><AdminSubmitProject mode="submit" /></AdminLayout>} />
           <Route path="/admin/projects/view/:id" element={<AdminLayout><AdminSubmitProject mode="view" /></AdminLayout>} />
+          <Route path="/admin/gallery" element={<AdminLayout><Gallery /></AdminLayout>} />
 
           <Route path="/dashboard" element={<UserLayout><Dashboard /></UserLayout>} />
           <Route path="/request-design" element={<UserLayout><RequestDesign /></UserLayout>} />

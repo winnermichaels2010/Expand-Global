@@ -79,6 +79,16 @@ alter table public.messages
   add column if not exists deleted_by_label text,
   add column if not exists deleted_for uuid[] not null default '{}';
 
+-- Public gallery of work done for clients (admin uploads new images)
+create table if not exists public.gallery_images (
+  id uuid primary key default gen_random_uuid(),
+  url text not null,
+  name text,
+  uploaded_by uuid references public.profiles (id) on delete set null,
+  source text not null default 'upload',
+  created_at timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------------------
 -- Indexes
 -- ---------------------------------------------------------------------------
@@ -89,6 +99,7 @@ create index if not exists notifications_user_id_idx on public.notifications (us
 create index if not exists notifications_created_at_idx on public.notifications (created_at);
 create index if not exists messages_design_request_id_idx on public.messages (design_request_id);
 create index if not exists messages_created_at_idx on public.messages (created_at);
+create index if not exists gallery_images_created_at_idx on public.gallery_images (created_at);
 
 -- ---------------------------------------------------------------------------
 -- Functions
@@ -186,6 +197,28 @@ alter table public.profiles enable row level security;
 alter table public.design_requests enable row level security;
 alter table public.notifications enable row level security;
 alter table public.messages enable row level security;
+alter table public.gallery_images enable row level security;
+
+-- The gallery is public so anyone can view the work we've done for clients.
+-- Only the admin can add or remove images.
+drop policy if exists "gallery_images_select" on public.gallery_images;
+create policy "gallery_images_select" on public.gallery_images
+  for select using (true);
+
+drop policy if exists "gallery_images_insert" on public.gallery_images;
+create policy "gallery_images_insert" on public.gallery_images
+  for insert with check (public.is_admin());
+
+drop policy if exists "gallery_images_update" on public.gallery_images;
+create policy "gallery_images_update" on public.gallery_images
+  for update using (public.is_admin());
+
+drop policy if exists "gallery_images_delete" on public.gallery_images;
+create policy "gallery_images_delete" on public.gallery_images
+  for delete using (public.is_admin());
+
+grant select on public.gallery_images to anon, authenticated;
+grant insert, update, delete on public.gallery_images to authenticated;
 
 -- profiles
 drop policy if exists "profiles_select" on public.profiles;
@@ -335,8 +368,35 @@ create policy "project-files-auth-delete" on storage.objects
   );
 
 -- ---------------------------------------------------------------------------
+-- Storage: public gallery images
+-- ---------------------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('gallery-images', 'gallery-images', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "gallery-images-public-read" on storage.objects;
+create policy "gallery-images-public-read" on storage.objects
+  for select using (bucket_id = 'gallery-images');
+
+drop policy if exists "gallery-images-admin-upload" on storage.objects;
+create policy "gallery-images-admin-upload" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'gallery-images' and public.is_admin());
+
+drop policy if exists "gallery-images-admin-update" on storage.objects;
+create policy "gallery-images-admin-update" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'gallery-images' and public.is_admin());
+
+drop policy if exists "gallery-images-admin-delete" on storage.objects;
+create policy "gallery-images-admin-delete" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'gallery-images' and public.is_admin());
+
+-- ---------------------------------------------------------------------------
 -- Realtime (used by the dashboard, notification panel, and message threads)
 -- ---------------------------------------------------------------------------
 alter publication supabase_realtime add table public.design_requests;
 alter publication supabase_realtime add table public.notifications;
 alter publication supabase_realtime add table public.messages;
+alter publication supabase_realtime add table public.gallery_images;

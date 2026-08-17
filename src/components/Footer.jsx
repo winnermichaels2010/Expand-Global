@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FaInstagram, FaBehance, FaDribbble, FaLinkedin } from 'react-icons/fa';
+import { FaInstagram } from 'react-icons/fa';
 import { HiMail, HiPhone, HiLocationMarker } from 'react-icons/hi';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -117,34 +117,25 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-            <div className="flex items-center gap-2 mt-5">
-              {[
-                { icon: FaInstagram, label: 'Instagram' },
-                { icon: FaBehance, label: 'Behance' },
-                { icon: FaDribbble, label: 'Dribbble' },
-                { icon: FaLinkedin, label: 'LinkedIn' },
-              ].map(({ icon: Icon, label }) => (
-                <a
-                  key={label}
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg transition-all duration-200"
-                  style={{ color: 'var(--text-tertiary)' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'var(--color-accent)';
-                    e.currentTarget.style.background = 'var(--color-accent-light)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--text-tertiary)';
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                  aria-label={label}
-                >
-                  <Icon size={14} />
-                </a>
-              ))}
-            </div>
+            <a
+              href="https://www.instagram.com/expandcolours?igsh=cnkzZ3pyMWpzMGs5"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 group"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--color-accent)';
+                e.currentTarget.style.background = 'var(--color-accent-light)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.background = 'transparent';
+              }}
+              aria-label="See our work on Instagram"
+            >
+              <FaInstagram size={14} />
+              See our work on Instagram
+            </a>
           </motion.div>
         </div>
 

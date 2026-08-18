@@ -90,8 +90,16 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    const totalKobo = Math.round(Number(request.standard_price) * 100);
-    if (!totalKobo || totalKobo <= 0) {
+    const rawPrice = request.standard_price;
+    if (rawPrice === null || rawPrice === undefined) {
+      return new Response(
+        JSON.stringify({ error: "Project price has not been set. Please contact the admin." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const totalKobo = Math.round(Number(rawPrice) * 100);
+    if (!Number.isFinite(totalKobo) || totalKobo <= 0) {
       return new Response(
         JSON.stringify({ error: "Invalid project price" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -92,6 +92,12 @@ export default function RemainingPayment() {
       return;
     }
 
+    const price = Number(request.standardPrice);
+    if (!price || !Number.isFinite(price) || price <= 0) {
+      setError('Project price is not set or invalid. Please contact the admin.');
+      return;
+    }
+
     setProcessing(true);
 
     try {
@@ -107,6 +113,12 @@ export default function RemainingPayment() {
         return;
       }
 
+      if (!initData.access_code || !initData.reference) {
+        setError('Payment initialization returned incomplete data. Please try again.');
+        setProcessing(false);
+        return;
+      }
+
       const PaystackPop = await loadPaystackScript();
       if (!PaystackPop) {
         setError('Failed to load payment gateway. Please refresh and try again.');
@@ -116,9 +128,7 @@ export default function RemainingPayment() {
 
       const handler = PaystackPop.setup({
         key: PAYSTACK_KEY,
-        email: currentUser.email,
-        amount: initData.amount_kobo,
-        currency: 'NGN',
+        access_code: initData.access_code,
         ref: initData.reference,
         metadata: {
           custom_fields: [

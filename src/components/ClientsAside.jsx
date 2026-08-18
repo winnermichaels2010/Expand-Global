@@ -8,7 +8,7 @@ import MessageThread from './MessageThread';
 import ProfileAvatar from './ProfileAvatar';
 
 export default function ClientsAside({ open, onClose, initial = null }) {
-  const { getRegisteredUsers, getDesignRequests, rejectDesignRequest, ADMIN_EMAIL } = useAuth();
+  const { getRegisteredUsers, getDesignRequests, rejectDesignRequest, ADMIN_EMAIL, getUnreadMessageCounts, markMessagesAsRead } = useAuth();
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +23,7 @@ export default function ClientsAside({ open, onClose, initial = null }) {
   const [rejectingBusy, setRejectingBusy] = useState(false);
   const [asideToast, setAsideToast] = useState(null);
   const [viewportHeight, setViewportHeight] = useState('100vh');
+  const [unreadCounts, setUnreadCounts] = useState({});
   const touchStart = useRef(null);
   const infoRef = useRef(null);
   const toastTimer = useRef(null);
@@ -121,6 +122,19 @@ export default function ClientsAside({ open, onClose, initial = null }) {
     });
     return () => { mounted = false; };
   }, [selectedClient, getDesignRequests]);
+
+  useEffect(() => {
+    if (projects.length === 0) { setUnreadCounts({}); return; }
+    let mounted = true;
+    async function fetch() {
+      const ids = projects.map((p) => p.id);
+      const counts = await getUnreadMessageCounts(ids);
+      if (mounted) setUnreadCounts(counts);
+    }
+    fetch();
+    const interval = setInterval(fetch, 8000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, [projects, getUnreadMessageCounts]);
 
   useEffect(() => {
     if (!open || !initial?.projectId) return;
@@ -446,7 +460,7 @@ export default function ClientsAside({ open, onClose, initial = null }) {
               [...projects].reverse().map((request) => (
                 <button
                   key={request.id}
-                  onClick={() => setSelectedProject(request)}
+                  onClick={() => { setSelectedProject(request); markMessagesAsRead(request.id).then(() => { getUnreadMessageCounts(projects.map((p) => p.id)).then(setUnreadCounts); }); }}
                   className="w-full text-left p-3 rounded-xl transition-all duration-200 cursor-pointer hover-lift pressable"
                   style={{
                     background: 'var(--bg-primary)',
@@ -457,7 +471,17 @@ export default function ClientsAside({ open, onClose, initial = null }) {
                     <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                       {request.service || 'Design request'}
                     </p>
-                    <StatusBadge status={request.status} />
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {unreadCounts[request.id] > 0 && (
+                        <span
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white min-w-[18px] text-center"
+                          style={{ background: '#ef4444' }}
+                        >
+                          {unreadCounts[request.id]}
+                        </span>
+                      )}
+                      <StatusBadge status={request.status} />
+                    </div>
                   </div>
                   <p className="text-[10px] mb-1" style={{ color: 'var(--text-tertiary)' }}>
                     {new Date(request.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}

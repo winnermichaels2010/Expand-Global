@@ -39,8 +39,8 @@ export default function RejectedProjects() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
         <motion.div
-          className="p-5 sm:p-6 rounded-2xl glass-strong"
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+          className="p-5 sm:p-6 rounded-2xl "
+          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >

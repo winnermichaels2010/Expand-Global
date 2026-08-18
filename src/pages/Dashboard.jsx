@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import {
   FaCamera,
@@ -7,7 +7,6 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaClock,
-  FaCommentDots,
   FaPaperPlane,
   FaDownload,
   FaChartPie,
@@ -19,7 +18,6 @@ import {
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import PanelHeader from '../components/PanelHeader';
-import MessageThread from '../components/MessageThread';
 
 const statusMeta = {
   Pending: { color: '#f59e0b', icon: FaClock },
@@ -36,30 +34,13 @@ const statusOrder = ['Pending', 'In Progress', 'Accepted', 'Completed', 'Rejecte
 export default function Dashboard() {
   const { currentUser, updateProfilePicture, getUserProfile, subscribeToDesignRequests } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const threadParam = searchParams.get('thread');
   const [profile, setProfile] = useState(null);
   const [designRequests, setDesignRequests] = useState([]);
   const [showPhotoPopup, setShowPhotoPopup] = useState(false);
   const [showPhotoPreview, setShowPhotoPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
-  const [openThreadId, setOpenThreadId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('All');
-  const scrolledRef = useRef(null);
-
-  useEffect(() => {
-    if (!threadParam) return;
-    setOpenThreadId(threadParam);
-    if (scrolledRef.current === threadParam || designRequests.length === 0) return;
-    scrolledRef.current = threadParam;
-    const t = setTimeout(() => {
-      document
-        .getElementById(`request-${threadParam}`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 250);
-    return () => clearTimeout(t);
-  }, [threadParam, designRequests]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -281,8 +262,8 @@ export default function Dashboard() {
         {designRequests.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
             <motion.div
-              className="p-6 rounded-2xl glass-strong"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+              className="p-6 rounded-2xl "
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -324,8 +305,8 @@ export default function Dashboard() {
             </motion.div>
 
             <motion.div
-              className="p-6 rounded-2xl glass-strong"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+              className="p-6 rounded-2xl "
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
@@ -374,8 +355,8 @@ export default function Dashboard() {
             </motion.div>
 
             <motion.div
-              className="p-6 rounded-2xl glass-strong"
-              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+              className="p-6 rounded-2xl "
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -438,8 +419,8 @@ export default function Dashboard() {
 
         {/* Requests */}
         <motion.div
-          className="p-6 rounded-2xl glass-strong"
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+          className="p-6 rounded-2xl "
+          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -602,32 +583,6 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    {req.status === 'Pending' ? (
-                      <p className="text-xs pl-2" style={{ color: 'var(--text-tertiary)' }}>
-                        Chat becomes available once the admin accepts this project.
-                      </p>
-                    ) : (
-                      <div className="flex items-center gap-2 pl-2">
-                        <button
-                          onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
-                          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
-                          style={{
-                            background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--color-accent-light)',
-                            color: openThreadId === req.id ? '#fff' : 'var(--color-accent)',
-                            border: '1px solid ' + (openThreadId === req.id ? 'transparent' : 'hsl(262 60% 80%)'),
-                          }}
-                        >
-                          <FaCommentDots />
-                          {openThreadId === req.id ? 'Hide Messages' : 'Message Admin'}
-                        </button>
-                      </div>
-                    )}
-
-                    {openThreadId === req.id && (
-                      <div className="pl-2">
-                        <MessageThread designRequestId={req.id} />
-                      </div>
-                    )}
                   </motion.div>
                 );
               })}

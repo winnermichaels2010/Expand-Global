@@ -5,14 +5,16 @@ import { useAuth } from '../context/AuthContext';
 import StatusBadge from './StatusBadge';
 import MessageThread from './MessageThread';
 
-export default function MyRequestsAside({ open, onClose }) {
-  const { currentUser, subscribeToDesignRequests } = useAuth();
+export default function MyRequestsAside({ open, onClose, initial = null }) {
+  const { currentUser, subscribeToDesignRequests, getUnreadMessageCounts, markMessagesAsRead } = useAuth();
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [viewportHeight, setViewportHeight] = useState('100vh');
+  const [unreadCounts, setUnreadCounts] = useState({});
   const touchStart = useRef(null);
   const infoRef = useRef(null);
+  const appliedRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return;
@@ -67,6 +69,19 @@ export default function MyRequestsAside({ open, onClose }) {
   }, [currentUser, subscribeToDesignRequests]);
 
   useEffect(() => {
+    if (requests.length === 0) { setUnreadCounts({}); return; }
+    let mounted = true;
+    async function fetch() {
+      const ids = requests.map((r) => r.id);
+      const counts = await getUnreadMessageCounts(ids);
+      if (mounted) setUnreadCounts(counts);
+    }
+    fetch();
+    const interval = setInterval(fetch, 8000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, [requests, getUnreadMessageCounts]);
+
+  useEffect(() => {
     if (!selectedRequest) return;
     const fresh = requests.find((r) => r.id === selectedRequest.id);
     if (fresh) setSelectedRequest(fresh);
@@ -75,6 +90,17 @@ export default function MyRequestsAside({ open, onClose }) {
   useEffect(() => {
     if (!open) setSelectedRequest(null);
   }, [open]);
+
+  useEffect(() => {
+    if (!open || !initial?.requestId) return;
+    if (appliedRef.current === initial.nonce) return;
+    if (requests.length === 0) return;
+    const request = requests.find((r) => r.id === initial.requestId);
+    if (request) {
+      setSelectedRequest(request);
+      appliedRef.current = initial.nonce;
+    }
+  }, [open, initial, requests]);
 
   const backButton = (onBack, label) => (
     <button
@@ -270,7 +296,7 @@ export default function MyRequestsAside({ open, onClose }) {
               [...requests].reverse().map((request) => (
                 <button
                   key={request.id}
-                  onClick={() => setSelectedRequest(request)}
+                  onClick={() => { setSelectedRequest(request); markMessagesAsRead(request.id).then(() => { getUnreadMessageCounts(requests.map((r) => r.id)).then(setUnreadCounts); }); }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 cursor-pointer hover-lift text-left"
                   style={{
                     background: 'var(--bg-primary)',
@@ -292,6 +318,14 @@ export default function MyRequestsAside({ open, onClose }) {
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {unreadCounts[request.id] > 0 && (
+                      <span
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white min-w-[18px] text-center"
+                        style={{ background: '#ef4444' }}
+                      >
+                        {unreadCounts[request.id]}
+                      </span>
+                    )}
                     <StatusBadge status={request.status} />
                     <FaChevronRight className="text-[10px]" style={{ color: 'var(--text-tertiary)' }} />
                   </div>

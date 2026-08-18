@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaCreditCard, FaLock, FaCheckCircle, FaSpinner } from 'react-icons/fa';
+import { FaCreditCard, FaLock, FaCheckCircle, FaSpinner, FaDownload } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
 
@@ -48,7 +48,7 @@ function loadPaystackScript() {
   });
 }
 
-export default function Payment() {
+export default function RemainingPayment() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser, getDesignRequests, initializePayment, verifyPayment } = useAuth();
@@ -95,7 +95,7 @@ export default function Payment() {
     setProcessing(true);
 
     try {
-      const initData = await initializePayment(request.id, 'half');
+      const initData = await initializePayment(request.id, 'remaining');
       if (!initData) {
         setError('Failed to initialize payment. Please try again.');
         setProcessing(false);
@@ -195,14 +195,14 @@ export default function Payment() {
     );
   }
 
-  if (request.halfPaid) {
+  if (request.fullyPaid) {
     return (
       <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
         <PanelHeader
           title="Payment Complete"
-          subtitle="Your first payment has been received"
-          onBack={() => navigate('/active-requests')}
-          backLabel="Back to Active Requests"
+          subtitle="Your project is fully paid"
+          onBack={() => navigate('/completed-projects')}
+          backLabel="Back to Completed Projects"
         />
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
           <motion.div
@@ -218,17 +218,49 @@ export default function Payment() {
               <FaCheckCircle className="text-3xl" style={{ color: '#10b981' }} />
             </div>
             <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-              Payment Already Completed
+              Fully Paid
             </h2>
             <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-              You have already made the first payment for this project. The admin is now working on your design.
+              This project is fully paid. You can download your finished design.
             </p>
             <button
               onClick={() => navigate('/completed-projects')}
-              className="px-6 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
+              className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable mx-auto"
               style={{ background: 'var(--color-accent)' }}
             >
-              View Completed Projects
+              <FaDownload /> View & Download Design
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!request.halfPaid) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+        <PanelHeader
+          title="Payment Not Available"
+          subtitle="First payment has not been completed"
+          onBack={() => navigate('/active-requests')}
+          backLabel="Back to Active Requests"
+        />
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
+          <motion.div
+            className="p-8 rounded-2xl  text-center"
+            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+              You need to complete the first 50% payment before paying the remaining balance.
+            </p>
+            <button
+              onClick={() => navigate(`/payment/${request.id}`)}
+              className="px-6 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
+              style={{ background: '#059669' }}
+            >
+              Pay First Installment
             </button>
           </motion.div>
         </div>
@@ -237,15 +269,15 @@ export default function Payment() {
   }
 
   const price = Number(request.standardPrice) || 0;
-  const halfPrice = price / 2;
+  const remaining = price / 2;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <PanelHeader
-        title="Complete Payment"
-        subtitle="Pay 50% now to start your design project"
-        onBack={() => navigate('/active-requests')}
-        backLabel="Back to Active Requests"
+        title="Pay Remaining Balance"
+        subtitle="Pay the remaining 50% to download your finished design"
+        onBack={() => navigate('/completed-projects')}
+        backLabel="Back to Completed Projects"
       />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
@@ -268,22 +300,15 @@ export default function Payment() {
           >
             <div className="grid grid-cols-2 gap-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
               <span><strong>Service:</strong> {request.service}</span>
-              <span><strong>Phone:</strong> {request.phone || 'Not specified'}</span>
               <span><strong>Timeline:</strong> {request.timeline || 'Not specified'}</span>
-              <span><strong>Budget:</strong> {request.budget || 'Not specified'}</span>
             </div>
-            {request.description && (
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                <strong>Description:</strong> {request.description}
-              </p>
-            )}
           </div>
 
           <h2
             className="text-lg font-semibold mb-4"
             style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
           >
-            Payment Breakdown
+            Payment Summary
           </h2>
 
           <div className="space-y-3 mb-6">
@@ -293,58 +318,38 @@ export default function Payment() {
             >
               <div>
                 <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Total Project Price</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>Full amount for the design</p>
               </div>
               <span className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                 {'\u20A6'}{price.toLocaleString()}
               </span>
             </div>
 
-            <div className="flex items-center justify-center">
-              <div className="w-px h-4" style={{ background: 'var(--border-default)' }} />
-            </div>
-
             <div
               className="flex items-center justify-between p-4 rounded-xl"
-              style={{ background: '#0596691a', border: '1px solid #05966933' }}
+              style={{ background: '#10b9811a', border: '1px solid #10b98133' }}
             >
               <div>
-                <p className="text-sm font-medium" style={{ color: '#059669' }}>Pay Now (50%)</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
-                  First installment to begin the project
-                </p>
+                <p className="text-sm font-medium" style={{ color: '#10b981' }}>First Payment (Paid)</p>
               </div>
-              <span className="text-lg font-bold" style={{ color: '#059669' }}>
-                {'\u20A6'}{halfPrice.toLocaleString()}
+              <span className="text-sm font-bold" style={{ color: '#10b981' }}>
+                {'\u20A6'}{remaining.toLocaleString()}
               </span>
             </div>
 
             <div
               className="flex items-center justify-between p-4 rounded-xl"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
+              style={{ background: '#f59e0b1a', border: '1px solid #f59e0b33' }}
             >
               <div>
-                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Remaining (50%)</p>
+                <p className="text-sm font-medium" style={{ color: '#f59e0b' }}>Remaining Balance</p>
                 <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
-                  Pay after the admin submits the finished design
+                  Pay to download the finished design
                 </p>
               </div>
-              <span className="text-lg font-bold" style={{ color: 'var(--text-secondary)' }}>
-                {'\u20A6'}{halfPrice.toLocaleString()}
+              <span className="text-lg font-bold" style={{ color: '#f59e0b' }}>
+                {'\u20A6'}{remaining.toLocaleString()}
               </span>
             </div>
-          </div>
-
-          <div
-            className="p-4 rounded-xl mb-6 text-xs"
-            style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)' }}
-          >
-            <p className="mb-1"><strong>How it works:</strong></p>
-            <ol className="list-decimal list-inside space-y-1">
-              <li>Pay 50% of the project price now to confirm your order.</li>
-              <li>The admin will work on your design and submit the finished result.</li>
-              <li>The remaining 50% is payable when you download the final design.</li>
-            </ol>
           </div>
 
           {error && (
@@ -364,14 +369,14 @@ export default function Payment() {
               <FaCheckCircle className="text-3xl mx-auto mb-3" style={{ color: '#10b981' }} />
               <p className="text-sm font-medium mb-1" style={{ color: '#10b981' }}>Payment Successful!</p>
               <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-                Your first payment has been recorded. The admin will now work on your design.
+                Your project is now fully paid. You can download your finished design.
               </p>
               <button
                 onClick={() => navigate('/completed-projects')}
-                className="px-5 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
+                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable mx-auto"
                 style={{ background: '#10b981' }}
               >
-                View Projects
+                <FaDownload /> Download Design
               </button>
             </div>
           ) : (
@@ -379,9 +384,9 @@ export default function Payment() {
               onClick={handlePayment}
               disabled={processing}
               className="w-full flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer pressable"
-              style={{ background: '#059669' }}
-              onMouseEnter={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#047857'; }}
-              onMouseLeave={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#059669'; }}
+              style={{ background: '#f59e0b' }}
+              onMouseEnter={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#d97706'; }}
+              onMouseLeave={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#f59e0b'; }}
             >
               {processing ? (
                 <>
@@ -391,7 +396,7 @@ export default function Payment() {
               ) : (
                 <>
                   <FaCreditCard />
-                  Pay {'\u20A6'}{halfPrice.toLocaleString()} Now
+                  Pay {'\u20A6'}{remaining.toLocaleString()} Remaining
                 </>
               )}
             </button>

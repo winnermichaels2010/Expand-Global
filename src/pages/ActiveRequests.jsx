@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaSpinner, FaCreditCard, FaClock, FaCommentDots } from 'react-icons/fa';
+import { FaSpinner, FaCreditCard, FaClock } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
-import MessageThread from '../components/MessageThread';
 
 export default function ActiveRequests() {
   const { currentUser, subscribeToDesignRequests } = useAuth();
   const navigate = useNavigate();
   const [designRequests, setDesignRequests] = useState([]);
-  const [openThreadId, setOpenThreadId] = useState(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -46,8 +44,8 @@ export default function ActiveRequests() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
         <motion.div
-          className="p-5 sm:p-6 rounded-2xl glass-strong"
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+          className="p-5 sm:p-6 rounded-2xl "
+          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -152,25 +150,7 @@ export default function ActiveRequests() {
                           First Payment Completed
                         </span>
                       )}
-                      <button
-                        onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
-                        style={{
-                          background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--color-accent-light)',
-                          color: openThreadId === req.id ? '#fff' : 'var(--color-accent)',
-                          border: '1px solid ' + (openThreadId === req.id ? 'transparent' : 'hsl(262 60% 80%)'),
-                        }}
-                      >
-                        <FaCommentDots />
-                        {openThreadId === req.id ? 'Hide' : 'Message'}
-                      </button>
                     </div>
-
-                    {openThreadId === req.id && (
-                      <div className="pl-2 mt-3">
-                        <MessageThread designRequestId={req.id} />
-                      </div>
-                    )}
                   </motion.div>
                 );
               })}

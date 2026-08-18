@@ -101,11 +101,13 @@ export default function NotificationBell({ asideOpen = false }) {
     >
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center justify-center w-11 h-11 rounded-full text-white shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+        className="relative flex items-center justify-center w-11 h-11 rounded-xl text-white transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
         style={{
-          background: 'linear-gradient(135deg, hsl(262 83% 55%) 0%, hsl(263 70% 40%) 100%)',
-          border: '2px solid hsl(0 0% 100% / 0.9)',
-          boxShadow: '0 8px 20px hsl(262 83% 55% / 0.35)',
+          background: 'hsl(0 0% 100% / 0.15)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid hsl(0 0% 100% / 0.25)',
+          boxShadow: '0 4px 15px hsl(262 83% 55% / 0.3)',
         }}
         aria-label="Notifications"
         title="Notifications"
@@ -119,7 +121,7 @@ export default function NotificationBell({ asideOpen = false }) {
             />
             <span
               className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-              style={{ background: '#ef4444', border: '2px solid hsl(0 0% 100% / 0.9)' }}
+              style={{ background: '#ef4444', border: '2px solid hsl(262 83% 55%)' }}
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
@@ -133,7 +135,7 @@ export default function NotificationBell({ asideOpen = false }) {
           style={{
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border-default)',
-            boxShadow: 'var(--shadow-xl)',
+            boxShadow: '0 20px 60px -15px hsl(262 83% 55% / 0.2), 0 8px 24px -8px rgba(0,0,0,0.25)',
           }}
         >
           <div

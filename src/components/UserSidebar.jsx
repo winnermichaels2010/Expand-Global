@@ -65,12 +65,17 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
       {/* Mobile Brand Bar */}
       <div
         className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 pr-28 h-14"
-        style={{ background: 'linear-gradient(90deg, hsl(262 83% 55%) 0%, hsl(263 70% 42%) 100%)' }}
+        style={{
+          background: 'linear-gradient(135deg, hsl(262 83% 55% / 0.95) 0%, hsl(263 70% 42% / 0.95) 100%)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid hsl(0 0% 100% / 0.1)',
+        }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"
-            style={{ background: 'hsl(0 0% 100% / 0.15)', border: '1px solid hsl(0 0% 100% / 0.25)' }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"
+            style={{ background: 'hsl(0 0% 100% / 0.18)', border: '1px solid hsl(0 0% 100% / 0.2)' }}
           >
             <img src="/expand-global-logo.jpg" alt="Expand Global" className="w-full h-full object-cover" />
           </div>
@@ -78,30 +83,44 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
             Expand Global
           </span>
         </div>
-        <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-white/70">
+        <span className="text-[10px] font-semibold tracking-[0.18em] uppercase" style={{ color: 'hsl(0 0% 100% / 0.6)' }}>
           My Account
         </span>
       </div>
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-3 right-16 z-[60] md:hidden p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer pressable hover:bg-white/90 ${
+        className={`fixed top-3 right-16 z-[60] md:hidden p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
           requestsOpen ? 'hidden' : ''
         }`}
+        style={{
+          background: 'hsl(0 0% 100% / 0.15)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid hsl(0 0% 100% / 0.25)',
+          boxShadow: '0 4px 15px hsl(262 83% 55% / 0.3)',
+        }}
         aria-label="Toggle sidebar"
       >
-        {isOpen ? <HiX size={22} /> : <HiMenu size={22} />}
+        {isOpen ? <HiX size={20} /> : <HiMenu size={20} />}
       </button>
 
       <button
         onClick={onToggleRequests}
-        className={`fixed top-3 right-4 z-[60] lg:hidden p-2.5 rounded-xl bg-white text-[var(--color-accent)] shadow-lg transition-colors duration-200 cursor-pointer pressable hover:bg-white/90 ${
+        className={`fixed top-3 right-4 z-[60] lg:hidden p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
           requestsOpen ? 'hidden' : ''
         }`}
+        style={{
+          background: 'hsl(0 0% 100% / 0.15)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid hsl(0 0% 100% / 0.25)',
+          boxShadow: '0 4px 15px hsl(262 83% 55% / 0.3)',
+        }}
         aria-label={requestsOpen ? 'Close my requests' : 'Open my requests'}
         title={requestsOpen ? 'Close my requests' : 'My Requests'}
       >
-        {requestsOpen ? <FaChevronLeft size={20} /> : <FaChevronRight size={20} />}
+        {requestsOpen ? <FaChevronLeft size={18} /> : <FaChevronRight size={18} />}
       </button>
 
       <AnimatePresence>

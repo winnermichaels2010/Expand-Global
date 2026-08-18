@@ -13,6 +13,7 @@ export default function UserLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [isRequestsOpen, setIsRequestsOpen] = useState(false);
+  const [asideInitial, setAsideInitial] = useState(null);
   const touchStart = useRef(null);
 
   useEffect(() => {
@@ -26,6 +27,18 @@ export default function UserLayout({ children }) {
   useEffect(() => {
     setIsRequestsOpen(false);
   }, [location.pathname]);
+
+  const searchParams = new URLSearchParams(location.search);
+  const threadParam = searchParams.get('thread');
+
+  useEffect(() => {
+    if (!threadParam) return;
+    setAsideInitial({
+      requestId: threadParam,
+      nonce: `${location.search}-${Date.now()}`,
+    });
+    setIsRequestsOpen(true);
+  }, [location.search, threadParam]);
 
   if (!currentUser) {
     return (
@@ -64,6 +77,7 @@ export default function UserLayout({ children }) {
       <MyRequestsAside
         open={isRequestsOpen}
         onClose={() => setIsRequestsOpen(false)}
+        initial={asideInitial}
       />
       <NotificationBell asideOpen={isRequestsOpen} />
       <div

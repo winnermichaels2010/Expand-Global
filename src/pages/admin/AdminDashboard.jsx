@@ -115,7 +115,7 @@ export default function AdminDashboard() {
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
@@ -130,19 +130,23 @@ export default function AdminDashboard() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
               }}
-              className="p-5 rounded-2xl glass-strong hover-lift"
+              className="p-4 sm:p-5 rounded-2xl hover-lift group cursor-default"
               style={{
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-default)',
+                boxShadow: '0 4px 20px -4px rgba(0,0,0,0.1)',
               }}
             >
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
-                style={{ background: card.iconBg }}
+                className="w-11 h-11 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110"
+                style={{
+                  background: `linear-gradient(135deg, ${card.iconBg}dd, ${card.iconBg})`,
+                  boxShadow: `0 4px 14px -3px ${card.iconBg}55`,
+                }}
               >
-                <card.icon className="text-white text-lg" />
+                <card.icon className="text-white text-base" />
               </div>
-              <p className="text-2xl font-bold">{card.value}</p>
+              <p className="text-2xl font-bold tracking-tight">{card.value}</p>
               <p className="label-caps mt-1">{card.label}</p>
             </motion.div>
           ))}
@@ -150,12 +154,13 @@ export default function AdminDashboard() {
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div
-            className="lg:col-span-2 p-6 rounded-2xl glass-strong"
+            className="lg:col-span-2 p-6 rounded-2xl"
             style={{
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-default)',
+              boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)',
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -198,10 +203,11 @@ export default function AdminDashboard() {
           </motion.div>
 
           <motion.div
-            className="p-6 rounded-2xl glass-strong"
+            className="p-6 rounded-2xl"
             style={{
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-default)',
+              boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)',
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -248,10 +254,11 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <motion.div
-              className="p-6 rounded-2xl glass-strong"
+              className="p-6 rounded-2xl"
               style={{
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-default)',
+                boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)',
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -340,10 +347,11 @@ export default function AdminDashboard() {
 
           <div>
             <motion.div
-              className="p-6 rounded-2xl glass-strong"
+              className="p-6 rounded-2xl"
               style={{
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-default)',
+                boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)',
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

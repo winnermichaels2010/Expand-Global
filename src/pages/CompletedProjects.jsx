@@ -59,8 +59,8 @@ export default function CompletedProjects() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
         <motion.div
-          className="p-5 sm:p-6 rounded-2xl glass-strong"
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+          className="p-5 sm:p-6 rounded-2xl "
+          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -81,7 +81,7 @@ export default function CompletedProjects() {
           ) : (
             <div className="space-y-4">
               {finished.map((req) => {
-                const paid = !!req.halfPaid;
+                const paid = !!req.halfPaid && !!req.fullyPaid;
                 const price = Number(req.standardPrice) || 0;
                 const remaining = price / 2;
 
@@ -166,7 +166,7 @@ export default function CompletedProjects() {
                                       Complete payment to view the full design
                                     </p>
                                     <button
-                                      onClick={() => navigate(`/active-requests`)}
+                                      onClick={() => navigate(`/pay-remaining/${req.id}`)}
                                       className="flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white cursor-pointer pressable"
                                       style={{ background: '#059669' }}
                                     >
@@ -215,7 +215,7 @@ export default function CompletedProjects() {
                             ) : (
                               <button
                                 key={idx}
-                                onClick={() => navigate('/active-requests')}
+                                onClick={() => navigate(`/pay-remaining/${req.id}`)}
                                 className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white cursor-pointer pressable"
                                 style={{ background: '#059669' }}
                               >
@@ -239,7 +239,7 @@ export default function CompletedProjects() {
                           </p>
                         </div>
                         <button
-                          onClick={() => navigate('/active-requests')}
+                          onClick={() => navigate(`/pay-remaining/${req.id}`)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-white cursor-pointer pressable flex-shrink-0"
                           style={{ background: '#f59e0b' }}
                         >

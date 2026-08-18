@@ -48,6 +48,10 @@ alter table public.design_requests
 alter table public.design_requests
   add column if not exists half_paid boolean not null default false;
 
+-- Fully-paid tracking for second payment (also safe to re-run)
+alter table public.design_requests
+  add column if not exists fully_paid boolean not null default false;
+
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
@@ -93,6 +97,21 @@ create table if not exists public.gallery_images (
   created_at timestamptz not null default now()
 );
 
+-- Payments audit table for idempotent server-side verification
+create table if not exists public.payments (
+  id uuid primary key default gen_random_uuid(),
+  design_request_id uuid not null references public.design_requests (id) on delete cascade,
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  paystack_reference text not null unique,
+  amount_kobo integer not null,
+  currency text not null default 'NGN',
+  payment_type text not null check (payment_type in ('half', 'remaining')),
+  verified boolean not null default false,
+  verified_at timestamptz,
+  paystack_response jsonb,
+  created_at timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------------------
 -- Indexes
 -- ---------------------------------------------------------------------------
@@ -104,6 +123,9 @@ create index if not exists notifications_created_at_idx on public.notifications 
 create index if not exists messages_design_request_id_idx on public.messages (design_request_id);
 create index if not exists messages_created_at_idx on public.messages (created_at);
 create index if not exists gallery_images_created_at_idx on public.gallery_images (created_at);
+create index if not exists payments_design_request_id_idx on public.payments (design_request_id);
+create index if not exists payments_user_id_idx on public.payments (user_id);
+create index if not exists payments_reference_idx on public.payments (paystack_reference);
 
 -- ---------------------------------------------------------------------------
 -- Functions
@@ -202,6 +224,7 @@ alter table public.design_requests enable row level security;
 alter table public.notifications enable row level security;
 alter table public.messages enable row level security;
 alter table public.gallery_images enable row level security;
+alter table public.payments enable row level security;
 
 -- The gallery is public so anyone can view the work we've done for clients.
 -- Only the admin can add or remove images.
@@ -300,6 +323,23 @@ create policy "messages_update" on public.messages
 drop policy if exists "messages_delete" on public.messages;
 create policy "messages_delete" on public.messages
   for delete using (sender_id = auth.uid() or public.is_admin());
+
+-- payments
+drop policy if exists "payments_select_owner_or_admin" on public.payments;
+create policy "payments_select_owner_or_admin" on public.payments
+  for select using (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists "payments_insert_auth" on public.payments;
+create policy "payments_insert_auth" on public.payments
+  for insert with check (auth.role() = 'authenticated' and user_id = auth.uid());
+
+drop policy if exists "payments_update_admin" on public.payments;
+create policy "payments_update_admin" on public.payments
+  for update using (public.is_admin() or user_id = auth.uid());
+
+grant select, insert, update on public.payments to authenticated;
+grant all on public.payments to service_role;
+grant select, update on public.design_requests to service_role;
 
 -- ---------------------------------------------------------------------------
 -- Storage: profile pictures
@@ -404,3 +444,4 @@ alter publication supabase_realtime add table public.design_requests;
 alter publication supabase_realtime add table public.notifications;
 alter publication supabase_realtime add table public.messages;
 alter publication supabase_realtime add table public.gallery_images;
+alter publication supabase_realtime add table public.payments;

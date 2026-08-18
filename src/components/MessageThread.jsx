@@ -9,6 +9,7 @@ export default function MessageThread({ designRequestId, fill = false }) {
     currentUser,
     sendMessage,
     subscribeToMessages,
+    markMessagesAsRead,
     getUserProfile,
     deleteMessageForEveryone,
     deleteMessageForMe,
@@ -36,6 +37,11 @@ export default function MessageThread({ designRequestId, fill = false }) {
     const unsub = subscribeToMessages(designRequestId, setMessages);
     return unsub;
   }, [designRequestId, subscribeToMessages]);
+
+  useEffect(() => {
+    if (!designRequestId) return;
+    markMessagesAsRead(designRequestId);
+  }, [designRequestId, markMessagesAsRead]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

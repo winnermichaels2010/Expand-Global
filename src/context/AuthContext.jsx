@@ -50,6 +50,7 @@ function mapRequest(row) {
     submittedMessage: row.submitted_message,
     submittedAt: row.submitted_at,
     halfPaid: row.half_paid,
+    fullyPaid: row.fully_paid,
     createdAt: row.created_at,
   };
 }
@@ -75,6 +76,7 @@ function toRequestWrite(data) {
   if (data.submittedMessage !== undefined) payload.submitted_message = data.submittedMessage;
   if (data.submittedAt !== undefined) payload.submitted_at = data.submittedAt;
   if (data.halfPaid !== undefined) payload.half_paid = data.halfPaid;
+  if (data.fullyPaid !== undefined) payload.fully_paid = data.fullyPaid;
   return payload;
 }
 
@@ -471,6 +473,56 @@ export function AuthProvider({ children }) {
     return true;
   }
 
+  // ---------- Payment Edge Functions ----------
+
+  async function initializePayment(requestId, paymentType) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const res = await fetch(`${supabaseUrl}/functions/v1/initialize-payment`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ request_id: requestId, payment_type: paymentType }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Payment initialization failed');
+      return data;
+    } catch (err) {
+      console.error('initializePayment error:', err);
+      throw err;
+    }
+  }
+
+  async function verifyPayment(reference) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const res = await fetch(`${supabaseUrl}/functions/v1/verify-payment`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reference }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Payment verification failed');
+      return data;
+    } catch (err) {
+      console.error('verifyPayment error:', err);
+      throw err;
+    }
+  }
+
   async function toggleUserStatus(userId) {
     try {
       const { data, error } = await supabase
@@ -668,6 +720,42 @@ export function AuthProvider({ children }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchAll)
       .subscribe();
     return () => supabase.removeChannel(channel);
+  }
+
+  async function markMessagesAsRead(designRequestId) {
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('design_request_id', designRequestId)
+        .eq('read', false)
+        .neq('sender_id', currentUser.id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Failed to mark messages as read:', err);
+    }
+  }
+
+  async function getUnreadMessageCounts(designRequestIds) {
+    try {
+      if (!designRequestIds.length) return {};
+      const { data, error } = await supabase
+        .from('messages')
+        .select('design_request_id')
+        .in('design_request_id', designRequestIds)
+        .eq('read', false)
+        .neq('sender_id', currentUser.id)
+        .eq('deleted', false);
+      if (error) throw error;
+      const counts = {};
+      (data || []).forEach((row) => {
+        counts[row.design_request_id] = (counts[row.design_request_id] || 0) + 1;
+      });
+      return counts;
+    } catch (err) {
+      console.error('Failed to get unread message counts:', err);
+      return {};
+    }
   }
 
   async function deleteMessageForEveryone(messageId, deleterLabel) {
@@ -868,6 +956,8 @@ export function AuthProvider({ children }) {
     uploadProjectFile,
     submitProject,
     processHalfPayment,
+    initializePayment,
+    verifyPayment,
     toggleUserStatus,
     ADMIN_EMAIL,
     getNotifications,
@@ -880,6 +970,8 @@ export function AuthProvider({ children }) {
     subscribeToNotifications,
     sendMessage,
     subscribeToMessages,
+    markMessagesAsRead,
+    getUnreadMessageCounts,
     deleteMessageForEveryone,
     deleteMessageForMe,
     getGalleryImages,

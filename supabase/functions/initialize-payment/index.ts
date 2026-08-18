@@ -14,14 +14,6 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const paystackSecretKey = Deno.env.get("PAYSTACK_SECRET_KEY");
-
-    if (!paystackSecretKey) {
-      return new Response(
-        JSON.stringify({ error: "Payment system not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -150,35 +142,6 @@ serve(async (req: Request): Promise<Response> => {
 
     const reference = `EG-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-    const paystackResponse = await fetch("https://api.paystack.co/transaction/initialize", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${paystackSecretKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: request.email || user.email,
-        amount: amountKobo,
-        currency: "NGN",
-        reference,
-        metadata: {
-          request_id: request.id,
-          payment_type: payment_type,
-          service: request.service,
-        },
-        callback_url: `${Deno.env.get("SITE_URL") || "https://expandglobal.online"}/payment/callback`,
-      }),
-    });
-
-    const paystackData = await paystackResponse.json();
-
-    if (!paystackData.status) {
-      return new Response(
-        JSON.stringify({ error: "Payment initialization failed", details: paystackData.message }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     await supabaseAdmin.from("payments").insert({
       design_request_id: request_id,
       user_id: user.id,
@@ -191,9 +154,7 @@ serve(async (req: Request): Promise<Response> => {
 
     return new Response(
       JSON.stringify({
-        authorization_url: paystackData.data.authorization_url,
-        reference: paystackData.data.reference,
-        access_code: paystackData.data.access_code,
+        reference,
         amount_kobo: amountKobo,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }

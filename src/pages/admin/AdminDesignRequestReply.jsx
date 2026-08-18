@@ -40,7 +40,7 @@ export default function AdminDesignRequestReply() {
     setSubmitting(true);
     await acceptDesignRequest(id, { price: amount, adminComment });
     setSubmitting(false);
-    navigate('/admin/design-requests');
+    navigate('/admin/projects/pending');
   }
 
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
@@ -75,8 +75,8 @@ export default function AdminDesignRequestReply() {
       <PanelHeader
         title="Reply to Request"
         subtitle="Review project details and set pricing"
-        onBack={() => navigate('/admin/design-requests')}
-        backLabel="Back to Design Requests"
+        onBack={() => navigate('/admin/projects/pending')}
+        backLabel="Back to Pending Requests"
       />
 
       <div className="px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8 max-w-3xl mx-auto">
@@ -193,7 +193,7 @@ export default function AdminDesignRequestReply() {
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => navigate('/admin/design-requests')}
+                onClick={() => navigate('/admin/projects/pending')}
                 className="px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
                 style={{
                   background: 'var(--bg-tertiary)',

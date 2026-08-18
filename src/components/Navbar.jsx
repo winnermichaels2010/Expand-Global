@@ -21,7 +21,7 @@ const userLinks = [
 
 const adminLinks = [
   { name: 'Dashboard', path: '/admin' },
-  { name: 'Requests', path: '/admin/design-requests' },
+  { name: 'Pending Requests', path: '/admin/projects/pending' },
 ];
 
 export default function Navbar() {
@@ -33,7 +33,7 @@ export default function Navbar() {
   const navbarRef = useRef(null);
 
   const isActive = (path) => location.pathname === path;
-  const isAdmin = currentUser?.email === 'adminemail@gmail.com';
+  const isAdmin = currentUser?.email === 'winnermichael21dev@gmail.com';
 
   const links = !currentUser
     ? publicLinks

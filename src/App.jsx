@@ -20,7 +20,6 @@ import Gallery from './pages/Gallery';
 import AdminLayout from './layouts/AdminLayout';
 import UserLayout from './layouts/UserLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminDesignRequests from './pages/admin/AdminDesignRequests';
 import AdminDesignRequestReply from './pages/admin/AdminDesignRequestReply';
 import AdminRejectedRequests from './pages/admin/AdminRejectedRequests';
 import AdminProjects from './pages/admin/AdminProjects';
@@ -36,7 +35,7 @@ function HomeRedirect() {
   const { currentUser, loading } = useAuth();
   if (loading) return null;
   if (currentUser) {
-    const isAdmin = currentUser.email === 'adminemail@gmail.com';
+    const isAdmin = currentUser.email === 'winnermichael21dev@gmail.com';
     return <Navigate to={isAdmin ? '/admin' : '/dashboard'} replace />;
   }
   return <Home />;
@@ -45,7 +44,7 @@ function HomeRedirect() {
 function GalleryRoute() {
   const { currentUser } = useAuth();
   if (currentUser) {
-    return currentUser.email === 'adminemail@gmail.com'
+    return currentUser.email === 'winnermichael21dev@gmail.com'
       ? <Navigate to="/admin/gallery" replace />
       : <UserLayout><Gallery /></UserLayout>;
   }
@@ -74,12 +73,11 @@ function AppLayout() {
           <Route path="/auth" element={<Auth />} />
 
           <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-          <Route path="/admin/design-requests" element={<AdminLayout><AdminDesignRequests /></AdminLayout>} />
-          <Route path="/admin/design-requests/rejected" element={<AdminLayout><AdminRejectedRequests /></AdminLayout>} />
-          <Route path="/admin/design-requests/reply/:id" element={<AdminLayout><AdminDesignRequestReply /></AdminLayout>} />
           <Route path="/admin/projects/active" element={<AdminLayout><AdminProjects variant="active" /></AdminLayout>} />
           <Route path="/admin/projects/pending" element={<AdminLayout><AdminProjects variant="pending" /></AdminLayout>} />
           <Route path="/admin/projects/finished" element={<AdminLayout><AdminProjects variant="finished" /></AdminLayout>} />
+          <Route path="/admin/projects/rejected" element={<AdminLayout><AdminRejectedRequests /></AdminLayout>} />
+          <Route path="/admin/projects/reply/:id" element={<AdminLayout><AdminDesignRequestReply /></AdminLayout>} />
           <Route path="/admin/projects/submit/:id" element={<AdminLayout><AdminSubmitProject mode="submit" /></AdminLayout>} />
           <Route path="/admin/projects/view/:id" element={<AdminLayout><AdminSubmitProject mode="view" /></AdminLayout>} />
           <Route path="/admin/gallery" element={<AdminLayout><Gallery /></AdminLayout>} />

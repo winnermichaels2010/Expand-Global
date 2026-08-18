@@ -4,7 +4,6 @@ import {
   Menu,
   X,
   LayoutDashboard,
-  Palette,
   Hammer,
   Clock,
   BadgeCheck,
@@ -23,11 +22,10 @@ import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-  { name: 'Design Requests', path: '/admin/design-requests', icon: Palette },
-  { name: 'Rejected Requests', path: '/admin/design-requests/rejected', icon: XCircle },
   { name: 'Active Projects', path: '/admin/projects/active', icon: Hammer },
   { name: 'Pending Requests', path: '/admin/projects/pending', icon: Clock },
   { name: 'Finished Projects', path: '/admin/projects/finished', icon: BadgeCheck },
+  { name: 'Rejected Requests', path: '/admin/projects/rejected', icon: XCircle },
   { name: 'Gallery', path: '/admin/gallery', icon: Images },
 ];
 

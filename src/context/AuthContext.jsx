@@ -298,7 +298,7 @@ export function AuthProvider({ children }) {
           adminProfile.id,
           `New design request from ${request.name || 'a user'} (${request.service})`,
           'design_request',
-          requestId ? `/admin/design-requests/reply/${requestId}` : '/admin/design-requests'
+          requestId ? `/admin/projects/reply/${requestId}` : '/admin/projects/pending'
         );
       }
     } catch (err) {

@@ -354,7 +354,7 @@ export default function ClientsAside({ open, onClose, initial = null }) {
                     This request is awaiting your review.
                   </p>
                   <button
-                    onClick={() => navigate(`/admin/design-requests/reply/${selectedProject.id}`)}
+                    onClick={() => navigate(`/admin/projects/reply/${selectedProject.id}`)}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-white transition-all duration-200 cursor-pointer pressable"
                     style={{ background: '#059669' }}
                   >

@@ -113,7 +113,7 @@ export default function RemainingPayment() {
         return;
       }
 
-      if (!initData.access_code || !initData.reference) {
+      if (!initData.reference) {
         setError('Payment initialization returned incomplete data. Please try again.');
         setProcessing(false);
         return;
@@ -128,7 +128,9 @@ export default function RemainingPayment() {
 
       const handler = PaystackPop.setup({
         key: PAYSTACK_KEY,
-        access_code: initData.access_code,
+        email: currentUser.email,
+        amount: initData.amount_kobo,
+        currency: 'NGN',
         ref: initData.reference,
         metadata: {
           custom_fields: [

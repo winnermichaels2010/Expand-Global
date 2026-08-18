@@ -21,7 +21,7 @@ const userLinks = [
 
 const adminLinks = [
   { name: 'Dashboard', path: '/admin' },
-  { name: 'Design Requests', path: '/admin/design-requests' },
+  { name: 'Pending Requests', path: '/admin/projects/pending' },
   { name: 'Gallery', path: '/admin/gallery' },
   { name: 'Finished Projects', path: '/admin/projects/finished' },
 ];
@@ -29,7 +29,7 @@ const adminLinks = [
 export default function Footer() {
   const { currentUser } = useAuth();
   const location = useLocation();
-  const isAdmin = currentUser?.email === 'adminemail@gmail.com';
+  const isAdmin = currentUser?.email === 'winnermichael21dev@gmail.com';
   const isActive = (path) => location.pathname === path;
 
   const navLinks = !currentUser ? publicLinks : isAdmin ? adminLinks : userLinks;

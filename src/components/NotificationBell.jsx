@@ -77,7 +77,7 @@ export default function NotificationBell({ asideOpen = false }) {
     if (n.link) return n.link;
     const isAdmin = currentUser?.email === ADMIN_EMAIL;
     if (n.type === 'message') return isAdmin ? '/admin' : '/dashboard';
-    if (n.type === 'design_request') return isAdmin ? '/admin/design-requests' : '/dashboard';
+    if (n.type === 'design_request') return isAdmin ? '/admin/projects/pending' : '/dashboard';
     return isAdmin ? '/admin' : '/dashboard';
   }
 

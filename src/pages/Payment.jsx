@@ -236,11 +236,11 @@ export default function Payment() {
               You have already made the first payment for this project. The admin is now working on your design.
             </p>
             <button
-              onClick={() => navigate('/completed-projects')}
+              onClick={() => navigate('/half-paid-requests')}
               className="px-6 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
               style={{ background: 'var(--color-accent)' }}
             >
-              View Completed Projects
+              View Half Paid Requests
             </button>
           </motion.div>
         </div>
@@ -379,11 +379,11 @@ export default function Payment() {
                 Your first payment has been recorded. The admin will now work on your design.
               </p>
               <button
-                onClick={() => navigate('/completed-projects')}
+                onClick={() => navigate('/half-paid-requests')}
                 className="px-5 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
                 style={{ background: '#10b981' }}
               >
-                View Projects
+                View Half Paid Requests
               </button>
             </div>
           ) : (

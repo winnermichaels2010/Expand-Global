@@ -15,6 +15,7 @@ import CompletedProjects from './pages/CompletedProjects';
 import ActiveRequests from './pages/ActiveRequests';
 import Payment from './pages/Payment';
 import RemainingPayment from './pages/RemainingPayment';
+import HalfPaidRequests from './pages/HalfPaidRequests';
 import RejectedProjects from './pages/RejectedProjects';
 import Gallery from './pages/Gallery';
 import AdminLayout from './layouts/AdminLayout';
@@ -55,7 +56,7 @@ function AppLayout() {
   const location = useLocation();
   const { currentUser } = useAuth();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isUserRoute = ['/dashboard', '/request-design', '/completed-projects', '/active-requests', '/rejected-projects'].includes(location.pathname) || location.pathname.startsWith('/payment/') || location.pathname.startsWith('/pay-remaining/');
+  const isUserRoute = ['/dashboard', '/request-design', '/completed-projects', '/active-requests', '/half-paid-requests', '/rejected-projects'].includes(location.pathname) || location.pathname.startsWith('/payment/') || location.pathname.startsWith('/pay-remaining/');
   const isAuthedGallery = location.pathname === '/gallery' && !!currentUser;
   const showPublicLayout = !isAdminRoute && !isUserRoute && !isAuthedGallery;
 
@@ -86,6 +87,7 @@ function AppLayout() {
           <Route path="/request-design" element={<UserLayout><RequestDesign /></UserLayout>} />
           <Route path="/completed-projects" element={<UserLayout><CompletedProjects /></UserLayout>} />
           <Route path="/active-requests" element={<UserLayout><ActiveRequests /></UserLayout>} />
+          <Route path="/half-paid-requests" element={<UserLayout><HalfPaidRequests /></UserLayout>} />
           <Route path="/payment/:id" element={<UserLayout><Payment /></UserLayout>} />
           <Route path="/pay-remaining/:id" element={<UserLayout><RemainingPayment /></UserLayout>} />
           <Route path="/rejected-projects" element={<UserLayout><RejectedProjects /></UserLayout>} />

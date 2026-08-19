@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClipboardList, FaChevronRight, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { FaClipboardList, FaChevronRight, FaCheck, FaTimes, FaExclamationTriangle, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import PanelHeader from '../../components/PanelHeader';
 import StatusBadge from '../../components/StatusBadge';
@@ -144,7 +144,22 @@ export default function AdminProjects({ variant = 'active' }) {
                         </p>
                       </div>
                     </div>
-                    <StatusBadge status={request.status} />
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <StatusBadge status={request.status} />
+                      {variant === 'active' && (
+                        <span
+                          className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium"
+                          style={
+                            request.halfPaid
+                              ? { background: '#10b9811a', color: '#10b981', border: '1px solid #10b98133' }
+                              : { background: '#f59e0b1a', color: '#f59e0b', border: '1px solid #f59e0b33' }
+                          }
+                        >
+                          {request.halfPaid ? <FaCheckCircle className="text-[8px]" /> : <FaTimesCircle className="text-[8px]" />}
+                          {request.halfPaid ? 'Paid' : 'Unpaid'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div
                     className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] mb-1.5"
@@ -163,6 +178,11 @@ export default function AdminProjects({ variant = 'active' }) {
                     <div className="mt-1.5 text-[10px] space-y-0.5" style={{ color: '#059669' }}>
                       <p><strong>Price:</strong> ₦{request.standardPrice?.toLocaleString()}</p>
                       {request.adminComment && <p className="line-clamp-1"><strong>Comment:</strong> {request.adminComment}</p>}
+                      {variant === 'active' && !request.halfPaid && (
+                        <p style={{ color: '#f59e0b' }}>
+                          <strong>Payment:</strong> Awaiting first payment (50% — ₦{((Number(request.standardPrice) || 0) / 2).toLocaleString()})
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -196,12 +216,16 @@ export default function AdminProjects({ variant = 'active' }) {
                     ) : (
                       <button
                         onClick={() => navigate(config.button.path(request.id))}
-                        className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-medium rounded-md transition-all duration-200 cursor-pointer pressable"
+                        disabled={variant === 'active' && !request.halfPaid}
+                        className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-medium rounded-md transition-all duration-200 cursor-pointer pressable disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
                         style={
                           variant === 'active'
-                            ? { background: '#059669', color: '#ffffff' }
+                            ? request.halfPaid
+                              ? { background: '#059669', color: '#ffffff' }
+                              : { background: '#9ca3af', color: '#ffffff' }
                             : { background: 'var(--color-accent-light)', color: 'var(--color-accent)' }
                         }
+                        title={variant === 'active' && !request.halfPaid ? 'Client has not made the first payment yet' : ''}
                       >
                         {config.button.label} <FaChevronRight className="text-[8px]" />
                       </button>

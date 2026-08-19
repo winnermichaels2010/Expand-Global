@@ -390,12 +390,20 @@ export function AuthProvider({ children }) {
   }
 
   async function uploadProjectFile(file) {
+    if (!currentUser?.id) {
+      console.error('uploadProjectFile: No authenticated user');
+      return null;
+    }
     try {
-      const path = `${currentUser?.id}/${Date.now()}-${file.name}`;
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `${currentUser.id}/${Date.now()}-${safeName}`;
       const { error: uploadError } = await supabase.storage
         .from('project-files')
         .upload(path, file, { upsert: true });
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError.message, uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('project-files')
@@ -403,7 +411,7 @@ export function AuthProvider({ children }) {
 
       return { url: publicUrl, name: file.name };
     } catch (err) {
-      console.error('Failed to upload project file:', err);
+      console.error('Failed to upload project file:', err.message || err);
       return null;
     }
   }
@@ -478,7 +486,7 @@ export function AuthProvider({ children }) {
   async function initializePayment(requestId, paymentType) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      if (!session) throw new Error('Not authenticated. Please log in again.');
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const res = await fetch(`${supabaseUrl}/functions/v1/initialize-payment`, {
@@ -491,10 +499,14 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Payment initialization failed');
+      if (!res.ok) {
+        const errMsg = data.error || data.detail || `Server error (${res.status})`;
+        console.error('initializePayment failed:', res.status, data);
+        throw new Error(errMsg);
+      }
       return data;
     } catch (err) {
-      console.error('initializePayment error:', err);
+      console.error('initializePayment error:', err.message || err);
       throw err;
     }
   }
@@ -502,7 +514,7 @@ export function AuthProvider({ children }) {
   async function verifyPayment(reference) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      if (!session) throw new Error('Not authenticated. Please log in again.');
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const res = await fetch(`${supabaseUrl}/functions/v1/verify-payment`, {
@@ -515,10 +527,14 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Payment verification failed');
+      if (!res.ok) {
+        const errMsg = data.error || `Verification failed (${res.status})`;
+        console.error('verifyPayment failed:', res.status, data);
+        throw new Error(errMsg);
+      }
       return data;
     } catch (err) {
-      console.error('verifyPayment error:', err);
+      console.error('verifyPayment error:', err.message || err);
       throw err;
     }
   }

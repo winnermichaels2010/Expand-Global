@@ -4,49 +4,9 @@ import { motion } from 'framer-motion';
 import { FaCreditCard, FaLock, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
+import { loadPaystackScript } from '../lib/paystack';
 
 const PAYSTACK_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '';
-
-function loadPaystackScript() {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('Paystack script timed out. Check your connection or disable ad blockers.'));
-    }, 10000);
-
-    if (window.PaystackPop && typeof window.PaystackPop.setup === 'function') {
-      clearTimeout(timeout);
-      resolve(window.PaystackPop);
-      return;
-    }
-
-    const existing = document.getElementById('paystack-script');
-    if (existing) {
-      if (window.PaystackPop && typeof window.PaystackPop.setup === 'function') {
-        clearTimeout(timeout);
-        resolve(window.PaystackPop);
-        return;
-      }
-      existing.remove();
-    }
-
-    const script = document.createElement('script');
-    script.id = 'paystack-script';
-    script.src = 'https://js.paystack.co/v1/inline.js';
-    script.onload = () => {
-      clearTimeout(timeout);
-      if (window.PaystackPop && typeof window.PaystackPop.setup === 'function') {
-        resolve(window.PaystackPop);
-      } else {
-        reject(new Error('Paystack failed to initialize. Disable ad blockers and try again.'));
-      }
-    };
-    script.onerror = () => {
-      clearTimeout(timeout);
-      reject(new Error('Failed to load Paystack script. Check your connection.'));
-    };
-    document.head.appendChild(script);
-  });
-}
 
 export default function Payment() {
   const { id } = useParams();
@@ -184,8 +144,14 @@ export default function Payment() {
       const msg = err?.message || 'Unknown error';
       if (msg.includes('already')) {
         setSuccess(true);
+      } else if (msg.includes('not configured') || msg.includes('PAYSTACK')) {
+        setError('Payment system is not configured. Please contact the admin.');
+      } else if (msg.includes('not authenticated') || msg.includes('Unauthorized')) {
+        setError('Your session expired. Please log in again.');
+      } else if (msg.includes('not eligible') || msg.includes('not been set')) {
+        setError(msg + '. Please contact the admin.');
       } else {
-        setError('Could not start payment: ' + msg + '. Please try again.');
+        setError('Could not start payment: ' + msg);
       }
       setProcessing(false);
     }

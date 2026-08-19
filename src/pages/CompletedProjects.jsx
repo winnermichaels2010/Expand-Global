@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaCheckCircle, FaDownload, FaFile, FaImage, FaCommentDots, FaClipboardCheck, FaCreditCard, FaLock } from 'react-icons/fa';
+import { FaCheckCircle, FaDownload, FaFile, FaImage, FaClipboardCheck, FaCreditCard, FaLock } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
-import MessageThread from '../components/MessageThread';
 
 function isImage(url) {
   return /\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(url);
@@ -46,7 +45,6 @@ export default function CompletedProjects() {
   const { currentUser, subscribeToDesignRequests } = useAuth();
   const navigate = useNavigate();
   const [designRequests, setDesignRequests] = useState([]);
-  const [openThreadId, setOpenThreadId] = useState(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -60,7 +58,7 @@ export default function CompletedProjects() {
     return unsub;
   }, [currentUser, subscribeToDesignRequests]);
 
-  const finished = [...designRequests].reverse();
+  const finished = designRequests;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
@@ -283,28 +281,19 @@ export default function CompletedProjects() {
                           Download Design
                         </button>
                       ) : (
-                        <>
-                          <button
-                            onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
-                            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
-                            style={{
-                              background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--color-accent-light)',
-                              color: openThreadId === req.id ? '#fff' : 'var(--color-accent)',
-                              border: '1px solid ' + (openThreadId === req.id ? 'transparent' : 'hsl(262 60% 80%)'),
-                            }}
-                          >
-                            <FaCommentDots />
-                            {openThreadId === req.id ? 'Hide Messages' : 'Message Admin'}
-                          </button>
-                        </>
+                        <button
+                          onClick={() => navigate(`/pay-remaining/${req.id}`)}
+                          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
+                          style={{
+                            background: '#059669',
+                            color: '#fff',
+                            border: '1px solid transparent',
+                          }}
+                        >
+                          <FaCreditCard /> Pay to Unlock
+                        </button>
                       )}
                     </div>
-
-                    {!paid && openThreadId === req.id && (
-                      <div className="pl-2">
-                        <MessageThread designRequestId={req.id} />
-                      </div>
-                    )}
                   </motion.div>
                 );
               })}

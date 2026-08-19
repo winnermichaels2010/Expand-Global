@@ -108,7 +108,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-2.5">
+          <div className="hidden lg:flex items-center gap-2.5">
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all duration-200 cursor-pointer"
@@ -124,7 +124,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <div className="md:hidden flex items-center gap-1.5">
+          <div className="lg:hidden flex items-center gap-1.5">
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors duration-200 cursor-pointer"
@@ -150,7 +150,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-[72px] left-4 right-4 sm:left-6 sm:right-6 rounded-2xl glass shadow-xl overflow-hidden md:hidden"
+            className="absolute top-[72px] left-4 right-4 sm:left-6 sm:right-6 rounded-2xl glass shadow-xl overflow-hidden lg:hidden"
             style={{ border: '1px solid var(--border-default)' }}
           >
             <div className="p-3 space-y-0.5">
@@ -168,15 +168,25 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <div className="pt-1.5 mt-1.5" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+
+              {currentUser && (
                 <Link
-                  to={currentUser ? (isAdmin ? '/admin' : '/dashboard') : '/auth'}
+                  to={isAdmin ? '/admin' : '/dashboard'}
                   onClick={() => setMobileOpen(false)}
-                  className="block px-4 py-2.5 rounded-xl text-sm font-semibold text-white text-center bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] transition-all duration-200"
+                  className="hidden sm:inline-flex items-center justify-center w-full px-4 py-2.5 mt-2 rounded-xl text-sm font-semibold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-all duration-200"
                 >
-                  {currentUser ? (isAdmin ? 'Admin Panel' : 'My Account') : 'Get Started'}
+                  {isAdmin ? 'Admin Panel' : 'My Account'}
                 </Link>
-              </div>
+              )}
+              {!currentUser && (
+                <Link
+                  to="/auth"
+                  onClick={() => setMobileOpen(false)}
+                  className="hidden sm:inline-flex items-center justify-center w-full px-4 py-2.5 mt-2 rounded-xl text-sm font-semibold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-all duration-200"
+                >
+                  Get Started
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

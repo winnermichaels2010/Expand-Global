@@ -22,6 +22,26 @@ function parseSubmittedFiles(req) {
   return [{ url: req.submittedFileUrl, name: req.submittedFileName || 'Finished design file' }];
 }
 
+async function handleDownload(req) {
+  const files = parseSubmittedFiles(req);
+  for (const file of files) {
+    try {
+      const response = await fetch(file.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name || 'design-file';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      window.open(file.url, '_blank');
+    }
+  }
+}
+
 export default function CompletedProjects() {
   const { currentUser, subscribeToDesignRequests } = useAuth();
   const navigate = useNavigate();
@@ -249,21 +269,38 @@ export default function CompletedProjects() {
                     )}
 
                     <div className="flex items-center gap-2 pl-2">
-                      <button
-                        onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
-                        style={{
-                          background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--color-accent-light)',
-                          color: openThreadId === req.id ? '#fff' : 'var(--color-accent)',
-                          border: '1px solid ' + (openThreadId === req.id ? 'transparent' : 'hsl(262 60% 80%)'),
-                        }}
-                      >
-                        <FaCommentDots />
-                        {openThreadId === req.id ? 'Hide Messages' : 'Message Admin'}
-                      </button>
+                      {paid ? (
+                        <button
+                          onClick={() => handleDownload(req)}
+                          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
+                          style={{
+                            background: 'var(--color-accent)',
+                            color: '#fff',
+                            border: '1px solid transparent',
+                          }}
+                        >
+                          <FaDownload />
+                          Download Design
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setOpenThreadId(openThreadId === req.id ? null : req.id)}
+                            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
+                            style={{
+                              background: openThreadId === req.id ? 'var(--color-accent)' : 'var(--color-accent-light)',
+                              color: openThreadId === req.id ? '#fff' : 'var(--color-accent)',
+                              border: '1px solid ' + (openThreadId === req.id ? 'transparent' : 'hsl(262 60% 80%)'),
+                            }}
+                          >
+                            <FaCommentDots />
+                            {openThreadId === req.id ? 'Hide Messages' : 'Message Admin'}
+                          </button>
+                        </>
+                      )}
                     </div>
 
-                    {openThreadId === req.id && (
+                    {!paid && openThreadId === req.id && (
                       <div className="pl-2">
                         <MessageThread designRequestId={req.id} />
                       </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaPalette, FaClipboardCheck, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight, FaTimesCircle, FaImages, FaSpinner, FaMoneyBillWave } from 'react-icons/fa';
+import { FaTachometerAlt, FaPalette, FaClipboardCheck, FaTimesCircle, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight, FaImages, FaSpinner, FaMoneyBillWave } from 'react-icons/fa';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -12,10 +12,10 @@ const navLinks = [
   { name: 'Dashboard', path: '/dashboard', icon: FaTachometerAlt },
   { name: 'Request Design', path: '/request-design', icon: FaPalette },
   { name: 'Active Requests', path: '/active-requests', icon: FaSpinner },
-  { name: 'Half Paid', path: '/half-paid-requests', icon: FaMoneyBillWave },
-  { name: 'Completed Projects', path: '/completed-projects', icon: FaClipboardCheck },
-  { name: 'Gallery', path: '/gallery', icon: FaImages },
+  { name: 'Completed Design', path: '/completed-projects', icon: FaClipboardCheck },
   { name: 'Rejected Requests', path: '/rejected-projects', icon: FaTimesCircle },
+  { name: 'Gallery', path: '/gallery', icon: FaImages },
+  { name: 'All Transactions', path: '/all-transactions', icon: FaMoneyBillWave },
 ];
 
 // eslint-disable-next-line react/prop-types
@@ -84,9 +84,6 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
             Expand Global
           </span>
         </div>
-        <span className="text-[10px] font-semibold tracking-[0.18em] uppercase" style={{ color: 'hsl(0 0% 100% / 0.6)' }}>
-          My Account
-        </span>
       </div>
 
       <button
@@ -217,22 +214,6 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
           className="px-4 py-4 space-y-3"
           style={{ borderTop: '1px solid hsl(0 0% 100% / 0.12)' }}
         >
-          <div className="flex items-center justify-center gap-2">
-            <button
-              onClick={toggleDarkMode}
-              className="p-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
-              style={{
-                background: 'hsl(0 0% 100% / 0.1)',
-                border: '1px solid hsl(0 0% 100% / 0.18)',
-                color: '#ffffff',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.2)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.1)'; }}
-              aria-label="Toggle theme"
-            >
-              {darkMode ? <FaSun /> : <FaMoon />}
-            </button>
-          </div>
           <div
             className="flex items-center gap-3 rounded-xl p-3"
             style={{ background: 'hsl(0 0% 100% / 0.08)' }}
@@ -250,6 +231,22 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
               </p>
             </div>
           </div>
+          <button
+            onClick={toggleDarkMode}
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-all duration-300 cursor-pointer group"
+            style={{
+              background: 'linear-gradient(135deg, hsl(45 100% 60%) 0%, hsl(25 95% 53%) 50%, hsl(350 80% 55%) 100%)',
+              border: '1px solid hsl(0 0% 100% / 0.25)',
+              color: '#ffffff',
+              boxShadow: '0 4px 20px hsl(45 100% 60% / 0.3), 0 2px 8px hsl(25 95% 53% / 0.2)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 6px 30px hsl(45 100% 60% / 0.5), 0 4px 12px hsl(25 95% 53% / 0.3)'; e.currentTarget.style.transform = 'scale(1.02)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 20px hsl(45 100% 60% / 0.3), 0 2px 8px hsl(25 95% 53% / 0.2)'; e.currentTarget.style.transform = 'scale(1)'; }}
+            aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {darkMode ? <FaSun className="drop-shadow-sm" /> : <FaMoon className="drop-shadow-sm" />}
+            {darkMode ? 'Dark Mode' : 'Light Mode'}
+          </button>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-colors duration-200 cursor-pointer"

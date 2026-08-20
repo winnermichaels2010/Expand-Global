@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaCreditCard, FaLock, FaCheckCircle, FaSpinner } from 'react-icons/fa';
@@ -23,6 +23,17 @@ export default function Payment() {
   useEffect(() => {
     requestRef.current = request;
   }, [request]);
+
+  const handleSuccessRedirect = useCallback(() => {
+    if (!success) return;
+    const timer = setTimeout(() => navigate('/active-requests'), 3000);
+    return () => clearTimeout(timer);
+  }, [success, navigate]);
+
+  useEffect(() => {
+    const cleanup = handleSuccessRedirect();
+    return cleanup;
+  }, [handleSuccessRedirect]);
 
   useEffect(() => {
     async function fetchRequest() {
@@ -201,13 +212,9 @@ export default function Payment() {
             <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
               You have already made the first payment for this project. The admin is now working on your design.
             </p>
-            <button
-              onClick={() => navigate('/half-paid-requests')}
-              className="px-6 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
-              style={{ background: 'var(--color-accent)' }}
-            >
-              View Half Paid Requests
-            </button>
+            <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+              Redirecting to Active Requests in 3 seconds...
+            </p>
           </motion.div>
         </div>
       </div>
@@ -344,13 +351,9 @@ export default function Payment() {
               <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
                 Your first payment has been recorded. The admin will now work on your design.
               </p>
-              <button
-                onClick={() => navigate('/half-paid-requests')}
-                className="px-5 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
-                style={{ background: '#10b981' }}
-              >
-                View Half Paid Requests
-              </button>
+              <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                Redirecting to Active Requests in 3 seconds...
+              </p>
             </div>
           ) : (
             <button

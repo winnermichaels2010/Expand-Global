@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserSidebar from '../components/UserSidebar';
 import MyRequestsAside from '../components/MyRequestsAside';
-import DashboardFooter from '../components/DashboardFooter';
 import NotificationBell from '../components/NotificationBell';
 
 
@@ -88,7 +87,6 @@ export default function UserLayout({ children }) {
         <main className="flex-1 w-full">
           {children}
         </main>
-        <DashboardFooter />
       </div>
     </div>
   );

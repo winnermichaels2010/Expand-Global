@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaCheckCircle, FaDownload, FaFile, FaImage, FaClipboardCheck, FaCreditCard, FaLock } from 'react-icons/fa';
+import { FaCheckCircle, FaDownload, FaFile, FaImage, FaClipboardCheck } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
 
@@ -51,7 +51,7 @@ export default function CompletedProjects() {
     const unsub = subscribeToDesignRequests((requests) => {
       setDesignRequests(
         requests.filter(
-          (r) => r.email === currentUser.email && r.status === 'Completed' && r.submittedFileUrl
+          (r) => r.email === currentUser.email && r.status === 'Completed' && r.submittedFileUrl && r.fullyPaid
         )
       );
     });
@@ -63,7 +63,7 @@ export default function CompletedProjects() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <PanelHeader
-        title="Completed Projects"
+        title="Completed Design"
         subtitle="Finished designs delivered by the admin"
       >
         <div
@@ -86,7 +86,7 @@ export default function CompletedProjects() {
             <div className="text-center py-16">
               <FaCheckCircle className="text-4xl mx-auto mb-3" style={{ color: 'var(--text-tertiary)' }} />
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                No completed projects yet. Once the admin submits a finished design, it will appear here.
+                No completed projects yet. Once the admin submits a finished design and you complete payment, it will appear here.
               </p>
               <button
                 onClick={() => navigate('/request-design')}
@@ -98,205 +98,106 @@ export default function CompletedProjects() {
             </div>
           ) : (
             <div className="space-y-4">
-              {finished.map((req) => {
-                const paid = !!req.halfPaid && !!req.fullyPaid;
-                const price = Number(req.standardPrice) || 0;
-                const remaining = price / 2;
-
-                return (
-                  <motion.div
-                    key={req.id}
-                    className="relative p-5 rounded-xl transition-all duration-300 hover-lift"
-                    style={{
-                      background: 'var(--bg-primary)',
-                      border: '1px solid var(--border-default)',
-                    }}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
+              {finished.map((req) => (
+                <motion.div
+                  key={req.id}
+                  className="relative p-5 rounded-xl transition-all duration-300 hover-lift"
+                  style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-default)',
+                  }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <span
+                    className="absolute left-0 top-5 bottom-5 w-1 rounded-r-full"
+                    style={{ background: '#10b981' }}
+                  />
+                  <div className="flex items-start justify-between mb-3 pl-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{req.service}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                        Requested on{' '}
+                        {new Date(req.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    </div>
                     <span
-                      className="absolute left-0 top-5 bottom-5 w-1 rounded-r-full"
-                      style={{ background: '#10b981' }}
-                    />
-                    <div className="flex items-start justify-between mb-3 pl-2">
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{req.service}</p>
-                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                          Requested on{' '}
-                          {new Date(req.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
-                        </p>
-                      </div>
-                      <span
-                        className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium flex-shrink-0"
-                        style={{ background: '#10b9811a', color: '#10b981', border: '1px solid #10b98133' }}
-                      >
-                        <FaCheckCircle className="text-xs" />
-                        Completed
-                      </span>
-                    </div>
-
-                    <div
-                      className="rounded-xl overflow-hidden mb-3 pl-2"
-                      style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+                      className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium flex-shrink-0"
+                      style={{ background: '#10b9811a', color: '#10b981', border: '1px solid #10b98133' }}
                     >
-                      <div
-                        className="px-4 py-2 text-xs font-medium"
-                        style={{
-                          background: 'var(--bg-secondary)',
-                          borderBottom: '1px solid var(--border-subtle)',
-                          color: 'var(--text-secondary)',
-                        }}
-                      >
-                        Finished Design
-                      </div>
-                      <div className="p-4 space-y-3">
-                        {parseSubmittedFiles(req).map((file, idx) => (
-                          <div key={idx}>
-                            {isImage(file.url) ? (
-                              <div className="relative rounded-xl overflow-hidden">
-                                <div
-                                  className="relative"
-                                  style={{
-                                    maxHeight: paid ? 'none' : '220px',
-                                    overflow: 'hidden',
-                                  }}
-                                >
-                                  <img
-                                    src={file.url}
-                                    alt={file.name || 'Finished design'}
-                                    className="w-full object-contain rounded-xl"
-                                    style={{
-                                      filter: paid ? 'none' : 'none',
-                                      maxHeight: paid ? '400px' : '220px',
-                                    }}
-                                  />
-                                </div>
-                                {!paid && (
-                                  <div
-                                    className="absolute inset-0 flex flex-col items-center justify-center"
-                                    style={{
-                                      background: 'linear-gradient(to bottom, transparent 30%, var(--bg-elevated) 60%)',
-                                      backdropFilter: 'blur(4px)',
-                                    }}
-                                  >
-                                    <FaLock className="text-2xl mb-2" style={{ color: 'var(--text-tertiary)' }} />
-                                    <p className="text-xs font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>
-                                      Complete payment to view the full design
-                                    </p>
-                                    <button
-                                      onClick={() => navigate(`/pay-remaining/${req.id}`)}
-                                      className="flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white cursor-pointer pressable"
-                                      style={{ background: '#059669' }}
-                                    >
-                                      <FaCreditCard /> Pay to Unlock
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <div
-                                className="flex items-center gap-3 p-4 rounded-xl"
-                                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
-                              >
-                                <FaFile style={{ color: 'var(--color-accent)' }} />
-                                <span className="text-xs font-medium truncate flex-1">
-                                  {file.name || 'Finished design file'}
-                                </span>
-                                {!paid && <FaLock className="text-xs" style={{ color: 'var(--text-tertiary)' }} />}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                        {req.submittedMessage && (
-                          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                            {req.submittedMessage}
-                          </p>
-                        )}
-                        {req.submittedAt && (
-                          <p className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-                            Submitted on {new Date(req.submittedAt).toLocaleString()}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap gap-2">
-                          {parseSubmittedFiles(req).map((file, idx) => (
-                            paid ? (
-                              <a
-                                key={idx}
-                                href={file.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white"
-                                style={{ background: 'var(--color-accent)' }}
-                              >
-                                <FaDownload /> {file.name || 'Download'}
-                              </a>
-                            ) : (
-                              <button
-                                key={idx}
-                                onClick={() => navigate(`/pay-remaining/${req.id}`)}
-                                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-lg text-white cursor-pointer pressable"
-                                style={{ background: '#059669' }}
-                              >
-                                <FaCreditCard /> Pay ₦{remaining.toLocaleString()} to Download
-                              </button>
-                            )
-                          ))}
-                        </div>
-                      </div>
+                      <FaCheckCircle className="text-xs" />
+                      Completed
+                    </span>
+                  </div>
+
+                  <div
+                    className="rounded-xl overflow-hidden mb-3 pl-2"
+                    style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+                  >
+                    <div
+                      className="px-4 py-2 text-xs font-medium"
+                      style={{
+                        background: 'var(--bg-secondary)',
+                        borderBottom: '1px solid var(--border-subtle)',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      Finished Design
                     </div>
-
-                    {!paid && (
-                      <div
-                        className="rounded-xl p-4 mb-3 pl-2 flex items-center justify-between"
-                        style={{ background: '#f59e0b1a', border: '1px solid #f59e0b33' }}
-                      >
-                        <div>
-                          <p className="text-xs font-medium" style={{ color: '#f59e0b' }}>Remaining Payment</p>
-                          <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
-                            Pay the remaining ₦{remaining.toLocaleString()} to download your design
-                          </p>
+                    <div className="p-4 space-y-3">
+                      {parseSubmittedFiles(req).map((file, idx) => (
+                        <div key={idx}>
+                          {isImage(file.url) ? (
+                            <div className="relative rounded-xl overflow-hidden">
+                              <img
+                                src={file.url}
+                                alt={file.name || 'Finished design'}
+                                className="w-full object-contain rounded-xl"
+                                style={{ maxHeight: '400px' }}
+                              />
+                            </div>
+                          ) : (
+                            <div
+                              className="flex items-center gap-3 p-4 rounded-xl"
+                              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
+                            >
+                              <FaFile style={{ color: 'var(--color-accent)' }} />
+                              <span className="text-xs font-medium truncate flex-1">
+                                {file.name || 'Finished design file'}
+                              </span>
+                            </div>
+                          )}
                         </div>
-                        <button
-                          onClick={() => navigate(`/pay-remaining/${req.id}`)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-white cursor-pointer pressable flex-shrink-0"
-                          style={{ background: '#f59e0b' }}
-                        >
-                          <FaCreditCard /> Pay Now
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 pl-2">
-                      {paid ? (
-                        <button
-                          onClick={() => handleDownload(req)}
-                          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
-                          style={{
-                            background: 'var(--color-accent)',
-                            color: '#fff',
-                            border: '1px solid transparent',
-                          }}
-                        >
-                          <FaDownload />
-                          Download Design
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => navigate(`/pay-remaining/${req.id}`)}
-                          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
-                          style={{
-                            background: '#059669',
-                            color: '#fff',
-                            border: '1px solid transparent',
-                          }}
-                        >
-                          <FaCreditCard /> Pay to Unlock
-                        </button>
+                      ))}
+                      {req.submittedMessage && (
+                        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          {req.submittedMessage}
+                        </p>
+                      )}
+                      {req.submittedAt && (
+                        <p className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
+                          Submitted on {new Date(req.submittedAt).toLocaleString()}
+                        </p>
                       )}
                     </div>
-                  </motion.div>
-                );
-              })}
+                  </div>
+
+                  <div className="flex items-center gap-2 pl-2">
+                    <button
+                      onClick={() => handleDownload(req)}
+                      className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 cursor-pointer pressable"
+                      style={{
+                        background: 'var(--color-accent)',
+                        color: '#fff',
+                        border: '1px solid transparent',
+                      }}
+                    >
+                      <FaDownload />
+                      Download Design
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           )}
         </motion.div>

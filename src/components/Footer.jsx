@@ -16,7 +16,7 @@ const userLinks = [
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Request Design', path: '/request-design' },
   { name: 'Gallery', path: '/gallery' },
-  { name: 'Completed Projects', path: '/completed-projects' },
+  { name: 'Completed Design', path: '/completed-projects' },
 ];
 
 const adminLinks = [

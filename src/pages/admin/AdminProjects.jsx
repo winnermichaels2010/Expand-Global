@@ -121,7 +121,7 @@ export default function AdminProjects({ variant = 'active' }) {
                 {config.empty}
               </p>
             ) : (
-              [...projects].reverse().map((request) => (
+              projects.map((request) => (
                 <div
                   key={request.id}
                   className="p-3 sm:p-4 rounded-xl overflow-hidden"

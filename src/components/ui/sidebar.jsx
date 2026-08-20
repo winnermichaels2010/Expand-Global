@@ -12,9 +12,9 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  XCircle,
   Images,
 } from 'lucide-react';
+import { FaMoneyBillWave } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import ProfileAvatar from '../ProfileAvatar';
@@ -22,11 +22,11 @@ import { useProfilePicsByEmail } from '../../hooks/useProfilePics';
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-  { name: 'Active Projects', path: '/admin/projects/active', icon: Hammer },
-  { name: 'Pending Requests', path: '/admin/projects/pending', icon: Clock },
-  { name: 'Finished Projects', path: '/admin/projects/finished', icon: BadgeCheck },
-  { name: 'Rejected Requests', path: '/admin/projects/rejected', icon: XCircle },
   { name: 'Gallery', path: '/admin/gallery', icon: Images },
+  { name: 'Pending Requests', path: '/admin/projects/pending', icon: Clock },
+  { name: 'Active Projects', path: '/admin/projects/active', icon: Hammer },
+  { name: 'Finished Projects', path: '/admin/projects/finished', icon: BadgeCheck },
+  { name: 'All Transactions', path: '/admin/transactions', icon: FaMoneyBillWave },
 ];
 
 // eslint-disable-next-line react/prop-types
@@ -241,23 +241,6 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
 
         {/* Footer */}
           <div className="p-4 space-y-3" style={{ borderTop: '1px solid hsl(0 0% 100% / 0.12)' }}>
-            <button
-              onClick={toggleDarkMode}
-              className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-colors duration-200 cursor-pointer ${
-                collapsed ? 'justify-center' : ''
-              }`}
-              style={{
-                background: 'hsl(0 0% 100% / 0.1)',
-                border: '1px solid hsl(0 0% 100% / 0.18)',
-                color: '#ffffff',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.2)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'hsl(0 0% 100% / 0.1)'; }}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-              {!collapsed && (darkMode ? 'Dark Mode' : 'Light Mode')}
-            </button>
             <div
               className={`flex items-center gap-3 rounded-xl p-3 ${
                 collapsed ? 'justify-center' : ''
@@ -278,6 +261,24 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
                 </div>
               )}
             </div>
+            <button
+              onClick={toggleDarkMode}
+              className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-all duration-300 cursor-pointer group ${
+                collapsed ? 'justify-center' : ''
+              }`}
+              style={{
+                background: 'linear-gradient(135deg, hsl(45 100% 60%) 0%, hsl(25 95% 53%) 50%, hsl(350 80% 55%) 100%)',
+                border: '1px solid hsl(0 0% 100% / 0.25)',
+                color: '#ffffff',
+                boxShadow: '0 4px 20px hsl(45 100% 60% / 0.3), 0 2px 8px hsl(25 95% 53% / 0.2)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 6px 30px hsl(45 100% 60% / 0.5), 0 4px 12px hsl(25 95% 53% / 0.3)'; e.currentTarget.style.transform = 'scale(1.02)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 20px hsl(45 100% 60% / 0.3), 0 2px 8px hsl(25 95% 53% / 0.2)'; e.currentTarget.style.transform = 'scale(1)'; }}
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {darkMode ? <Sun size={18} className="drop-shadow-sm" /> : <Moon size={18} className="drop-shadow-sm" />}
+              {!collapsed && (darkMode ? 'Dark Mode' : 'Light Mode')}
+            </button>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl transition-colors duration-200 cursor-pointer"

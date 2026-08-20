@@ -440,9 +440,9 @@ export function AuthProvider({ children }) {
         if (userProfile) {
           await addNotification(
             userProfile.id,
-            `Your project "${request.service}" has been submitted! View the finished design in your Completed Projects.`,
+            `Your project "${request.service}" has been submitted! View the finished design in your Completed Design.`,
             'design_request',
-            '/completed-projects'
+            '/active-requests'
           );
         }
       }
@@ -474,7 +474,7 @@ export function AuthProvider({ children }) {
           userProfile.id,
           `Payment received for "${request.service}"! Your design is now being worked on.`,
           'payment',
-          '/completed-projects'
+          '/active-requests'
         );
       }
     }

@@ -6,12 +6,14 @@ import {
   FaPalette,
   FaInfoCircle,
   FaCheckDouble,
+  FaMoneyBillWave,
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
 const typeMeta = {
   message: { icon: FaCommentDots, color: '#2563eb' },
   design_request: { icon: FaPalette, color: 'var(--color-accent)' },
+  payment: { icon: FaMoneyBillWave, color: '#10b981' },
   info: { icon: FaInfoCircle, color: 'var(--color-accent-muted)' },
 };
 
@@ -78,6 +80,7 @@ export default function NotificationBell({ asideOpen = false }) {
     const isAdmin = currentUser?.email === ADMIN_EMAIL;
     if (n.type === 'message') return isAdmin ? '/admin' : '/dashboard';
     if (n.type === 'design_request') return isAdmin ? '/admin/projects/pending' : '/dashboard';
+    if (n.type === 'payment') return isAdmin ? '/admin/transactions' : '/all-transactions';
     return isAdmin ? '/admin' : '/dashboard';
   }
 

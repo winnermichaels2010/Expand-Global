@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaCreditCard, FaLock, FaCheckCircle, FaSpinner, FaDownload } from 'react-icons/fa';
+import { FaCreditCard, FaLock, FaCheckCircle, FaSpinner, FaDownload, FaHammer } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
 import { loadPaystackScript } from '../lib/paystack';
@@ -23,6 +23,17 @@ export default function RemainingPayment() {
   useEffect(() => {
     requestRef.current = request;
   }, [request]);
+
+  const handleSuccessRedirect = useCallback(() => {
+    if (!success) return;
+    const timer = setTimeout(() => navigate('/completed-projects'), 3000);
+    return () => clearTimeout(timer);
+  }, [success, navigate]);
+
+  useEffect(() => {
+    const cleanup = handleSuccessRedirect();
+    return cleanup;
+  }, [handleSuccessRedirect]);
 
   useEffect(() => {
     async function fetchRequest() {
@@ -180,7 +191,7 @@ export default function RemainingPayment() {
           title="Payment Complete"
           subtitle="Your project is fully paid"
           onBack={() => navigate('/completed-projects')}
-          backLabel="Back to Completed Projects"
+          backLabel="Back to Completed Design"
         />
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
           <motion.div
@@ -201,13 +212,9 @@ export default function RemainingPayment() {
             <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
               This project is fully paid. You can download your finished design.
             </p>
-            <button
-              onClick={() => navigate('/completed-projects')}
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable mx-auto"
-              style={{ background: 'var(--color-accent)' }}
-            >
-              <FaDownload /> View & Download Design
-            </button>
+            <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+              Redirecting to Completed Design in 3 seconds...
+            </p>
           </motion.div>
         </div>
       </div>
@@ -246,6 +253,39 @@ export default function RemainingPayment() {
     );
   }
 
+  if (!request.submittedFileUrl) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+        <PanelHeader
+          title="Payment Not Available"
+          subtitle="The admin has not submitted the finished design yet"
+          onBack={() => navigate('/active-requests')}
+          backLabel="Back to Active Requests"
+        />
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
+          <motion.div
+            className="p-8 rounded-2xl  text-center"
+            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <FaHammer className="text-3xl mx-auto mb-3" style={{ color: '#3b82f6' }} />
+            <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+              The admin is still working on your design. You can pay the remaining balance once the project is submitted.
+            </p>
+            <button
+              onClick={() => navigate('/active-requests')}
+              className="px-6 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable"
+              style={{ background: 'var(--color-accent)' }}
+            >
+              Back to Active Requests
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   const price = Number(request.standardPrice) || 0;
   const remaining = price / 2;
 
@@ -254,8 +294,8 @@ export default function RemainingPayment() {
       <PanelHeader
         title="Pay Remaining Balance"
         subtitle="Pay the remaining 50% to download your finished design"
-        onBack={() => navigate('/completed-projects')}
-        backLabel="Back to Completed Projects"
+        onBack={() => navigate('/active-requests')}
+        backLabel="Back to Active Requests"
       />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-8">
@@ -349,13 +389,9 @@ export default function RemainingPayment() {
               <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
                 Your project is now fully paid. You can download your finished design.
               </p>
-              <button
-                onClick={() => navigate('/completed-projects')}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer pressable mx-auto"
-                style={{ background: '#10b981' }}
-              >
-                <FaDownload /> Download Design
-              </button>
+              <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                Redirecting to Completed Design in 3 seconds...
+              </p>
             </div>
           ) : (
             <button

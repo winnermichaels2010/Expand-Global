@@ -40,7 +40,7 @@ export default function AdminDesignRequestReply() {
     setSubmitting(true);
     await acceptDesignRequest(id, { price: amount, adminComment });
     setSubmitting(false);
-    navigate('/admin/projects/pending');
+    navigate('/admin');
   }
 
   if (!currentUser || currentUser.email !== ADMIN_EMAIL) {

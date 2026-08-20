@@ -111,10 +111,17 @@ export default function Navbar() {
           <div className={`${!currentUser ? 'hidden md:flex' : 'hidden lg:flex'} items-center gap-2.5`}>
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all duration-200 cursor-pointer"
+              className="p-2 rounded-lg transition-all duration-300 cursor-pointer"
+              style={{
+                background: 'linear-gradient(135deg, hsl(45 100% 60%) 0%, hsl(25 95% 53%) 50%, hsl(350 80% 55%) 100%)',
+                color: '#ffffff',
+                boxShadow: '0 2px 10px hsl(45 100% 60% / 0.3)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 20px hsl(45 100% 60% / 0.5)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 2px 10px hsl(45 100% 60% / 0.3)'; e.currentTarget.style.transform = 'scale(1)'; }}
               aria-label="Toggle theme"
             >
-              {darkMode ? <BsSun size={15} /> : <BsMoonStars size={15} />}
+              {darkMode ? <BsSun size={15} className="drop-shadow-sm" /> : <BsMoonStars size={15} className="drop-shadow-sm" />}
             </button>
             <Link
               to={currentUser ? (isAdmin ? '/admin' : '/dashboard') : '/auth'}
@@ -127,10 +134,17 @@ export default function Navbar() {
           <div className={`${!currentUser ? 'md:hidden' : 'lg:hidden'} flex items-center gap-1.5`}>
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors duration-200 cursor-pointer"
+              className="p-2 rounded-lg transition-all duration-300 cursor-pointer"
+              style={{
+                background: 'linear-gradient(135deg, hsl(45 100% 60%) 0%, hsl(25 95% 53%) 50%, hsl(350 80% 55%) 100%)',
+                color: '#ffffff',
+                boxShadow: '0 2px 10px hsl(45 100% 60% / 0.3)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 20px hsl(45 100% 60% / 0.5)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 2px 10px hsl(45 100% 60% / 0.3)'; e.currentTarget.style.transform = 'scale(1)'; }}
               aria-label="Toggle theme"
             >
-              {darkMode ? <BsSun size={15} /> : <BsMoonStars size={15} />}
+              {darkMode ? <BsSun size={15} className="drop-shadow-sm" /> : <BsMoonStars size={15} className="drop-shadow-sm" />}
             </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}

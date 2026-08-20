@@ -162,7 +162,7 @@ serve(async (req: Request): Promise<Response> => {
           message: `Payment received for "${designRequest.service}"! Your design is now being worked on.`,
           type: "payment",
           read: false,
-          link: "/completed-projects",
+          link: "/active-requests",
         });
       }
     }

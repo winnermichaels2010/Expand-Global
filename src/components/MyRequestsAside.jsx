@@ -63,7 +63,7 @@ export default function MyRequestsAside({ open, onClose, initial = null }) {
   useEffect(() => {
     if (!currentUser) return;
     const unsub = subscribeToDesignRequests((all) => {
-      setRequests(all.filter((r) => r.email === currentUser.email && r.status !== 'Rejected'));
+      setRequests(all.filter((r) => r.email === currentUser.email && r.status !== 'Rejected' && !r.fullyPaid));
     });
     return unsub;
   }, [currentUser, subscribeToDesignRequests]);

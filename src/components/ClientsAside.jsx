@@ -15,6 +15,7 @@ export default function ClientsAside({ open, onClose, initial = null }) {
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [clientProjectCounts, setClientProjectCounts] = useState({});
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [previewPicture, setPreviewPicture] = useState(null);
@@ -92,6 +93,23 @@ export default function ClientsAside({ open, onClose, initial = null }) {
     load();
     return () => { mounted = false; };
   }, [getRegisteredUsers, ADMIN_EMAIL]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadCounts() {
+      const all = await getDesignRequests();
+      if (!mounted) return;
+      const counts = {};
+      all.forEach((r) => {
+        if (r.status !== 'Rejected') {
+          counts[r.email] = (counts[r.email] || 0) + 1;
+        }
+      });
+      setClientProjectCounts(counts);
+    }
+    loadCounts();
+    return () => { mounted = false; };
+  }, [getDesignRequests]);
 
   useEffect(() => {
     if (!open) {
@@ -544,9 +562,17 @@ export default function ClientsAside({ open, onClose, initial = null }) {
                     }}
                   >
                     {avatarButton(client, 'w-9 h-9')}
-                    <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                    <p className="text-xs font-medium truncate flex-1" style={{ color: 'var(--text-primary)' }}>
                       {clientName(client)}
                     </p>
+                    {clientProjectCounts[client.email] > 0 && (
+                      <span
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                        style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)' }}
+                      >
+                        {clientProjectCounts[client.email]}
+                      </span>
+                    )}
                   </button>
                 </div>
               ))

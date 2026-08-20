@@ -489,10 +489,16 @@ export function AuthProvider({ children }) {
       if (!session) throw new Error('Not authenticated. Please log in again.');
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      if (!supabaseUrl) {
+        throw new Error('Payment service is not configured (missing SUPABASE_URL). Please contact the admin.');
+      }
+
       const res = await fetch(`${supabaseUrl}/functions/v1/initialize-payment`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${session.access_token}`,
+          apikey: supabaseKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ request_id: requestId, payment_type: paymentType }),
@@ -517,10 +523,16 @@ export function AuthProvider({ children }) {
       if (!session) throw new Error('Not authenticated. Please log in again.');
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      if (!supabaseUrl) {
+        throw new Error('Payment service is not configured (missing SUPABASE_URL). Please contact the admin.');
+      }
+
       const res = await fetch(`${supabaseUrl}/functions/v1/verify-payment`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${session.access_token}`,
+          apikey: supabaseKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ reference }),

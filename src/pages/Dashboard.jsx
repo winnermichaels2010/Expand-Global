@@ -41,7 +41,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!currentUser) {
       navigate('/auth');
-    } else if (currentUser.email === 'winnermichael21dev@gmail.com') {
+    } else if (currentUser.email === 'esenichijindu53@gmail.com') {
       navigate('/admin');
     } else {
       getUserProfile(currentUser.uid).then(setProfile);

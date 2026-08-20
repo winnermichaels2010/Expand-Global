@@ -99,7 +99,7 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
       {/* Mobile Menu Button */}
       <button
         onClick={toggleSidebar}
-        className={`md:hidden fixed top-3 right-16 z-[60] p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
+        className={`md:hidden fixed top-3 right-4 z-[60] p-2.5 rounded-xl text-white cursor-pointer ${
           clientsOpen ? 'hidden' : ''
         }`}
         style={{
@@ -111,13 +111,32 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
         }}
         aria-label="Toggle sidebar"
       >
-        {isOpen ? <X size={20} /> : <Menu size={20} />}
+        <span className="relative block w-5 h-5">
+          <span
+            className="absolute inset-0 flex items-center justify-center transition-all duration-300"
+            style={{
+              opacity: isOpen ? 0 : 1,
+              transform: isOpen ? 'rotate(-90deg) scale(0.5)' : 'rotate(0deg) scale(1)',
+            }}
+          >
+            <Menu size={20} />
+          </span>
+          <span
+            className="absolute inset-0 flex items-center justify-center transition-all duration-300"
+            style={{
+              opacity: isOpen ? 1 : 0,
+              transform: isOpen ? 'rotate(0deg) scale(1)' : 'rotate(90deg) scale(0.5)',
+            }}
+          >
+            <X size={20} />
+          </span>
+        </span>
       </button>
 
       {/* Mobile Clients Arrow */}
       <button
         onClick={onToggleClients}
-        className={`lg:hidden fixed top-3 right-4 z-[60] p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
+        className={`lg:hidden fixed top-3 right-16 z-[60] p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
           clientsOpen ? 'hidden' : ''
         }`}
         style={{
@@ -134,22 +153,24 @@ const Sidebar = ({ collapsed = false, onToggleCollapse, clientsOpen = false, onT
       </button>
 
       {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300"
-          onClick={toggleSidebar}
-        />
-      )}
+      <div
+        className={`md:hidden fixed inset-0 z-30 transition-opacity duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        style={{ background: 'rgba(0,0,0,0.5)' }}
+        onClick={toggleSidebar}
+      />
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full transition-all duration-300 ease-in-out z-40 flex flex-col ${
+        className={`fixed top-0 left-0 h-full z-40 flex flex-col ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 ${
           collapsed ? 'md:w-20' : 'md:w-64'
         } w-64 shadow-2xl`}
         style={{
           background: 'linear-gradient(180deg, hsl(262 83% 55%) 0%, hsl(263 70% 42%) 45%, hsl(262 80% 20%) 100%)',
+          transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         {/* Header */}

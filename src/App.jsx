@@ -17,6 +17,7 @@ import Payment from './pages/Payment';
 import RemainingPayment from './pages/RemainingPayment';
 import AllTransactions from './pages/AllTransactions';
 import RejectedProjects from './pages/RejectedProjects';
+import Faq from './pages/Faq';
 import Gallery from './pages/Gallery';
 import AdminLayout from './layouts/AdminLayout';
 import UserLayout from './layouts/UserLayout';
@@ -36,7 +37,7 @@ function HomeRedirect() {
   const { currentUser, loading } = useAuth();
   if (loading) return null;
   if (currentUser) {
-    const isAdmin = currentUser.email === 'winnermichael21dev@gmail.com';
+    const isAdmin = currentUser.email === 'esenichijindu53@gmail.com';
     return <Navigate to={isAdmin ? '/admin' : '/dashboard'} replace />;
   }
   return <Home />;
@@ -45,7 +46,7 @@ function HomeRedirect() {
 function GalleryRoute() {
   const { currentUser } = useAuth();
   if (currentUser) {
-    return currentUser.email === 'winnermichael21dev@gmail.com'
+    return currentUser.email === 'esenichijindu53@gmail.com'
       ? <Navigate to="/admin/gallery" replace />
       : <UserLayout><Gallery /></UserLayout>;
   }
@@ -56,7 +57,7 @@ function AppLayout() {
   const location = useLocation();
   const { currentUser } = useAuth();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isUserRoute = ['/dashboard', '/request-design', '/completed-projects', '/active-requests', '/all-transactions', '/rejected-projects'].includes(location.pathname) || location.pathname.startsWith('/payment/') || location.pathname.startsWith('/pay-remaining/');
+  const isUserRoute = ['/dashboard', '/request-design', '/completed-projects', '/active-requests', '/all-transactions', '/rejected-projects', '/faq'].includes(location.pathname) || location.pathname.startsWith('/payment/') || location.pathname.startsWith('/pay-remaining/');
   const isAuthedGallery = location.pathname === '/gallery' && !!currentUser;
   const showPublicLayout = !isAdminRoute && !isUserRoute && !isAuthedGallery;
 
@@ -88,6 +89,7 @@ function AppLayout() {
           <Route path="/completed-projects" element={<UserLayout><CompletedProjects /></UserLayout>} />
           <Route path="/active-requests" element={<UserLayout><ActiveRequests /></UserLayout>} />
           <Route path="/rejected-projects" element={<UserLayout><RejectedProjects /></UserLayout>} />
+          <Route path="/faq" element={<UserLayout><Faq /></UserLayout>} />
           <Route path="/all-transactions" element={<UserLayout><AllTransactions /></UserLayout>} />
           <Route path="/payment/:id" element={<UserLayout><Payment /></UserLayout>} />
           <Route path="/pay-remaining/:id" element={<UserLayout><RemainingPayment /></UserLayout>} />

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaPalette, FaClipboardCheck, FaTimesCircle, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight, FaImages, FaSpinner, FaMoneyBillWave } from 'react-icons/fa';
+import { FaTachometerAlt, FaPalette, FaClipboardCheck, FaTimesCircle, FaSignOutAlt, FaSun, FaMoon, FaChevronLeft, FaChevronRight, FaImages, FaSpinner, FaMoneyBillWave, FaQuestionCircle } from 'react-icons/fa';
 import { HiMenu, HiX } from 'react-icons/hi';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import ProfileAvatar from './ProfileAvatar';
@@ -15,6 +15,7 @@ const navLinks = [
   { name: 'Completed Design', path: '/completed-projects', icon: FaClipboardCheck },
   { name: 'Rejected Requests', path: '/rejected-projects', icon: FaTimesCircle },
   { name: 'Gallery', path: '/gallery', icon: FaImages },
+  { name: 'FAQ', path: '/faq', icon: FaQuestionCircle },
   { name: 'All Transactions', path: '/all-transactions', icon: FaMoneyBillWave },
 ];
 
@@ -88,7 +89,7 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-3 right-16 z-[60] md:hidden p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
+        className={`fixed top-3 right-4 z-[60] md:hidden p-2.5 rounded-xl text-white cursor-pointer ${
           requestsOpen ? 'hidden' : ''
         }`}
         style={{
@@ -100,12 +101,31 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
         }}
         aria-label="Toggle sidebar"
       >
-        {isOpen ? <HiX size={20} /> : <HiMenu size={20} />}
+        <span className="relative block w-5 h-5">
+          <span
+            className="absolute inset-0 flex items-center justify-center transition-all duration-300"
+            style={{
+              opacity: isOpen ? 0 : 1,
+              transform: isOpen ? 'rotate(-90deg) scale(0.5)' : 'rotate(0deg) scale(1)',
+            }}
+          >
+            <HiMenu size={20} />
+          </span>
+          <span
+            className="absolute inset-0 flex items-center justify-center transition-all duration-300"
+            style={{
+              opacity: isOpen ? 1 : 0,
+              transform: isOpen ? 'rotate(0deg) scale(1)' : 'rotate(90deg) scale(0.5)',
+            }}
+          >
+            <HiX size={20} />
+          </span>
+        </span>
       </button>
 
       <button
         onClick={onToggleRequests}
-        className={`fixed top-3 right-4 z-[60] lg:hidden p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
+        className={`fixed top-3 right-16 z-[60] lg:hidden p-2.5 rounded-xl text-white transition-all duration-200 cursor-pointer ${
           requestsOpen ? 'hidden' : ''
         }`}
         style={{
@@ -123,19 +143,28 @@ export default function UserSidebar({ requestsOpen = false, onToggleRequests }) 
 
       <AnimatePresence>
         {isOpen && (
-          <div
+          <motion.div
             className="fixed inset-0 z-30 md:hidden"
             style={{ background: 'rgba(0,0,0,0.5)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
             onClick={() => setIsOpen(false)}
           />
         )}
       </AnimatePresence>
 
       <aside
-        className="fixed left-0 top-0 h-full w-64 z-40 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 shadow-2xl"
+        className="fixed left-0 top-0 h-full w-64 z-40 flex flex-col shadow-2xl"
         style={{
           background: 'linear-gradient(180deg, hsl(262 83% 55%) 0%, hsl(263 70% 42%) 45%, hsl(262 80% 20%) 100%)',
           transform: isDesktop ? 'translateX(0)' : (isOpen ? 'translateX(0)' : 'translateX(-100%)'),
+          transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+          opacity: isDesktop ? 1 : (isOpen ? 1 : 0),
+          transitionProperty: 'transform, opacity',
+          transitionDuration: '0.35s',
+          transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         {/* Brand */}

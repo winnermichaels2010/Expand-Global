@@ -106,11 +106,8 @@ export default function NotificationBell({ asideOpen = false }) {
         onClick={() => setOpen((o) => !o)}
         className="relative flex items-center justify-center w-11 h-11 rounded-xl text-white transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
         style={{
-          background: 'hsl(0 0% 100% / 0.15)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid hsl(0 0% 100% / 0.25)',
-          boxShadow: '0 4px 15px hsl(262 83% 55% / 0.3)',
         }}
         aria-label="Notifications"
         title="Notifications"

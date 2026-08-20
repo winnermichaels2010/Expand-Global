@@ -5,4 +5,4 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const ADMIN_EMAIL = 'winnermichael21dev@gmail.com';
+export const ADMIN_EMAIL = 'esenichijindu53@gmail.com';

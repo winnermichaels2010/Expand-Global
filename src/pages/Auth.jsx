@@ -60,7 +60,7 @@ function PasswordStrength({ password }) { // eslint-disable-line react/prop-type
   );
 }
 
-const ADMIN_EMAIL = 'winnermichael21dev@gmail.com';
+const ADMIN_EMAIL = 'esenichijindu53@gmail.com';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);

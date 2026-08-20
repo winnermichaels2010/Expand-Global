@@ -29,7 +29,7 @@ const adminLinks = [
 export default function Footer() {
   const { currentUser } = useAuth();
   const location = useLocation();
-  const isAdmin = currentUser?.email === 'winnermichael21dev@gmail.com';
+  const isAdmin = currentUser?.email === 'esenichijindu53@gmail.com';
   const isActive = (path) => location.pathname === path;
 
   const navLinks = !currentUser ? publicLinks : isAdmin ? adminLinks : userLinks;

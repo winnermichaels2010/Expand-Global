@@ -108,7 +108,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-2.5">
+          <div className={`${!currentUser ? 'hidden md:flex' : 'hidden lg:flex'} items-center gap-2.5`}>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all duration-200 cursor-pointer"
@@ -124,7 +124,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <div className="lg:hidden flex items-center gap-1.5">
+          <div className={`${!currentUser ? 'md:hidden' : 'lg:hidden'} flex items-center gap-1.5`}>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-colors duration-200 cursor-pointer"
@@ -182,7 +182,7 @@ export default function Navbar() {
                 <Link
                   to="/auth"
                   onClick={() => setMobileOpen(false)}
-                  className="hidden sm:inline-flex items-center justify-center w-full px-4 py-2.5 mt-2 rounded-xl text-sm font-semibold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-all duration-200"
+                  className="inline-flex items-center justify-center w-full px-4 py-2.5 mt-2 rounded-xl text-sm font-semibold bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-all duration-200"
                 >
                   Get Started
                 </Link>

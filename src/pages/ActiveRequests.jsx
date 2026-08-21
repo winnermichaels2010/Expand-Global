@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaSpinner, FaCreditCard, FaClock, FaCheckCircle, FaHammer, FaFile, FaLock } from 'react-icons/fa';
+import { FaSpinner, FaCreditCard, FaClock, FaCheckCircle, FaHammer, FaFile, FaDownload } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import PanelHeader from '../components/PanelHeader';
 
@@ -191,44 +191,36 @@ export default function ActiveRequests() {
                           Finished Design Ready
                         </div>
                         <div className="p-4 space-y-3">
-                          <div className="relative">
-                            <div style={{ filter: 'blur(12px)' }}>
-                              {parseSubmittedFiles(req).map((file, idx) => (
-                                <div key={idx}>
-                                  {/\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(file.url) ? (
-                                    <img
-                                      src={file.url}
-                                      alt={file.name || 'Finished design'}
-                                      className="w-full object-contain rounded-xl"
-                                      style={{ maxHeight: '300px' }}
-                                    />
-                                  ) : (
-                                    <div
-                                      className="flex items-center gap-3 p-3 rounded-xl"
-                                      style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
-                                    >
-                                      <FaFile style={{ color: 'var(--color-accent)' }} />
-                                      <span className="text-xs font-medium truncate flex-1">
-                                        {file.name || 'Finished design file'}
-                                      </span>
-                                    </div>
-                                  )}
+                          {parseSubmittedFiles(req).map((file, idx) => (
+                            <div key={idx}>
+                              {/\.(jpe?g|png|webp|gif|svg|bmp)$/i.test(file.url) ? (
+                                <img
+                                  src={file.url}
+                                  alt={file.name || 'Finished design'}
+                                  className="w-full object-contain rounded-xl"
+                                  style={{ maxHeight: '300px' }}
+                                />
+                              ) : (
+                                <div
+                                  className="flex items-center gap-3 p-3 rounded-xl"
+                                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}
+                                >
+                                  <FaFile style={{ color: 'var(--color-accent)' }} />
+                                  <span className="text-xs font-medium truncate flex-1">
+                                    {file.name || 'Finished design file'}
+                                  </span>
                                 </div>
-                              ))}
+                              )}
                             </div>
-                            <div
-                              className="absolute inset-0 flex flex-col items-center justify-center rounded-xl"
-                              style={{ background: 'rgba(0,0,0,0.3)' }}
-                            >
-                              <FaLock className="text-xl mb-2" style={{ color: '#ffffff' }} />
-                              <p className="text-xs font-semibold text-white">Pay remaining to unlock</p>
-                            </div>
-                          </div>
+                          ))}
                           {req.submittedMessage && (
                             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                               {req.submittedMessage}
                             </p>
                           )}
+                          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                            Not fully satisfied? Head to your project chat in My Requests and ask the admin to fix anything you don&apos;t like about the design.
+                          </p>
                         </div>
                       </div>
                     )}
@@ -253,8 +245,8 @@ export default function ActiveRequests() {
                           onMouseEnter={(e) => { e.currentTarget.style.background = '#d97706'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.background = '#f59e0b'; }}
                         >
-                          <FaCreditCard />
-                          Pay Remaining ₦{halfPrice.toLocaleString()}
+                          <FaDownload />
+                          Pay Remaining ₦{halfPrice.toLocaleString()} to Download
                         </button>
                       ) : null}
                     </div>

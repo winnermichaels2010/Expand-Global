@@ -177,7 +177,7 @@ returns boolean
 language sql
 stable
 as $$
-  select coalesce(auth.jwt() ->> 'email', '') = 'winnermichael21dev@gmail.com';
+  select coalesce(auth.jwt() ->> 'email', '') = 'expandglobalideas@gmail.com';
 $$;
 
 -- Security-definer helper so a participant can hide a message "for me" even

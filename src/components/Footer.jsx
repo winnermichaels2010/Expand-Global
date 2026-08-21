@@ -29,7 +29,7 @@ const adminLinks = [
 export default function Footer() {
   const { currentUser } = useAuth();
   const location = useLocation();
-  const isAdmin = currentUser?.email === 'esenichijindu53@gmail.com';
+  const isAdmin = currentUser?.email === 'expandglobalideas@gmail.com';
   const isActive = (path) => location.pathname === path;
 
   const navLinks = !currentUser ? publicLinks : isAdmin ? adminLinks : userLinks;
@@ -107,7 +107,7 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               {[
-                { icon: HiMail, value: 'esenichijindu53@gmail.com' },
+                { icon: HiMail, value: 'expandglobalideas@gmail.com' },
                 { icon: HiPhone, value: '+2348160740145' },
                 { icon: HiLocationMarker, value: 'Aba, Nigeria' },
               ].map(({ icon: Icon, value }) => (

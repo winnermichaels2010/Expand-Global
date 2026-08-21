@@ -16,7 +16,7 @@ const itemVariants = {
 };
 
 const contactDetails = [
-  { icon: HiMail, label: 'Email', value: 'esenichijindu53@gmail.com', href: 'mailto:esenichijindu53@gmail.com' },
+  { icon: HiMail, label: 'Email', value: 'expandglobalideas@gmail.com', href: 'mailto:expandglobalideas@gmail.com' },
   { icon: HiPhone, label: 'Phone', value: '+234 816 074 0145', href: 'tel:+2348160740145' },
   { icon: HiLocationMarker, label: 'Location', value: 'Aba, Nigeria', href: null },
   { icon: HiClock, label: 'Response Time', value: 'Within 24 hours', href: null },
@@ -147,7 +147,7 @@ export default function Contact() {
                   Call Us Now
                 </a>
                 <a
-                  href="mailto:esenichijindu53@gmail.com"
+                  href="mailto:expandglobalideas@gmail.com"
                   className="flex items-center gap-3 px-5 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 pressable"
                   style={{ border: '1px solid var(--border-default)', color: 'var(--text-primary)' }}
                 >
@@ -259,7 +259,7 @@ export default function Contact() {
                         Log In
                       </Link>
                       <a
-                        href="mailto:esenichijindu53@gmail.com"
+                        href="mailto:expandglobalideas@gmail.com"
                         className="inline-flex items-center gap-2 px-7 py-3 font-semibold rounded-xl transition-all duration-200 pressable"
                         style={{ border: '1px solid var(--border-default)', color: 'var(--text-secondary)' }}
                       >

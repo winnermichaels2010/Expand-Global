@@ -37,7 +37,7 @@ function HomeRedirect() {
   const { currentUser, loading } = useAuth();
   if (loading) return null;
   if (currentUser) {
-    const isAdmin = currentUser.email === 'esenichijindu53@gmail.com';
+    const isAdmin = currentUser.email === 'expandglobalideas@gmail.com';
     return <Navigate to={isAdmin ? '/admin' : '/dashboard'} replace />;
   }
   return <Home />;
@@ -46,7 +46,7 @@ function HomeRedirect() {
 function GalleryRoute() {
   const { currentUser } = useAuth();
   if (currentUser) {
-    return currentUser.email === 'esenichijindu53@gmail.com'
+    return currentUser.email === 'expandglobalideas@gmail.com'
       ? <Navigate to="/admin/gallery" replace />
       : <UserLayout><Gallery /></UserLayout>;
   }

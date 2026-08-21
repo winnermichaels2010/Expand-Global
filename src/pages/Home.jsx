@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HiArrowRight } from 'react-icons/hi';
-import { FaPalette, FaBullhorn, FaLaptopCode, FaQuoteLeft, FaExpand } from 'react-icons/fa';
+import { FaPalette, FaBullhorn, FaMapSigns, FaGift, FaQuoteLeft, FaExpand } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import Hero from '../components/Hero';
 import { staticGalleryImages, HOME_GALLERY_LIMIT } from '../lib/galleryImages';
@@ -18,9 +18,14 @@ const services = [
     description: 'Complete branding solutions including logos, color schemes, and brand guidelines.',
   },
   {
-    icon: FaLaptopCode,
-    title: 'Digital Design',
-    description: 'Modern UI/UX design for websites and applications that engage users.',
+    icon: FaMapSigns,
+    title: 'Signage Design & Installation',
+    description: 'Custom signage designed and professionally installed to make your business stand out.',
+  },
+  {
+    icon: FaGift,
+    title: 'Gift Items Customization',
+    description: 'Personalized gifts like necklaces, mugs, and throw pillows, crafted to make every moment memorable.',
   },
 ];
 

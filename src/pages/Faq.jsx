@@ -77,7 +77,7 @@ const faqData = [
       },
       {
         q: 'What happens if I don\'t pay the remaining balance?',
-        a: 'The finished design will remain blurred/locked until the remaining balance is paid. You won\'t be able to download the full-resolution design until payment is complete.',
+        a: 'The finished design will stay visible in your Active Requests, but you won\'t be able to download it until the remaining balance is paid. Once payment is complete, the project moves to "Completed Design" where you can download the full-resolution files.',
       },
     ],
   },
@@ -98,7 +98,7 @@ const faqData = [
       },
       {
         q: 'Can I see a preview of my design before paying the full amount?',
-        a: 'Yes! After the admin submits the design, you\'ll see a blurred preview in your Active Requests. Pay the remaining balance to unlock and download the full design.',
+        a: 'Yes! After the admin submits the design, you can view it fully in your Active Requests. Downloading the design requires paying the remaining balance. If there\'s anything you\'d like changed, open your project chat and ask the admin for a fix.',
       },
       {
         q: 'What if my request is rejected?',

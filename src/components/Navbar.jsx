@@ -33,7 +33,7 @@ export default function Navbar() {
   const navbarRef = useRef(null);
 
   const isActive = (path) => location.pathname === path;
-  const isAdmin = currentUser?.email === 'esenichijindu53@gmail.com';
+  const isAdmin = currentUser?.email === 'expandglobalideas@gmail.com';
 
   const links = !currentUser
     ? publicLinks
